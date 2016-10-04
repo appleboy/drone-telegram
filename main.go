@@ -32,6 +32,11 @@ func main() {
 			Usage:  "send telegram message",
 			EnvVar: "PLUGIN_MESSAGE",
 		},
+		cli.BoolFlag{
+			Name:   "debug",
+			Usage:  "enable debug message",
+			EnvVar: "PLUGIN_DEBUG",
+		},
 		cli.StringFlag{
 			Name:   "repo.owner",
 			Usage:  "repository owner",
@@ -107,6 +112,7 @@ func run(c *cli.Context) error {
 		},
 		Config: Config{
 			Token:   c.String("telegram.token"),
+			Debug:   c.Bool("debug"),
 			To:      c.StringSlice("to"),
 			Message: c.StringSlice("message"),
 		},

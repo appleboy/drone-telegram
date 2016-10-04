@@ -32,6 +32,7 @@ type (
 	// Config for the plugin.
 	Config struct {
 		Token   string
+		Debug   bool
 		To      []string
 		Message []string
 	}
@@ -98,7 +99,7 @@ func (p Plugin) Exec() error {
 		return err
 	}
 
-	bot.Debug = false
+	bot.Debug = p.Config.Debug
 
 	// parse ids
 	ids := parseID(p.Config.To)

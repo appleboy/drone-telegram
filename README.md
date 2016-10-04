@@ -42,9 +42,10 @@ Execute from the working directory:
 
 ```
 docker run --rm \
-  -e PLUGIN_TOKEN=xxxxxxx \
+  -e PLUGIN_TELEGRAM_TOKEN=xxxxxxx \
   -e PLUGIN_TO=xxxxxxx \
   -e PLUGIN_MESSAGE=test \
+  -e PLUGIN_DEBUG=true \
   -e DRONE_REPO_OWNER=appleboy \
   -e DRONE_REPO_NAME=go-hello \
   -e DRONE_COMMIT_SHA=e5e82b5eb3737205c25955dcc3dcacc839b7be52 \
