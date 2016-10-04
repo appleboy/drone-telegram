@@ -98,7 +98,7 @@ func (p Plugin) Exec() error {
 		return err
 	}
 
-	bot.Debug = true
+	bot.Debug = false
 
 	// parse ids
 	ids := parseID(p.Config.To)
