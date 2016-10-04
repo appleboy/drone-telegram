@@ -1,0 +1,11 @@
+package: github.com/appleboy/drone-telegram
+import:
+- package: github.com/joho/godotenv
+  subpackages:
+  - autoload
+- package: github.com/urfave/cli
+- package: gopkg.in/telegram-bot-api.v4
+testImport:
+- package: github.com/stretchr/testify
+  subpackages:
+  - assert
