@@ -81,6 +81,33 @@ func TestSendMessage(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestBotError(t *testing.T) {
+	plugin := Plugin{
+		Repo: Repo{
+			Name:  "go-hello",
+			Owner: "appleboy",
+		},
+		Build: Build{
+			Number:  101,
+			Status:  "success",
+			Link:    "https://github.com/appleboy/go-hello",
+			Author:  "Bo-Yi Wu",
+			Branch:  "master",
+			Message: "update travis by drone plugin",
+			Commit:  "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
+		},
+
+		Config: Config{
+			Token:   "appleboy",
+			To:      []string{os.Getenv("TELEGRAM_TO"), "中文ID", "1234567890"},
+			Message: []string{"Test Telegram Chat Bot From Travis or Local", " "},
+		},
+	}
+
+	err := plugin.Exec()
+	assert.NotNil(t, err)
+}
+
 func TestTrimElement(t *testing.T) {
 	var input, result []string
 

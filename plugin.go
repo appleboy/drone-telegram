@@ -90,7 +90,7 @@ func (p Plugin) Exec() error {
 		message = p.Message(p.Repo, p.Build)
 	}
 
-	bot, err := tgbotapi.NewBotAPI("219364688:AAETlB6U1OZGnadM6-pLC1QUiXdeHlPUu1E")
+	bot, err := tgbotapi.NewBotAPI(p.Config.Token)
 
 	if err != nil {
 		log.Println(err.Error())
