@@ -1,4 +1,4 @@
-.PHONY:
+.PHONY: install build test html update docker_build docker_image docker_deploy clean
 
 VERSION := $(shell git describe --tags || git rev-parse --short HEAD)
 DEPLOY_ACCOUNT := "appleboy"
