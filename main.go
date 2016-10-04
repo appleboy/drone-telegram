@@ -18,9 +18,9 @@ func main() {
 	app.Version = Version
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:   "telegram.token",
+			Name:   "token",
 			Usage:  "telegram token",
-			EnvVar: "PLUGIN_TELEGRAM_TOKEN,TELEGRAM_TOKEN",
+			EnvVar: "PLUGIN_TOKEN,TELEGRAM_TOKEN",
 		},
 		cli.StringSliceFlag{
 			Name:   "to",
@@ -111,7 +111,7 @@ func run(c *cli.Context) error {
 			Link:    c.String("build.link"),
 		},
 		Config: Config{
-			Token:   c.String("telegram.token"),
+			Token:   c.String("token"),
 			Debug:   c.Bool("debug"),
 			To:      c.StringSlice("to"),
 			Message: c.StringSlice("message"),

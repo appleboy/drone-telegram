@@ -42,7 +42,7 @@ Execute from the working directory:
 
 ```
 docker run --rm \
-  -e PLUGIN_TELEGRAM_TOKEN=xxxxxxx \
+  -e PLUGIN_TOKEN=xxxxxxx \
   -e PLUGIN_TO=xxxxxxx \
   -e PLUGIN_MESSAGE=test \
   -e PLUGIN_DEBUG=true \
