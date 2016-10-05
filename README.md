@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/appleboy/drone-telegram.svg?branch=master)](https://travis-ci.org/appleboy/drone-telegram) [![codecov](https://codecov.io/gh/appleboy/drone-telegram/branch/master/graph/badge.svg)](https://codecov.io/gh/appleboy/drone-telegram) [![Go Report Card](https://goreportcard.com/badge/github.com/appleboy/drone-telegram)](https://goreportcard.com/report/github.com/appleboy/drone-telegram)
 
-Drone plugin for sending telegram notifications.
+[Drone](https://github.com/drone/drone) plugin for sending telegram notifications.
 
 ## Build
 
