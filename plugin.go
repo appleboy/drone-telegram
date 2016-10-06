@@ -108,7 +108,13 @@ func (p Plugin) Exec() error {
 	for _, user := range ids {
 		for _, value := range trimElement(message) {
 			msg := tgbotapi.NewMessage(user, value)
-			bot.Send(msg)
+			msg.ParseMode = "markdown"
+
+			_, err := bot.Send(msg)
+
+			if err != nil {
+				log.Println(err.Error())
+			}
 		}
 	}
 
