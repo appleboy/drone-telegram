@@ -4,6 +4,10 @@
 
 [Drone](https://github.com/drone/drone) plugin for sending telegram notifications.
 
+## Feature
+
+* [x] Send Text Message (`markdown` or `html` format)
+
 ## Build
 
 Build the binary with the following commands:
@@ -46,6 +50,7 @@ docker run --rm \
   -e PLUGIN_TO=xxxxxxx \
   -e PLUGIN_MESSAGE=test \
   -e PLUGIN_DEBUG=true \
+  -e PLUGIN_FORMAT=markdown
   -e DRONE_REPO_OWNER=appleboy \
   -e DRONE_REPO_NAME=go-hello \
   -e DRONE_COMMIT_SHA=e5e82b5eb3737205c25955dcc3dcacc839b7be52 \
