@@ -35,6 +35,7 @@ type (
 		Debug   bool
 		To      []string
 		Message []string
+		Format  string
 	}
 
 	// Plugin values.
@@ -107,8 +108,9 @@ func (p Plugin) Exec() error {
 	// send message.
 	for _, user := range ids {
 		for _, value := range trimElement(message) {
+			log.Println(user)
 			msg := tgbotapi.NewMessage(user, value)
-			msg.ParseMode = "markdown"
+			msg.ParseMode = p.Config.Format
 
 			_, err := bot.Send(msg)
 
