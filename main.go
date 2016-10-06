@@ -38,6 +38,12 @@ func main() {
 			EnvVar: "PLUGIN_DEBUG",
 		},
 		cli.StringFlag{
+			Name:   "format",
+			Value:  "markdown",
+			Usage:  "telegram message format",
+			EnvVar: "PLUGIN_FORMAT",
+		},
+		cli.StringFlag{
 			Name:   "repo.owner",
 			Usage:  "repository owner",
 			EnvVar: "DRONE_REPO_OWNER",
@@ -115,6 +121,7 @@ func run(c *cli.Context) error {
 			Debug:   c.Bool("debug"),
 			To:      c.StringSlice("to"),
 			Message: c.StringSlice("message"),
+			Format:  c.String("format"),
 		},
 	}
 
