@@ -8,7 +8,7 @@
 
 * [x] Send with Text Message. (`markdown` or `html` format)
 * [x] Send with New Photo.
-* [ ] Send with New Document.
+* [x] Send with New Document.
 * [ ] Send with New Audio.
 * [ ] Send with New Voice.
 * [ ] Send with New Contact.
@@ -59,6 +59,7 @@ docker run --rm \
   -e PLUGIN_TO=xxxxxxx \
   -e PLUGIN_MESSAGE=test \
   -e PLUGIN_PHOTO=tests/github.png \
+  -e PLUGIN_DOCUMENT=tests/gophercolor.png \
   -e PLUGIN_DEBUG=true \
   -e PLUGIN_FORMAT=markdown \
   -e DRONE_REPO_OWNER=appleboy \

@@ -32,12 +32,13 @@ type (
 
 	// Config for the plugin.
 	Config struct {
-		Token   string
-		Debug   bool
-		To      []string
-		Message []string
-		Photo   []string
-		Format  string
+		Token    string
+		Debug    bool
+		To       []string
+		Message  []string
+		Photo    []string
+		Document []string
+		Format   string
 	}
 
 	// Plugin values.
@@ -120,31 +121,37 @@ func (p Plugin) Exec() error {
 	// parse ids
 	ids := parseID(p.Config.To)
 	photos := fileExist(trimElement(p.Config.Photo))
+	documents := fileExist(trimElement(p.Config.Document))
 
 	// send message.
 	for _, user := range ids {
 		for _, value := range trimElement(message) {
 			msg := tgbotapi.NewMessage(user, value)
 			msg.ParseMode = p.Config.Format
-
-			_, err := bot.Send(msg)
-
-			if err != nil {
-				log.Println(err.Error())
-			}
+			p.Send(bot, msg)
 		}
 
 		for _, value := range photos {
 			msg := tgbotapi.NewPhotoUpload(user, value)
-			_, err := bot.Send(msg)
+			p.Send(bot, msg)
+		}
 
-			if err != nil {
-				log.Println(err.Error())
-			}
+		for _, value := range documents {
+			msg := tgbotapi.NewDocumentUpload(user, value)
+			p.Send(bot, msg)
 		}
 	}
 
 	return nil
+}
+
+// Send bot message.
+func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) {
+	_, err := bot.Send(msg)
+
+	if err != nil {
+		log.Println(err.Error())
+	}
 }
 
 // Message is plugin default message.
