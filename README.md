@@ -58,8 +58,9 @@ docker run --rm \
   -e PLUGIN_TOKEN=xxxxxxx \
   -e PLUGIN_TO=xxxxxxx \
   -e PLUGIN_MESSAGE=test \
+  -e PLUGIN_PHOTO=tests/github.png \
   -e PLUGIN_DEBUG=true \
-  -e PLUGIN_FORMAT=markdown
+  -e PLUGIN_FORMAT=markdown \
   -e DRONE_REPO_OWNER=appleboy \
   -e DRONE_REPO_NAME=go-hello \
   -e DRONE_COMMIT_SHA=e5e82b5eb3737205c25955dcc3dcacc839b7be52 \
@@ -68,5 +69,7 @@ docker run --rm \
   -e DRONE_BUILD_NUMBER=1 \
   -e DRONE_BUILD_STATUS=success \
   -e DRONE_BUILD_LINK=http://github.com/appleboy/go-hello \
+  -v $(pwd):$(pwd) \
+  -w $(pwd) \
   appleboy/drone-telegram
 ```
