@@ -6,7 +6,16 @@
 
 ## Feature
 
-* [x] Send Text Message (`markdown` or `html` format)
+* [x] Send with Text Message. (`markdown` or `html` format)
+* [ ] Send with New Photo.
+* [ ] Send with New Document.
+* [ ] Send with New Audio.
+* [ ] Send with New Voice.
+* [ ] Send with New Contact.
+* [ ] Send with New Location.
+* [ ] Send with New Venue.
+* [ ] Send with New Video.
+* [ ] Send with New Sticker.
 
 ## Build
 
