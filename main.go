@@ -32,6 +32,11 @@ func main() {
 			Usage:  "send telegram message",
 			EnvVar: "PLUGIN_MESSAGE",
 		},
+		cli.StringSliceFlag{
+			Name:   "photo",
+			Usage:  "send photo message",
+			EnvVar: "PLUGIN_PHOTO",
+		},
 		cli.BoolFlag{
 			Name:   "debug",
 			Usage:  "enable debug message",
@@ -121,6 +126,7 @@ func run(c *cli.Context) error {
 			Debug:   c.Bool("debug"),
 			To:      c.StringSlice("to"),
 			Message: c.StringSlice("message"),
+			Photo:   c.StringSlice("photo"),
 			Format:  c.String("format"),
 		},
 	}

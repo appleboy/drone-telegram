@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 
@@ -35,6 +36,7 @@ type (
 		Debug   bool
 		To      []string
 		Message []string
+		Photo   []string
 		Format  string
 	}
 
@@ -52,6 +54,19 @@ func trimElement(keys []string) []string {
 	for _, value := range keys {
 		value = strings.Trim(value, " ")
 		if len(value) == 0 {
+			continue
+		}
+		newKeys = append(newKeys, value)
+	}
+
+	return newKeys
+}
+
+func fileExist(keys []string) []string {
+	var newKeys []string
+
+	for _, value := range keys {
+		if _, err := os.Stat(value); os.IsNotExist(err) {
 			continue
 		}
 		newKeys = append(newKeys, value)
@@ -104,14 +119,23 @@ func (p Plugin) Exec() error {
 
 	// parse ids
 	ids := parseID(p.Config.To)
+	photos := fileExist(trimElement(p.Config.Photo))
 
 	// send message.
 	for _, user := range ids {
 		for _, value := range trimElement(message) {
-			log.Println(user)
 			msg := tgbotapi.NewMessage(user, value)
 			msg.ParseMode = p.Config.Format
 
+			_, err := bot.Send(msg)
+
+			if err != nil {
+				log.Println(err.Error())
+			}
+		}
+
+		for _, value := range photos {
+			msg := tgbotapi.NewPhotoUpload(user, value)
 			_, err := bot.Send(msg)
 
 			if err != nil {

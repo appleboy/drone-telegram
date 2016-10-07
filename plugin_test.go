@@ -69,6 +69,7 @@ func TestSendMessage(t *testing.T) {
 			Token:   os.Getenv("TELEGRAM_TOKEN"),
 			To:      []string{os.Getenv("TELEGRAM_TO"), "中文ID", "1234567890"},
 			Message: []string{"Test Telegram Chat Bot From Travis or Local", " "},
+			Photo:   []string{"tests/gophercolor.png", "1234", " "},
 			Debug:   false,
 		},
 	}
@@ -136,4 +137,14 @@ func TestParseID(t *testing.T) {
 	result = []int64{int64(1), int64(2)}
 
 	assert.Equal(t, result, parseID(input))
+}
+
+func TestCheckFileExist(t *testing.T) {
+	var input []string
+	var result []string
+
+	input = []string{"tests/gophercolor.png", "測試", "3"}
+	result = []string{"tests/gophercolor.png"}
+
+	assert.Equal(t, result, fileExist(input))
 }
