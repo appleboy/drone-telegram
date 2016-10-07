@@ -7,7 +7,7 @@
 ## Feature
 
 * [x] Send with Text Message. (`markdown` or `html` format)
-* [ ] Send with New Photo.
+* [x] Send with New Photo.
 * [ ] Send with New Document.
 * [ ] Send with New Audio.
 * [ ] Send with New Voice.
