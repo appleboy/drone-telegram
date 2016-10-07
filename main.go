@@ -24,7 +24,7 @@ func main() {
 		},
 		cli.StringSliceFlag{
 			Name:   "to",
-			Usage:  "send message to user",
+			Usage:  "telegram user",
 			EnvVar: "PLUGIN_TO",
 		},
 		cli.StringSliceFlag{
@@ -36,6 +36,11 @@ func main() {
 			Name:   "photo",
 			Usage:  "send photo message",
 			EnvVar: "PLUGIN_PHOTO",
+		},
+		cli.StringSliceFlag{
+			Name:   "photo",
+			Usage:  "send document message",
+			EnvVar: "PLUGIN_DOCUMENT",
 		},
 		cli.BoolFlag{
 			Name:   "debug",
@@ -122,12 +127,13 @@ func run(c *cli.Context) error {
 			Link:    c.String("build.link"),
 		},
 		Config: Config{
-			Token:   c.String("token"),
-			Debug:   c.Bool("debug"),
-			To:      c.StringSlice("to"),
-			Message: c.StringSlice("message"),
-			Photo:   c.StringSlice("photo"),
-			Format:  c.String("format"),
+			Token:    c.String("token"),
+			Debug:    c.Bool("debug"),
+			To:       c.StringSlice("to"),
+			Message:  c.StringSlice("message"),
+			Photo:    c.StringSlice("photo"),
+			Document: c.StringSlice("document"),
+			Format:   c.String("format"),
 		},
 	}
 
