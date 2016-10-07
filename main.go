@@ -38,7 +38,7 @@ func main() {
 			EnvVar: "PLUGIN_PHOTO",
 		},
 		cli.StringSliceFlag{
-			Name:   "photo",
+			Name:   "document",
 			Usage:  "send document message",
 			EnvVar: "PLUGIN_DOCUMENT",
 		},

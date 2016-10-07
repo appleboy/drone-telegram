@@ -111,7 +111,7 @@ func (p Plugin) Exec() error {
 	bot, err := tgbotapi.NewBotAPI(p.Config.Token)
 
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("Initialize New Bot Error:", err.Error())
 
 		return err
 	}
