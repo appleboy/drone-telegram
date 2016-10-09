@@ -42,6 +42,11 @@ func main() {
 			Usage:  "send document message",
 			EnvVar: "PLUGIN_DOCUMENT",
 		},
+		cli.StringSliceFlag{
+			Name:   "sticker",
+			Usage:  "send sticker message",
+			EnvVar: "PLUGIN_STICKER",
+		},
 		cli.BoolFlag{
 			Name:   "debug",
 			Usage:  "enable debug message",
@@ -133,6 +138,7 @@ func run(c *cli.Context) error {
 			Message:  c.StringSlice("message"),
 			Photo:    c.StringSlice("photo"),
 			Document: c.StringSlice("document"),
+			Sticker:  c.StringSlice("sticker"),
 			Format:   c.String("format"),
 		},
 	}
