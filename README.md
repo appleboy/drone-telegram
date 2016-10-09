@@ -15,7 +15,7 @@
 * [ ] Send with New Location.
 * [ ] Send with New Venue.
 * [ ] Send with New Video.
-* [ ] Send with New Sticker.
+* [x] Send with New Sticker.
 
 ## Build
 
@@ -60,6 +60,7 @@ docker run --rm \
   -e PLUGIN_MESSAGE=test \
   -e PLUGIN_PHOTO=tests/github.png \
   -e PLUGIN_DOCUMENT=tests/gophercolor.png \
+  -e PLUGIN_STICKER=tests/github-logo.png \
   -e PLUGIN_DEBUG=true \
   -e PLUGIN_FORMAT=markdown \
   -e DRONE_REPO_OWNER=appleboy \

@@ -71,6 +71,7 @@ func TestSendMessage(t *testing.T) {
 			Message:  []string{"Test Telegram Chat Bot From Travis or Local", " "},
 			Photo:    []string{"tests/github.png", "1234", " "},
 			Document: []string{"tests/gophercolor.png", "1234", " "},
+			Sticker:  []string{"tests/github-logo.png", "tests/github.png", "1234", " "},
 			Debug:    false,
 		},
 	}
