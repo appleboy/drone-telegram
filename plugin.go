@@ -39,6 +39,7 @@ type (
 		Photo    []string
 		Document []string
 		Sticker  []string
+		Audio    []string
 		Format   string
 	}
 
@@ -124,6 +125,7 @@ func (p Plugin) Exec() error {
 	photos := fileExist(trimElement(p.Config.Photo))
 	documents := fileExist(trimElement(p.Config.Document))
 	stickers := fileExist(trimElement(p.Config.Sticker))
+	audios := fileExist(trimElement(p.Config.Audio))
 
 	// send message.
 	for _, user := range ids {
@@ -145,6 +147,12 @@ func (p Plugin) Exec() error {
 
 		for _, value := range stickers {
 			msg := tgbotapi.NewStickerUpload(user, value)
+			p.Send(bot, msg)
+		}
+
+		for _, value := range audios {
+			msg := tgbotapi.NewAudioUpload(user, value)
+			msg.Title = "Audio Message."
 			p.Send(bot, msg)
 		}
 	}

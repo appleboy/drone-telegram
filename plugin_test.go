@@ -72,6 +72,7 @@ func TestSendMessage(t *testing.T) {
 			Photo:    []string{"tests/github.png", "1234", " "},
 			Document: []string{"tests/gophercolor.png", "1234", " "},
 			Sticker:  []string{"tests/github-logo.png", "tests/github.png", "1234", " "},
+			Audio:    []string{"tests/audio.mp3", "tests/github.png", "1234", " "},
 			Debug:    false,
 		},
 	}
