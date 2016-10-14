@@ -10,7 +10,7 @@
 * [x] Send with New Photo.
 * [x] Send with New Document.
 * [x] Send with New Audio.
-* [ ] Send with New Voice.
+* [x] Send with New Voice.
 * [ ] Send with New Contact.
 * [ ] Send with New Location.
 * [ ] Send with New Venue.
@@ -62,6 +62,7 @@ docker run --rm \
   -e PLUGIN_DOCUMENT=tests/gophercolor.png \
   -e PLUGIN_STICKER=tests/github-logo.png \
   -e PLUGIN_AUDIO=tests/audio.mp3 \
+  -e PLUGIN_VOICE=tests/voice.ogg \
   -e PLUGIN_DEBUG=true \
   -e PLUGIN_FORMAT=markdown \
   -e DRONE_REPO_OWNER=appleboy \
