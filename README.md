@@ -13,7 +13,7 @@
 * [x] Send with New Voice.
 * [x] Send with New Location.
 * [ ] Send with New Venue.
-* [ ] Send with New Video.
+* [x] Send with New Video.
 * [x] Send with New Sticker.
 
 ## Build
@@ -63,6 +63,7 @@ docker run --rm \
   -e PLUGIN_AUDIO=tests/audio.mp3 \
   -e PLUGIN_VOICE=tests/voice.ogg \
   -e PLUGIN_LOCATION=24.9163213,121.1424972 \
+  -e PLUGIN_VIDEO=tests/video.mp4 \
   -e PLUGIN_DEBUG=true \
   -e PLUGIN_FORMAT=markdown \
   -e DRONE_REPO_OWNER=appleboy \
