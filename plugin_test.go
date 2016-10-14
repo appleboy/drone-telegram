@@ -74,6 +74,7 @@ func TestSendMessage(t *testing.T) {
 			Sticker:  []string{"tests/github-logo.png", "tests/github.png", "1234", " "},
 			Audio:    []string{"tests/audio.mp3", "tests/github.png", "1234", " "},
 			Voice:    []string{"tests/voice.ogg", "tests/github.png", "1234", " "},
+			Location: []string{"24.9163213,121.1424972", "1", " "},
 			Debug:    false,
 		},
 	}
@@ -151,4 +152,39 @@ func TestCheckFileExist(t *testing.T) {
 	result = []string{"tests/gophercolor.png"}
 
 	assert.Equal(t, result, fileExist(input))
+}
+
+func TestConvertLocation(t *testing.T) {
+	var input string
+	var result Location
+	var empty bool
+
+	input = "1"
+	result, empty = convertLocation(input)
+
+	assert.Equal(t, true, empty)
+	assert.Equal(t, Location{}, result)
+
+	// strconv.ParseInt: parsing "測試": invalid syntax
+	input = "測試,139.704051"
+	result, empty = convertLocation(input)
+
+	assert.Equal(t, true, empty)
+	assert.Equal(t, Location{}, result)
+
+	// strconv.ParseInt: parsing "測試": invalid syntax
+	input = "35.661777,測試"
+	result, empty = convertLocation(input)
+
+	assert.Equal(t, true, empty)
+	assert.Equal(t, Location{}, result)
+
+	input = "35.661777,139.704051"
+	result, empty = convertLocation(input)
+
+	assert.Equal(t, false, empty)
+	assert.Equal(t, Location{
+		Latitude:  float64(35.661777),
+		Longitude: float64(139.704051),
+	}, result)
 }

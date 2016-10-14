@@ -41,6 +41,7 @@ type (
 		Sticker  []string
 		Audio    []string
 		Voice    []string
+		Location []string
 		Format   string
 	}
 
@@ -49,6 +50,12 @@ type (
 		Repo   Repo
 		Build  Build
 		Config Config
+	}
+
+	// Location format
+	Location struct {
+		Latitude  float64
+		Longitude float64
 	}
 )
 
@@ -77,6 +84,35 @@ func fileExist(keys []string) []string {
 	}
 
 	return newKeys
+}
+
+func convertLocation(value string) (Location, bool) {
+	var latitude, longitude float64
+	var err error
+	values := trimElement(strings.Split(value, ","))
+
+	if len(values) < 2 {
+		return Location{}, true
+	}
+
+	latitude, err = strconv.ParseFloat(values[0], 64)
+
+	if err != nil {
+		log.Println(err.Error())
+		return Location{}, true
+	}
+
+	longitude, err = strconv.ParseFloat(values[1], 64)
+
+	if err != nil {
+		log.Println(err.Error())
+		return Location{}, true
+	}
+
+	return Location{
+		Latitude:  latitude,
+		Longitude: longitude,
+	}, false
 }
 
 func parseID(keys []string) []int64 {
@@ -128,6 +164,7 @@ func (p Plugin) Exec() error {
 	stickers := fileExist(trimElement(p.Config.Sticker))
 	audios := fileExist(trimElement(p.Config.Audio))
 	voices := fileExist(trimElement(p.Config.Voice))
+	locations := trimElement(p.Config.Location)
 
 	// send message.
 	for _, user := range ids {
@@ -160,6 +197,17 @@ func (p Plugin) Exec() error {
 
 		for _, value := range voices {
 			msg := tgbotapi.NewVoiceUpload(user, value)
+			p.Send(bot, msg)
+		}
+
+		for _, value := range locations {
+			location, empty := convertLocation(value)
+
+			if empty == true {
+				continue
+			}
+
+			msg := tgbotapi.NewLocation(user, location.Latitude, location.Longitude)
 			p.Send(bot, msg)
 		}
 	}
