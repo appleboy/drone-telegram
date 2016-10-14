@@ -57,6 +57,11 @@ func main() {
 			Usage:  "send voice message",
 			EnvVar: "PLUGIN_VOICE",
 		},
+		cli.StringSliceFlag{
+			Name:   "location",
+			Usage:  "send location message",
+			EnvVar: "PLUGIN_LOCATION",
+		},
 		cli.BoolFlag{
 			Name:   "debug",
 			Usage:  "enable debug message",
@@ -151,6 +156,7 @@ func run(c *cli.Context) error {
 			Sticker:  c.StringSlice("sticker"),
 			Audio:    c.StringSlice("audio"),
 			Voice:    c.StringSlice("voice"),
+			Location: c.StringSlice("location"),
 			Format:   c.String("format"),
 		},
 	}
