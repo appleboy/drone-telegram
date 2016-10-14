@@ -42,6 +42,7 @@ type (
 		Audio    []string
 		Voice    []string
 		Location []string
+		Video    []string
 		Format   string
 	}
 
@@ -164,6 +165,7 @@ func (p Plugin) Exec() error {
 	stickers := fileExist(trimElement(p.Config.Sticker))
 	audios := fileExist(trimElement(p.Config.Audio))
 	voices := fileExist(trimElement(p.Config.Voice))
+	videos := fileExist(trimElement(p.Config.Video))
 	locations := trimElement(p.Config.Location)
 
 	// send message.
@@ -197,6 +199,12 @@ func (p Plugin) Exec() error {
 
 		for _, value := range voices {
 			msg := tgbotapi.NewVoiceUpload(user, value)
+			p.Send(bot, msg)
+		}
+
+		for _, value := range videos {
+			msg := tgbotapi.NewVideoUpload(user, value)
+			msg.Caption = "Video Message"
 			p.Send(bot, msg)
 		}
 
