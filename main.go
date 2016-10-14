@@ -63,6 +63,11 @@ func main() {
 			EnvVar: "PLUGIN_LOCATION",
 		},
 		cli.StringSliceFlag{
+			Name:   "venue",
+			Usage:  "send venue message",
+			EnvVar: "PLUGIN_VENUE",
+		},
+		cli.StringSliceFlag{
 			Name:   "video",
 			Usage:  "send video message",
 			EnvVar: "PLUGIN_VIDEO",
@@ -163,6 +168,7 @@ func run(c *cli.Context) error {
 			Voice:    c.StringSlice("voice"),
 			Location: c.StringSlice("location"),
 			Video:    c.StringSlice("video"),
+			Venue:    c.StringSlice("venue"),
 			Format:   c.String("format"),
 		},
 	}

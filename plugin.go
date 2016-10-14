@@ -43,6 +43,7 @@ type (
 		Voice    []string
 		Location []string
 		Video    []string
+		Venue    []string
 		Format   string
 	}
 
@@ -55,6 +56,8 @@ type (
 
 	// Location format
 	Location struct {
+		Title     string
+		Address   string
 		Latitude  float64
 		Longitude float64
 	}
@@ -89,11 +92,21 @@ func fileExist(keys []string) []string {
 
 func convertLocation(value string) (Location, bool) {
 	var latitude, longitude float64
+	var title, address string
 	var err error
 	values := trimElement(strings.Split(value, ","))
 
 	if len(values) < 2 {
 		return Location{}, true
+	}
+
+	if len(values) > 2 {
+		title = values[2]
+	}
+
+	if len(values) > 3 {
+		title = values[2]
+		address = values[3]
 	}
 
 	latitude, err = strconv.ParseFloat(values[0], 64)
@@ -111,6 +124,8 @@ func convertLocation(value string) (Location, bool) {
 	}
 
 	return Location{
+		Title:     title,
+		Address:   address,
 		Latitude:  latitude,
 		Longitude: longitude,
 	}, false
@@ -167,6 +182,7 @@ func (p Plugin) Exec() error {
 	voices := fileExist(trimElement(p.Config.Voice))
 	videos := fileExist(trimElement(p.Config.Video))
 	locations := trimElement(p.Config.Location)
+	venues := trimElement(p.Config.Venue)
 
 	// send message.
 	for _, user := range ids {
@@ -216,6 +232,17 @@ func (p Plugin) Exec() error {
 			}
 
 			msg := tgbotapi.NewLocation(user, location.Latitude, location.Longitude)
+			p.Send(bot, msg)
+		}
+
+		for _, value := range venues {
+			location, empty := convertLocation(value)
+
+			if empty == true {
+				continue
+			}
+
+			msg := tgbotapi.NewVenue(user, location.Title, location.Address, location.Latitude, location.Longitude)
 			p.Send(bot, msg)
 		}
 	}

@@ -75,6 +75,7 @@ func TestSendMessage(t *testing.T) {
 			Audio:    []string{"tests/audio.mp3", "1234", " "},
 			Voice:    []string{"tests/voice.ogg", "1234", " "},
 			Location: []string{"24.9163213,121.1424972", "1", " "},
+			Venue:    []string{"35.661777,139.704051,竹北體育館,新竹縣竹北市", "24.9163213,121.1424972", "1", " "},
 			Video:    []string{"tests/video.mp4", "1234", " "},
 			Debug:    false,
 		},
@@ -185,6 +186,28 @@ func TestConvertLocation(t *testing.T) {
 
 	assert.Equal(t, false, empty)
 	assert.Equal(t, Location{
+		Latitude:  float64(35.661777),
+		Longitude: float64(139.704051),
+	}, result)
+
+	input = "35.661777,139.704051,title"
+	result, empty = convertLocation(input)
+
+	assert.Equal(t, false, empty)
+	assert.Equal(t, Location{
+		Title:     "title",
+		Address:   "",
+		Latitude:  float64(35.661777),
+		Longitude: float64(139.704051),
+	}, result)
+
+	input = "35.661777,139.704051,title,address"
+	result, empty = convertLocation(input)
+
+	assert.Equal(t, false, empty)
+	assert.Equal(t, Location{
+		Title:     "title",
+		Address:   "address",
 		Latitude:  float64(35.661777),
 		Longitude: float64(139.704051),
 	}, result)
