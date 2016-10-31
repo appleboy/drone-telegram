@@ -68,7 +68,7 @@ func TestSendMessage(t *testing.T) {
 		Config: Config{
 			Token:    os.Getenv("TELEGRAM_TOKEN"),
 			To:       []string{os.Getenv("TELEGRAM_TO"), "中文ID", "1234567890"},
-			Message:  []string{"Test Telegram Chat Bot From Travis or Local", " "},
+			Message:  []string{"Test Telegram Chat Bot From Travis or Local", "commit message: 『{{ build.message }}』", " "},
 			Photo:    []string{"tests/github.png", "1234", " "},
 			Document: []string{"tests/gophercolor.png", "1234", " "},
 			Sticker:  []string{"tests/github-logo.png", "tests/github.png", "1234", " "},
