@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/appleboy/drone-facebook/template"
 	"gopkg.in/telegram-bot-api.v4"
 )
 
@@ -20,14 +21,16 @@ type (
 
 	// Build information.
 	Build struct {
-		Event   string
-		Number  int
-		Commit  string
-		Message string
-		Branch  string
-		Author  string
-		Status  string
-		Link    string
+		Event    string
+		Number   int
+		Commit   string
+		Message  string
+		Branch   string
+		Author   string
+		Status   string
+		Link     string
+		Started  float64
+		Finished float64
 	}
 
 	// Config for the plugin.
@@ -187,7 +190,12 @@ func (p Plugin) Exec() error {
 	// send message.
 	for _, user := range ids {
 		for _, value := range trimElement(message) {
-			msg := tgbotapi.NewMessage(user, value)
+			txt, err := template.RenderTrim(value, p)
+			if err != nil {
+				return err
+			}
+
+			msg := tgbotapi.NewMessage(user, txt)
 			msg.ParseMode = p.Config.Format
 			p.Send(bot, msg)
 		}

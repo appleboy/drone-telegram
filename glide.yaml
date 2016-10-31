@@ -5,6 +5,10 @@ import:
   - autoload
 - package: github.com/urfave/cli
 - package: gopkg.in/telegram-bot-api.v4
+- package: github.com/appleboy/drone-facebook
+  version: ^1.3.0
+  subpackages:
+  - template
 testImport:
 - package: github.com/stretchr/testify
   subpackages:

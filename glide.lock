@@ -1,6 +1,16 @@
-hash: b63ca4eb6e194481209bad2e58f3c4eb2c0ef2b4411ead5b3b7a77677ef815ab
-updated: 2016-10-04T21:46:25.713693812+08:00
+hash: 5bdcf53533d043ba1cb6ab55ae6a93aca40c812a20264406bd6e0fe342f51d61
+updated: 2016-10-31T09:50:34.654875319+08:00
 imports:
+- name: github.com/appleboy/drone-facebook
+  version: abda8124c404d424b150cf2a9935e3e108519c6e
+  subpackages:
+  - template
+- name: github.com/aymerick/raymond
+  version: a2232af10b53ef1ae5a767f5178db3a6c1dab655
+  subpackages:
+  - ast
+  - parser
+  - lexer
 - name: github.com/joho/godotenv
   version: 4ed13390c0acd2ff4e371e64d8b97c8954138243
   subpackages:
@@ -8,7 +18,7 @@ imports:
 - name: github.com/technoweenie/multipartstreamer
   version: a90a01d73ae432e2611d178c18367fbaa13e0154
 - name: github.com/urfave/cli
-  version: d53eb991652b1d438abdd34ce4bfa3ef1539108e
+  version: 3eb41f1bb122ac7535cc7b32db6b78b541879726
 - name: gopkg.in/telegram-bot-api.v4
   version: a7f48eb2dd301356942677e65bebe0c9aef07013
 testImports:

@@ -136,6 +136,16 @@ func main() {
 			Usage:  "build link",
 			EnvVar: "DRONE_BUILD_LINK",
 		},
+		cli.Float64Flag{
+			Name:   "job.started",
+			Usage:  "job started",
+			EnvVar: "DRONE_JOB_STARTED",
+		},
+		cli.Float64Flag{
+			Name:   "job.finished",
+			Usage:  "job finished",
+			EnvVar: "DRONE_JOB_FINISHED",
+		},
 	}
 	app.Run(os.Args)
 }
@@ -147,14 +157,16 @@ func run(c *cli.Context) error {
 			Name:  c.String("repo.name"),
 		},
 		Build: Build{
-			Number:  c.Int("build.number"),
-			Event:   c.String("build.event"),
-			Status:  c.String("build.status"),
-			Commit:  c.String("commit.sha"),
-			Branch:  c.String("commit.branch"),
-			Author:  c.String("commit.author"),
-			Message: c.String("commit.message"),
-			Link:    c.String("build.link"),
+			Number:   c.Int("build.number"),
+			Event:    c.String("build.event"),
+			Status:   c.String("build.status"),
+			Commit:   c.String("commit.sha"),
+			Branch:   c.String("commit.branch"),
+			Author:   c.String("commit.author"),
+			Message:  c.String("commit.message"),
+			Link:     c.String("build.link"),
+			Started:  c.Float64("job.started"),
+			Finished: c.Float64("job.finished"),
 		},
 		Config: Config{
 			Token:    c.String("token"),
