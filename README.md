@@ -75,6 +75,8 @@ docker run --rm \
   -e DRONE_BUILD_NUMBER=1 \
   -e DRONE_BUILD_STATUS=success \
   -e DRONE_BUILD_LINK=http://github.com/appleboy/go-hello \
+  -e DRONE_JOB_STARTED=1477550550 \
+  -e DRONE_JOB_FINISHED=1477550750 \
   -v $(pwd):$(pwd) \
   -w $(pwd) \
   appleboy/drone-telegram
