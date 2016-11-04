@@ -63,11 +63,12 @@ func TestSendMessage(t *testing.T) {
 			Branch:  "master",
 			Message: "update travis by drone plugin",
 			Commit:  "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
+			Email:   "test@gmail.com",
 		},
 
 		Config: Config{
 			Token:    os.Getenv("TELEGRAM_TOKEN"),
-			To:       []string{os.Getenv("TELEGRAM_TO"), "中文ID", "1234567890"},
+			To:       []string{os.Getenv("TELEGRAM_TO"), os.Getenv("TELEGRAM_TO") + ",appleboy@gmail.com", "中文ID", "1234567890"},
 			Message:  []string{"Test Telegram Chat Bot From Travis or Local", "commit message: 『{{ build.message }}』", " "},
 			Photo:    []string{"tests/github.png", "1234", " "},
 			Document: []string{"tests/gophercolor.png", "1234", " "},
