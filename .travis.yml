@@ -40,7 +40,7 @@ script:
 after_success:
   # ignore main.go coverage
   - sed -i '/main.go/d' coverage.txt
-  - bash <(curl -s https://codecov.io/bash) -f coverage.txt
+  - bash <(curl -s https://codecov.io/bash)
   # deploy from master
   - if [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_GO_VERSION" == "1.7.3" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";

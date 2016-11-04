@@ -63,11 +63,12 @@ func TestSendMessage(t *testing.T) {
 			Branch:  "master",
 			Message: "update travis by drone plugin",
 			Commit:  "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
+			Email:   "test@gmail.com",
 		},
 
 		Config: Config{
 			Token:    os.Getenv("TELEGRAM_TOKEN"),
-			To:       []string{os.Getenv("TELEGRAM_TO"), "中文ID", "1234567890"},
+			To:       []string{os.Getenv("TELEGRAM_TO"), os.Getenv("TELEGRAM_TO") + ",appleboy@gmail.com", "中文ID", "1234567890"},
 			Message:  []string{"Test Telegram Chat Bot From Travis or Local", "commit message: 『{{ build.message }}』", " "},
 			Photo:    []string{"tests/github.png", "1234", " "},
 			Document: []string{"tests/gophercolor.png", "1234", " "},
@@ -131,19 +132,31 @@ func TestTrimElement(t *testing.T) {
 	assert.Equal(t, result, trimElement(input))
 }
 
-func TestParseID(t *testing.T) {
-	var input []string
-	var result []int64
+func TestParseTo(t *testing.T) {
+	id, enable := parseTo("1234567890", "test@gmail.com")
 
-	input = []string{"1", "測試", "3"}
-	result = []int64{int64(1), int64(3)}
+	assert.Equal(t, true, enable)
+	assert.Equal(t, int64(1234567890), id)
 
-	assert.Equal(t, result, parseID(input))
+	id, enable = parseTo("1234567890,test2@gmail.com", "test@gmail.com")
 
-	input = []string{"1", "2"}
-	result = []int64{int64(1), int64(2)}
+	assert.Equal(t, false, enable)
+	assert.Equal(t, int64(0), id)
 
-	assert.Equal(t, result, parseID(input))
+	id, enable = parseTo("1234567890,test@gmail.com", "test@gmail.com")
+
+	assert.Equal(t, true, enable)
+	assert.Equal(t, int64(1234567890), id)
+
+	id, enable = parseTo("測試,test@gmail.com", "test@gmail.com")
+
+	assert.Equal(t, false, enable)
+	assert.Equal(t, int64(0), id)
+
+	id, enable = parseTo("測試", "test@gmail.com")
+
+	assert.Equal(t, false, enable)
+	assert.Equal(t, int64(0), id)
 }
 
 func TestCheckFileExist(t *testing.T) {

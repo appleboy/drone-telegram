@@ -27,6 +27,7 @@ type (
 		Message  string
 		Branch   string
 		Author   string
+		Email    string
 		Status   string
 		Link     string
 		Started  float64
@@ -134,20 +135,21 @@ func convertLocation(value string) (Location, bool) {
 	}, false
 }
 
-func parseID(keys []string) []int64 {
-	var newKeys []int64
+func parseTo(value, authorEmail string) (int64, bool) {
+	ids := trimElement(strings.Split(value, ","))
 
-	for _, value := range keys {
-		id, err := strconv.ParseInt(value, 10, 64)
-		if err != nil {
-			log.Println(err.Error())
-
-			continue
+	if len(ids) > 1 {
+		if email := ids[1]; email != authorEmail {
+			return int64(0), false
 		}
-		newKeys = append(newKeys, id)
 	}
 
-	return newKeys
+	id, err := strconv.ParseInt(ids[0], 10, 64)
+	if err != nil {
+		return int64(0), false
+	}
+
+	return id, true
 }
 
 // Exec executes the plugin.
@@ -176,8 +178,6 @@ func (p Plugin) Exec() error {
 
 	bot.Debug = p.Config.Debug
 
-	// parse ids
-	ids := parseID(p.Config.To)
 	photos := fileExist(trimElement(p.Config.Photo))
 	documents := fileExist(trimElement(p.Config.Document))
 	stickers := fileExist(trimElement(p.Config.Sticker))
@@ -188,7 +188,12 @@ func (p Plugin) Exec() error {
 	venues := trimElement(p.Config.Venue)
 
 	// send message.
-	for _, user := range ids {
+	for _, to := range p.Config.To {
+		user, enable := parseTo(to, p.Build.Email)
+		if !enable {
+			continue
+		}
+
 		for _, value := range trimElement(message) {
 			txt, err := template.RenderTrim(value, p)
 			if err != nil {
