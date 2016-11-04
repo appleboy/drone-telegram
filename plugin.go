@@ -136,10 +136,11 @@ func convertLocation(value string) (Location, bool) {
 }
 
 func parseTo(value, authorEmail string) (int64, bool) {
-	ids := trimElement(strings.Split(value, ","))
+	ids := trimElement(strings.Split(value, ":"))
 
 	if len(ids) > 1 {
 		if email := ids[1]; email != authorEmail {
+			log.Println("email not match")
 			return int64(0), false
 		}
 	}
