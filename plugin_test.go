@@ -131,19 +131,31 @@ func TestTrimElement(t *testing.T) {
 	assert.Equal(t, result, trimElement(input))
 }
 
-func TestParseID(t *testing.T) {
-	var input []string
-	var result []int64
+func TestParseTo(t *testing.T) {
+	id, enable := parseTo("1234567890", "test@gmail.com")
 
-	input = []string{"1", "測試", "3"}
-	result = []int64{int64(1), int64(3)}
+	assert.Equal(t, true, enable)
+	assert.Equal(t, int64(1234567890), id)
 
-	assert.Equal(t, result, parseID(input))
+	id, enable = parseTo("1234567890,test2@gmail.com", "test@gmail.com")
 
-	input = []string{"1", "2"}
-	result = []int64{int64(1), int64(2)}
+	assert.Equal(t, false, enable)
+	assert.Equal(t, int64(0), id)
 
-	assert.Equal(t, result, parseID(input))
+	id, enable = parseTo("1234567890,test@gmail.com", "test@gmail.com")
+
+	assert.Equal(t, true, enable)
+	assert.Equal(t, int64(1234567890), id)
+
+	id, enable = parseTo("測試,test@gmail.com", "test@gmail.com")
+
+	assert.Equal(t, false, enable)
+	assert.Equal(t, int64(0), id)
+
+	id, enable = parseTo("測試", "test@gmail.com")
+
+	assert.Equal(t, false, enable)
+	assert.Equal(t, int64(0), id)
 }
 
 func TestCheckFileExist(t *testing.T) {
