@@ -66,6 +66,7 @@ docker run --rm \
   -e PLUGIN_VENUE=24.9163213,121.1424972,title,address \
   -e PLUGIN_VIDEO=tests/video.mp4 \
   -e PLUGIN_DEBUG=true \
+  -e PLUGIN_ONLY_MATCH_EMAIL=false \
   -e PLUGIN_FORMAT=markdown \
   -e DRONE_REPO_OWNER=appleboy \
   -e DRONE_REPO_NAME=go-hello \
