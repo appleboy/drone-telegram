@@ -136,22 +136,43 @@ func convertLocation(value string) (Location, bool) {
 	}, false
 }
 
-func parseTo(value, authorEmail string) (int64, bool) {
-	ids := trimElement(strings.Split(value, ":"))
+func parseTo(to []string, authorEmail string, matchEmail bool) []int64 {
+	var emails []int64
+	var ids []int64
+	attachChat := true
 
-	if len(ids) > 1 {
-		if email := ids[1]; email != authorEmail {
-			log.Println("email not match")
-			return int64(0), false
+	for _, value := range to {
+		idArray := trimElement(strings.Split(value, ":"))
+
+		// check id
+		id, err := strconv.ParseInt(idArray[0], 10, 64)
+		if err != nil {
+			continue
 		}
+
+		// check match author email
+		if len(idArray) > 1 {
+			if email := idArray[1]; email != authorEmail {
+				continue
+			}
+
+			emails = append(emails, id)
+			attachChat = false
+			continue
+		}
+
+		ids = append(ids, id)
 	}
 
-	id, err := strconv.ParseInt(ids[0], 10, 64)
-	if err != nil {
-		return int64(0), false
+	if matchEmail == true && attachChat == false {
+		return emails
 	}
 
-	return id, true
+	for _, value := range emails {
+		ids = append(ids, value)
+	}
+
+	return ids
 }
 
 // Exec executes the plugin.
@@ -180,6 +201,7 @@ func (p Plugin) Exec() error {
 
 	bot.Debug = p.Config.Debug
 
+	ids := parseTo(p.Config.To, p.Build.Email, p.Config.MatchEmail)
 	photos := fileExist(trimElement(p.Config.Photo))
 	documents := fileExist(trimElement(p.Config.Document))
 	stickers := fileExist(trimElement(p.Config.Sticker))
@@ -190,12 +212,7 @@ func (p Plugin) Exec() error {
 	venues := trimElement(p.Config.Venue)
 
 	// send message.
-	for _, to := range p.Config.To {
-		user, enable := parseTo(to, p.Build.Email)
-		if !enable {
-			continue
-		}
-
+	for _, user := range ids {
 		for _, value := range trimElement(message) {
 			txt, err := template.RenderTrim(value, p)
 			if err != nil {
