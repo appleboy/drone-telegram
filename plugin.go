@@ -139,7 +139,7 @@ func convertLocation(value string) (Location, bool) {
 func parseTo(to []string, authorEmail string, matchEmail bool) []int64 {
 	var emails []int64
 	var ids []int64
-	attachChat := true
+	attachEmail := true
 
 	for _, value := range to {
 		idArray := trimElement(strings.Split(value, ":"))
@@ -157,14 +157,14 @@ func parseTo(to []string, authorEmail string, matchEmail bool) []int64 {
 			}
 
 			emails = append(emails, id)
-			attachChat = false
+			attachEmail = false
 			continue
 		}
 
 		ids = append(ids, id)
 	}
 
-	if matchEmail == true && attachChat == false {
+	if matchEmail == true && attachEmail == false {
 		return emails
 	}
 
