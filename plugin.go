@@ -36,19 +36,20 @@ type (
 
 	// Config for the plugin.
 	Config struct {
-		Token    string
-		Debug    bool
-		To       []string
-		Message  []string
-		Photo    []string
-		Document []string
-		Sticker  []string
-		Audio    []string
-		Voice    []string
-		Location []string
-		Video    []string
-		Venue    []string
-		Format   string
+		Token      string
+		Debug      bool
+		MatchEmail bool
+		To         []string
+		Message    []string
+		Photo      []string
+		Document   []string
+		Sticker    []string
+		Audio      []string
+		Voice      []string
+		Location   []string
+		Video      []string
+		Venue      []string
+		Format     string
 	}
 
 	// Plugin values.
