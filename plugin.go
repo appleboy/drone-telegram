@@ -141,7 +141,7 @@ func parseTo(to []string, authorEmail string, matchEmail bool) []int64 {
 	var ids []int64
 	attachEmail := true
 
-	for _, value := range to {
+	for _, value := range trimElement(to) {
 		idArray := trimElement(strings.Split(value, ":"))
 
 		// check id

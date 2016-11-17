@@ -146,6 +146,10 @@ func TestParseTo(t *testing.T) {
 
 	ids = parseTo(input, "a@gmail.com", true)
 	assert.Equal(t, []int64{0, 4, 5}, ids)
+
+	// test empty ids
+	ids = parseTo([]string{"", " ", "   "}, "a@gmail.com", true)
+	assert.Equal(t, 0, len(ids))
 }
 
 func TestCheckFileExist(t *testing.T) {
