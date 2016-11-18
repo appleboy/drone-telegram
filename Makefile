@@ -42,7 +42,7 @@ endif
 	docker push $(DEPLOY_ACCOUNT)/$(DEPLOY_IMAGE):$(tag)
 
 clean:
-	rm -rf coverage.txt ${DEPLOY_IMAGE}
+	rm -rf coverage.txt $(DEPLOY_IMAGE)
 
 version:
 	@echo $(VERSION)
