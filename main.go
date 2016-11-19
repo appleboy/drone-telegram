@@ -8,7 +8,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-// Version for command line
+// Version set at compile-time
 var Version string
 
 func main() {
