@@ -147,6 +147,11 @@ func main() {
 			Usage:  "build link",
 			EnvVar: "DRONE_BUILD_LINK",
 		},
+		cli.StringFlag{
+			Name:   "build.tag",
+			Usage:  "build tag",
+			EnvVar: "DRONE_TAG",
+		},
 		cli.Float64Flag{
 			Name:   "job.started",
 			Usage:  "job started",
@@ -177,6 +182,7 @@ func run(c *cli.Context) error {
 			Name:  c.String("repo.name"),
 		},
 		Build: Build{
+			Tag:      c.String("build.tag"),
 			Number:   c.Int("build.number"),
 			Event:    c.String("build.event"),
 			Status:   c.String("build.status"),

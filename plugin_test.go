@@ -56,6 +56,7 @@ func TestSendMessage(t *testing.T) {
 			Owner: "appleboy",
 		},
 		Build: Build{
+			Tag:     "1.0.0",
 			Number:  101,
 			Status:  "success",
 			Link:    "https://github.com/appleboy/go-hello",
