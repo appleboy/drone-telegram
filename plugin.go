@@ -33,6 +33,7 @@ type (
 		Link     string
 		Started  float64
 		Finished float64
+		PR       string
 	}
 
 	// Config for the plugin.

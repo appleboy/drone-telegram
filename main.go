@@ -152,6 +152,11 @@ func main() {
 			Usage:  "build tag",
 			EnvVar: "DRONE_TAG",
 		},
+		cli.StringFlag{
+			Name:   "pull.request",
+			Usage:  "pull request",
+			EnvVar: "DRONE_PULL_REQUEST",
+		},
 		cli.Float64Flag{
 			Name:   "job.started",
 			Usage:  "job started",
@@ -194,6 +199,7 @@ func run(c *cli.Context) error {
 			Link:     c.String("build.link"),
 			Started:  c.Float64("job.started"),
 			Finished: c.Float64("job.finished"),
+			PR:       c.String("pull.request"),
 		},
 		Config: Config{
 			Token:      c.String("token"),
