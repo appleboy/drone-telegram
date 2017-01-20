@@ -161,23 +161,6 @@ pipeline:
 +     {{ /success }}
 ```
 
-# Secrets
-
-The telegram plugin supports reading credentials from the Drone secret store. This is strongly recommended instead of storing credentials in the pipeline configuration in plain text.
-
-```diff
-pipeline:
-  telegram:
-    image: appleboy/drone-telegram
--   token: xxxxxxxxxx
-    to: telegram_user_id
-```
-
-The `token` attribute can be replaced with the below secret environment variables. Please see the Drone documentation to learn more about secrets.
-
-PLUGIN_TOKEN
-: telegram token
-
 # Parameter Reference
 
 token
