@@ -167,7 +167,7 @@ token
 : telegram token from [telegram developer center](https://core.telegram.org/bots/api)
 
 to
-: telegram user id
+: telegram user id (can be requested from the @userinfobot inside Telegram)
 
 message
 : overwrite the default message template
