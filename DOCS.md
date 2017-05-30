@@ -153,12 +153,12 @@ pipeline:
     image: appleboy/drone-telegram
     token: xxxxxxxxxx
     to: telegram_user_id
-+   message: |
-+     {{#success build.status}}
-+       build {{build.number}} succeeded. Good job.
-+     {{else}}
-+       build {{build.number}} failed. Fix me please.
-+     {{/success}}
+    message: >
+      {{#success build.status}}
+        build {{build.number}} succeeded. Good job.
+      {{else}}
+        build {{build.number}} failed. Fix me please.
+      {{/success}}
 ```
 
 # Parameter Reference
