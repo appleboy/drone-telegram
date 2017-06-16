@@ -133,6 +133,31 @@ func TestTrimElement(t *testing.T) {
 	assert.Equal(t, result, trimElement(input))
 }
 
+func TestEscapeMarkdown(t *testing.T) {
+	provider := [][][]string{
+		[][]string{
+			[]string{"user", "repo"},
+			[]string{"user", "repo"},
+		},
+		[][]string{
+			[]string{"user_name", "repo_name"},
+			[]string{`user\_name`, `repo\_name`},
+		},
+		[][]string{
+			[]string{"user_name_long", "user_name_long"},
+			[]string{`user\_name\_long`, `user\_name\_long`},
+		},
+		[][]string{
+			[]string{`user\_name\_long`, `repo\_name\_long`},
+			[]string{`user\_name\_long`, `repo\_name\_long`},
+		},
+	}
+
+	for _, testCase := range provider {
+		assert.Equal(t, testCase[1], escapeMarkdown(testCase[0]))
+	}
+}
+
 func TestParseTo(t *testing.T) {
 	input := []string{"0", "1:1@gmail.com", "2:2@gmail.com", "3:3@gmail.com", "4", "5"}
 
