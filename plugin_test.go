@@ -135,21 +135,21 @@ func TestTrimElement(t *testing.T) {
 
 func TestEscapeMarkdown(t *testing.T) {
 	provider := [][][]string{
-		[][]string{
-			[]string{"user", "repo"},
-			[]string{"user", "repo"},
+		{
+			{"user", "repo"},
+			{"user", "repo"},
 		},
-		[][]string{
-			[]string{"user_name", "repo_name"},
-			[]string{`user\_name`, `repo\_name`},
+		{
+			{"user_name", "repo_name"},
+			{`user\_name`, `repo\_name`},
 		},
-		[][]string{
-			[]string{"user_name_long", "user_name_long"},
-			[]string{`user\_name\_long`, `user\_name\_long`},
+		{
+			{"user_name_long", "user_name_long"},
+			{`user\_name\_long`, `user\_name\_long`},
 		},
-		[][]string{
-			[]string{`user\_name\_long`, `repo\_name\_long`},
-			[]string{`user\_name\_long`, `repo\_name\_long`},
+		{
+			{`user\_name\_long`, `repo\_name\_long`},
+			{`user\_name\_long`, `repo\_name\_long`},
 		},
 	}
 
