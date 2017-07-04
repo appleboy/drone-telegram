@@ -86,6 +86,7 @@ func TestSendMessage(t *testing.T) {
 	err := plugin.Exec()
 	assert.Nil(t, err)
 
+	plugin.Config.Format = "markdown"
 	plugin.Config.Message = []string{"Test escape under_score"}
 	err = plugin.Exec()
 	assert.Nil(t, err)
