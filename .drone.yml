@@ -1,0 +1,76 @@
+workspace:
+  base: /go
+  path: src/github.com/appleboy/drone-line
+
+clone:
+  git:
+    image: plugins/git
+    depth: 50
+    tags: true
+
+pipeline:
+  test:
+    image: appleboy/golang-testing
+    pull: true
+    environment:
+      TAGS: netgo
+    secrets: [ codecov_token ]
+    commands:
+      - make vet
+      - make lint
+      - make test-vendor
+      - make misspell-check
+      - make test
+      - make coverage
+      - make build
+      # build binary for docker image
+      - make static_build
+    when:
+      event: [ push, tag, pull_request ]
+
+  release:
+    image: appleboy/golang-testing
+    pull: true
+    environment:
+      TAGS: netgo
+      GOPATH: /srv/app
+    commands:
+      - make release
+    when:
+      event: [ tag ]
+      branch: [ refs/tags/* ]
+
+  docker:
+    image: plugins/docker
+    repo: ${DRONE_REPO}
+    tags: [ '${DRONE_TAG}' ]
+    secrets: [ docker_username, docker_password ]
+    when:
+      event: [ tag ]
+      branch: [ refs/tags/* ]
+
+  docker:
+    image: plugins/docker
+    repo: ${DRONE_REPO}
+    tags: [ 'latest' ]
+    secrets: [ docker_username, docker_password ]
+    when:
+      event: [ push ]
+      branch: [ master ]
+
+  github:
+    image: plugins/github-release
+    secrets: [ github_token ]
+    files:
+      - dist/release/*
+    when:
+      event: [ tag ]
+      branch: [ refs/tags/* ]
+
+  facebook:
+    image: appleboy/drone-facebook
+    secrets: [ fb_page_token, fb_verify_token ]
+    pull: true
+    to: 1234973386524610
+    when:
+      status: [ changed, failure ]
