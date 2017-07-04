@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/stretchr/testify/assert"
-
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMissingDefaultConfig(t *testing.T) {

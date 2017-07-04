@@ -5,9 +5,9 @@ services:
   - docker
 
 go:
-  - 1.5.4
-  - 1.6.4
-  - 1.7.4
+  - 1.6.x
+  - 1.7.x
+  - 1.8.x
   - tip
 
 env:
@@ -17,12 +17,10 @@ env:
 cache:
   directories:
     - vendor
-    - ${HOME}/.glide
     - ${HOME}/docker
 
 before_install:
   - mkdir -p $GOPATH/bin
-  - curl https://glide.sh/get | sh
   - if [ -f ${DOCKER_CACHE_FILE} ]; then gunzip -c ${DOCKER_CACHE_FILE} | docker load; fi
 
 install:
