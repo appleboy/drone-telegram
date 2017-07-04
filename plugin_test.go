@@ -86,6 +86,11 @@ func TestSendMessage(t *testing.T) {
 	err := plugin.Exec()
 	assert.Nil(t, err)
 
+	plugin.Config.Format = "markdown"
+	plugin.Config.Message = []string{"Test escape under_score"}
+	err = plugin.Exec()
+	assert.Nil(t, err)
+
 	// disable message
 	plugin.Config.Message = []string{}
 	err = plugin.Exec()
@@ -131,6 +136,48 @@ func TestTrimElement(t *testing.T) {
 	result = []string{"1", "2"}
 
 	assert.Equal(t, result, trimElement(input))
+}
+
+func TestEscapeMarkdown(t *testing.T) {
+	provider := [][][]string{
+		{
+			{"user", "repo"},
+			{"user", "repo"},
+		},
+		{
+			{"user_name", "repo_name"},
+			{`user\_name`, `repo\_name`},
+		},
+		{
+			{"user_name_long", "user_name_long"},
+			{`user\_name\_long`, `user\_name\_long`},
+		},
+		{
+			{`user\_name\_long`, `repo\_name\_long`},
+			{`user\_name\_long`, `repo\_name\_long`},
+		},
+		{
+			{`user\_name\_long`, `repo\_name\_long`, ""},
+			{`user\_name\_long`, `repo\_name\_long`},
+		},
+	}
+
+	for _, testCase := range provider {
+		assert.Equal(t, testCase[1], escapeMarkdown(testCase[0]))
+	}
+}
+
+func TestEscapeMarkdownOne(t *testing.T) {
+	provider := [][]string{
+		{"user", "user"},
+		{"user_name", `user\_name`},
+		{"user_name_long", `user\_name\_long`},
+		{`user\_name\_escaped`, `user\_name\_escaped`},
+	}
+
+	for _, testCase := range provider {
+		assert.Equal(t, testCase[1], escapeMarkdownOne(testCase[0]))
+	}
 }
 
 func TestParseTo(t *testing.T) {

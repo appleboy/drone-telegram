@@ -84,6 +84,27 @@ func trimElement(keys []string) []string {
 	return newKeys
 }
 
+func escapeMarkdown(keys []string) []string {
+	var newKeys []string
+
+	for _, value := range keys {
+		value = escapeMarkdownOne(value)
+		if len(value) == 0 {
+			continue
+		}
+		newKeys = append(newKeys, value)
+	}
+
+	return newKeys
+}
+
+func escapeMarkdownOne(str string) string {
+	str = strings.Replace(str, `\_`, `_`, -1)
+	str = strings.Replace(str, `_`, `\_`, -1)
+
+	return str
+}
+
 func fileExist(keys []string) []string {
 	var newKeys []string
 
@@ -213,9 +234,25 @@ func (p Plugin) Exec() error {
 	locations := trimElement(p.Config.Location)
 	venues := trimElement(p.Config.Venue)
 
+	message = trimElement(message)
+
+	if p.Config.Format == "markdown" {
+		message = escapeMarkdown(message)
+
+		p.Build.Message = escapeMarkdownOne(p.Build.Author)
+		p.Build.Branch = escapeMarkdownOne(p.Build.Branch)
+		p.Build.Author = escapeMarkdownOne(p.Build.Author)
+		p.Build.Email = escapeMarkdownOne(p.Build.Email)
+		p.Build.Link = escapeMarkdownOne(p.Build.Link)
+		p.Build.PR = escapeMarkdownOne(p.Build.PR)
+
+		p.Repo.Owner = escapeMarkdownOne(p.Repo.Owner)
+		p.Repo.Name = escapeMarkdownOne(p.Repo.Name)
+	}
+
 	// send message.
 	for _, user := range ids {
-		for _, value := range trimElement(message) {
+		for _, value := range message {
 			txt, err := template.RenderTrim(value, p)
 			if err != nil {
 				return err
