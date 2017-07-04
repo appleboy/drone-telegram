@@ -156,6 +156,10 @@ func TestEscapeMarkdown(t *testing.T) {
 			{`user\_name\_long`, `repo\_name\_long`},
 			{`user\_name\_long`, `repo\_name\_long`},
 		},
+		{
+			{`user\_name\_long`, `repo\_name\_long`, ""},
+			{`user\_name\_long`, `repo\_name\_long`},
+		},
 	}
 
 	for _, testCase := range provider {
