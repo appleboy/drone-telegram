@@ -57,7 +57,7 @@ pipeline:
 
   github:
     image: plugins/github-release
-    secrets: [ github_token ]
+    secrets: [ github_release_api_key ]
     files:
       - dist/release/*
     when:
