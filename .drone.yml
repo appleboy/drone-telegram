@@ -1,6 +1,6 @@
 workspace:
-  base: /go
-  path: src/github.com/appleboy/drone-line
+  base: /go/src
+  path: github.com/appleboy/drone-telegram
 
 clone:
   git:
