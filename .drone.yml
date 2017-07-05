@@ -1,6 +1,6 @@
 workspace:
-  base: /go/src
-  path: github.com/appleboy/drone-telegram
+  base: /go
+  path: src/github.com/appleboy/drone-telegram
 
 clone:
   git:
@@ -31,9 +31,6 @@ pipeline:
   release:
     image: appleboy/golang-testing
     pull: true
-    environment:
-      TAGS: netgo
-      GOPATH: /srv/app
     commands:
       - make release
     when:
