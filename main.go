@@ -26,12 +26,12 @@ func main() {
 		cli.StringSliceFlag{
 			Name:   "to",
 			Usage:  "telegram user",
-			EnvVar: "PLUGIN_TO",
+			EnvVar: "PLUGIN_TO,TELEGRAM_TO",
 		},
 		cli.StringSliceFlag{
 			Name:   "message",
 			Usage:  "send telegram message",
-			EnvVar: "PLUGIN_MESSAGE",
+			EnvVar: "PLUGIN_MESSAGE,TELEGRAM_MESSAGE",
 		},
 		cli.StringSliceFlag{
 			Name:   "photo",
