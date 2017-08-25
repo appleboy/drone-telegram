@@ -239,7 +239,7 @@ func (p Plugin) Exec() error {
 	if p.Config.Format == "markdown" {
 		message = escapeMarkdown(message)
 
-		p.Build.Message = escapeMarkdownOne(p.Build.Author)
+		p.Build.Message = escapeMarkdownOne(p.Build.Message)
 		p.Build.Branch = escapeMarkdownOne(p.Build.Branch)
 		p.Build.Author = escapeMarkdownOne(p.Build.Author)
 		p.Build.Email = escapeMarkdownOne(p.Build.Email)
