@@ -41,6 +41,7 @@ type (
 		Token      string
 		Debug      bool
 		MatchEmail bool
+		WebPreview bool
 		To         []string
 		Message    []string
 		Photo      []string
@@ -260,6 +261,7 @@ func (p Plugin) Exec() error {
 
 			msg := tgbotapi.NewMessage(user, txt)
 			msg.ParseMode = p.Config.Format
+			msg.DisableWebPagePreview = !p.Config.WebPreview
 			p.Send(bot, msg)
 		}
 
