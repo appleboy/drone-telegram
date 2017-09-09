@@ -81,6 +81,7 @@ docker run --rm \
   -e DRONE_REPO_NAME=go-hello \
   -e DRONE_COMMIT_SHA=e5e82b5eb3737205c25955dcc3dcacc839b7be52 \
   -e DRONE_COMMIT_BRANCH=master \
+  -e DRONE_COMMIT_LINK=https://github.com/appleboy/go-hello/compare/master... \
   -e DRONE_COMMIT_AUTHOR=appleboy \
   -e DRONE_COMMIT_AUTHOR_EMAIL=appleboy@gmail.com \
   -e DRONE_BUILD_NUMBER=1 \
