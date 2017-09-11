@@ -83,6 +83,11 @@ func main() {
 			Usage:  "send message when only match email",
 			EnvVar: "PLUGIN_ONLY_MATCH_EMAIL",
 		},
+		cli.BoolTFlag{
+			Name:   "webpage.preview",
+			Usage:  "toggle web-page preview",
+			EnvVar: "PLUGIN_WEBPAGE_PREVIEW",
+		},
 		cli.StringFlag{
 			Name:   "format",
 			Value:  "markdown",
@@ -205,6 +210,7 @@ func run(c *cli.Context) error {
 			Token:      c.String("token"),
 			Debug:      c.Bool("debug"),
 			MatchEmail: c.Bool("match.email"),
+			WebPreview: c.Bool("webpage.preview"),
 			To:         c.StringSlice("to"),
 			Message:    c.StringSlice("message"),
 			Photo:      c.StringSlice("photo"),
