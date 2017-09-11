@@ -19,16 +19,21 @@ type (
 		Name  string
 	}
 
+	// Commit information.
+	Commit struct {
+		Sha     string
+		Branch  string
+		Link    string
+		Author  string
+		Email   string
+		Message string
+	}
+
 	// Build information.
 	Build struct {
 		Tag      string
 		Event    string
 		Number   int
-		Commit   string
-		Message  string
-		Branch   string
-		Author   string
-		Email    string
 		Status   string
 		Link     string
 		Started  float64
@@ -58,6 +63,7 @@ type (
 	// Plugin values.
 	Plugin struct {
 		Repo   Repo
+		Commit Commit
 		Build  Build
 		Config Config
 	}
@@ -212,7 +218,7 @@ func (p Plugin) Exec() error {
 	if len(p.Config.Message) > 0 {
 		message = p.Config.Message
 	} else {
-		message = p.Message(p.Repo, p.Build)
+		message = p.Message(p.Repo, p.Commit, p.Build)
 	}
 
 	bot, err := tgbotapi.NewBotAPI(p.Config.Token)
@@ -225,7 +231,7 @@ func (p Plugin) Exec() error {
 
 	bot.Debug = p.Config.Debug
 
-	ids := parseTo(p.Config.To, p.Build.Email, p.Config.MatchEmail)
+	ids := parseTo(p.Config.To, p.Commit.Email, p.Config.MatchEmail)
 	photos := fileExist(trimElement(p.Config.Photo))
 	documents := fileExist(trimElement(p.Config.Document))
 	stickers := fileExist(trimElement(p.Config.Sticker))
@@ -240,10 +246,13 @@ func (p Plugin) Exec() error {
 	if p.Config.Format == "markdown" {
 		message = escapeMarkdown(message)
 
-		p.Build.Message = escapeMarkdownOne(p.Build.Message)
-		p.Build.Branch = escapeMarkdownOne(p.Build.Branch)
-		p.Build.Author = escapeMarkdownOne(p.Build.Author)
-		p.Build.Email = escapeMarkdownOne(p.Build.Email)
+		p.Commit.Message = escapeMarkdownOne(p.Commit.Message)
+		p.Commit.Branch = escapeMarkdownOne(p.Commit.Branch)
+		p.Commit.Link = escapeMarkdownOne(p.Commit.Link)
+		p.Commit.Author = escapeMarkdownOne(p.Commit.Author)
+		p.Commit.Email = escapeMarkdownOne(p.Commit.Email)
+
+		p.Build.Tag = escapeMarkdownOne(p.Build.Tag)
 		p.Build.Link = escapeMarkdownOne(p.Build.Link)
 		p.Build.PR = escapeMarkdownOne(p.Build.PR)
 
@@ -333,12 +342,12 @@ func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) {
 }
 
 // Message is plugin default message.
-func (p Plugin) Message(repo Repo, build Build) []string {
+func (p Plugin) Message(repo Repo, commit Commit, build Build) []string {
 	return []string{fmt.Sprintf("[%s] <%s> (%s)『%s』by %s",
 		build.Status,
 		build.Link,
-		build.Branch,
-		build.Message,
-		build.Author,
+		commit.Branch,
+		commit.Message,
+		commit.Author,
 	)}
 }
