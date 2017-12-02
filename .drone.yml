@@ -23,8 +23,6 @@ pipeline:
       - make build
       # build binary for docker image
       - make static_build
-    when:
-      event: [ push, tag, pull_request ]
 
   release:
     image: appleboy/golang-testing
@@ -34,25 +32,32 @@ pipeline:
     when:
       event: [ tag ]
 
-  docker:
+  publish_server:
     image: plugins/docker
-    repo: ${DRONE_REPO}
-    tags: [ '${DRONE_TAG}' ]
+    group: release
+    pull: true
     secrets: [ docker_username, docker_password ]
+    default_tags: true
     when:
-      event: [ tag ]
+      event: [ push, tag ]
+      local: false
 
-  docker:
+  publish_alpine:
     image: plugins/docker
-    repo: ${DRONE_REPO}
-    tags: [ 'latest' ]
+    group: release
+    pull: true
+    dockerfile: Dockerfile.alpine
     secrets: [ docker_username, docker_password ]
+    default_tags: true
+    default_suffix: alpine
     when:
-      event: [ push ]
-      branch: [ master ]
+      event: [ push, tag ]
+      local: false
 
   github:
     image: plugins/github-release
+    pull: true
+    group: release
     secrets: [ github_release_api_key ]
     files:
       - dist/release/*

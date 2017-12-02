@@ -1,4 +1,7 @@
-FROM centurylink/ca-certs
+FROM alpine:3.6
+
+RUN apk add -U --no-cache ca-certificates && \
+  rm -rf /var/cache/apk/*
 
 LABEL maintainer="Bo-Yi Wu <appleboy.tw@gmail.com>"
 
