@@ -12,7 +12,7 @@ pipeline:
   test:
     image: appleboy/golang-testing
     pull: true
-    secrets: [ codecov_token, telegram_token, telegram_to ]
+    secrets: [ telegram_token, telegram_to ]
     commands:
       - make vet
       - make lint
@@ -20,9 +20,15 @@ pipeline:
       - make misspell-check
       - make test
       - make coverage
-      - make build
-      # build binary for docker image
       - make static_build
+
+  codecov:
+    image: robertstettner/drone-codecov
+    secrets: [ codecov_token ]
+    files:
+      - .cover/coverage.txt
+    when:
+      event: [ push, pull_request ]
 
   release:
     image: appleboy/golang-testing

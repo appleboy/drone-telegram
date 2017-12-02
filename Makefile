@@ -140,9 +140,6 @@ endif
 
 coverage:
 	sed -i '/main.go/d' coverage.txt
-	curl -s https://codecov.io/bash > .codecov && \
-	chmod +x .codecov && \
-	./.codecov -f coverage.txt
 
 clean:
 	go clean -x -i ./...
