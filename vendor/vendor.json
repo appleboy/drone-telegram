@@ -75,10 +75,10 @@
 			"revisionTime": "2017-06-25T03:28:08Z"
 		},
 		{
-			"checksumSHA1": "AzeP9gpBdHRcPQ5ozBpkBcqfInk=",
+			"checksumSHA1": "JaRjqSc0lOpA0V7avHWBex1IY+w=",
 			"path": "gopkg.in/telegram-bot-api.v4",
-			"revision": "0a57807db79efce7f6719fbb2c0e0f83fda79aec",
-			"revisionTime": "2016-11-25T05:50:35Z"
+			"revision": "2022d04b94f50056a09962b1ac81cdd821d20a55",
+			"revisionTime": "2017-11-09T18:51:50Z"
 		}
 	],
 	"rootPath": "github.com/appleboy/drone-telegram"

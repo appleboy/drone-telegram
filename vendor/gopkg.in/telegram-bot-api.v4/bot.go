@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/technoweenie/multipartstreamer"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -16,12 +16,16 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/technoweenie/multipartstreamer"
 )
 
 // BotAPI allows you to interact with the Telegram Bot API.
 type BotAPI struct {
-	Token  string       `json:"token"`
-	Debug  bool         `json:"debug"`
+	Token  string `json:"token"`
+	Debug  bool   `json:"debug"`
+	Buffer int    `json:"buffer"`
+
 	Self   User         `json:"-"`
 	Client *http.Client `json:"-"`
 }
@@ -41,11 +45,12 @@ func NewBotAPIWithClient(token string, client *http.Client) (*BotAPI, error) {
 	bot := &BotAPI{
 		Token:  token,
 		Client: client,
+		Buffer: 100,
 	}
 
 	self, err := bot.GetMe()
 	if err != nil {
-		return &BotAPI{}, err
+		return nil, err
 	}
 
 	bot.Self = self
@@ -63,27 +68,45 @@ func (bot *BotAPI) MakeRequest(endpoint string, params url.Values) (APIResponse,
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == http.StatusForbidden {
-		return APIResponse{}, errors.New(ErrAPIForbidden)
-	}
-
-	bytes, err := ioutil.ReadAll(resp.Body)
+	var apiResp APIResponse
+	bytes, err := bot.decodeAPIResponse(resp.Body, &apiResp)
 	if err != nil {
-		return APIResponse{}, err
+		return apiResp, err
 	}
 
 	if bot.Debug {
-		log.Println(endpoint, string(bytes))
+		log.Printf("%s resp: %s", endpoint, bytes)
 	}
 
-	var apiResp APIResponse
-	json.Unmarshal(bytes, &apiResp)
-
 	if !apiResp.Ok {
-		return APIResponse{}, errors.New(apiResp.Description)
+		return apiResp, errors.New(apiResp.Description)
 	}
 
 	return apiResp, nil
+}
+
+// decodeAPIResponse decode response and return slice of bytes if debug enabled.
+// If debug disabled, just decode http.Response.Body stream to APIResponse struct
+// for efficient memory usage
+func (bot *BotAPI) decodeAPIResponse(responseBody io.Reader, resp *APIResponse) (_ []byte, err error) {
+	if !bot.Debug {
+		dec := json.NewDecoder(responseBody)
+		err = dec.Decode(resp)
+		return
+	}
+
+	// if debug, read reponse body
+	data, err := ioutil.ReadAll(responseBody)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(data, resp)
+	if err != nil {
+		return
+	}
+
+	return data, nil
 }
 
 // makeMessageRequest makes a request to a method that returns a Message.
@@ -183,7 +206,11 @@ func (bot *BotAPI) UploadFile(endpoint string, params map[string]string, fieldna
 	}
 
 	var apiResp APIResponse
-	json.Unmarshal(bytes, &apiResp)
+
+	err = json.Unmarshal(bytes, &apiResp)
+	if err != nil {
+		return APIResponse{}, err
+	}
 
 	if !apiResp.Ok {
 		return APIResponse{}, errors.New(apiResp.Description)
@@ -408,29 +435,29 @@ func (bot *BotAPI) RemoveWebhook() (APIResponse, error) {
 // If you do not have a legitimate TLS certificate, you need to include
 // your self signed certificate with the config.
 func (bot *BotAPI) SetWebhook(config WebhookConfig) (APIResponse, error) {
+
 	if config.Certificate == nil {
 		v := url.Values{}
 		v.Add("url", config.URL.String())
+		if config.MaxConnections != 0 {
+			v.Add("max_connections", strconv.Itoa(config.MaxConnections))
+		}
 
 		return bot.MakeRequest("setWebhook", v)
 	}
 
 	params := make(map[string]string)
 	params["url"] = config.URL.String()
+	if config.MaxConnections != 0 {
+		params["max_connections"] = strconv.Itoa(config.MaxConnections)
+	}
 
 	resp, err := bot.UploadFile("setWebhook", params, "certificate", config.Certificate)
 	if err != nil {
 		return APIResponse{}, err
 	}
 
-	var apiResp APIResponse
-	json.Unmarshal(resp.Result, &apiResp)
-
-	if bot.Debug {
-		log.Printf("setWebhook resp: %+v\n", apiResp)
-	}
-
-	return apiResp, nil
+	return resp, nil
 }
 
 // GetWebhookInfo allows you to fetch information about a webhook and if
@@ -448,8 +475,8 @@ func (bot *BotAPI) GetWebhookInfo() (WebhookInfo, error) {
 }
 
 // GetUpdatesChan starts and returns a channel for getting updates.
-func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (<-chan Update, error) {
-	updatesChan := make(chan Update, 100)
+func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (UpdatesChannel, error) {
+	ch := make(chan Update, bot.Buffer)
 
 	go func() {
 		for {
@@ -465,18 +492,18 @@ func (bot *BotAPI) GetUpdatesChan(config UpdateConfig) (<-chan Update, error) {
 			for _, update := range updates {
 				if update.UpdateID >= config.Offset {
 					config.Offset = update.UpdateID + 1
-					updatesChan <- update
+					ch <- update
 				}
 			}
 		}
 	}()
 
-	return updatesChan, nil
+	return ch, nil
 }
 
 // ListenForWebhook registers a http handler for a webhook.
-func (bot *BotAPI) ListenForWebhook(pattern string) <-chan Update {
-	updatesChan := make(chan Update, 100)
+func (bot *BotAPI) ListenForWebhook(pattern string) UpdatesChannel {
+	ch := make(chan Update, bot.Buffer)
 
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		bytes, _ := ioutil.ReadAll(r.Body)
@@ -484,10 +511,10 @@ func (bot *BotAPI) ListenForWebhook(pattern string) <-chan Update {
 		var update Update
 		json.Unmarshal(bytes, &update)
 
-		updatesChan <- update
+		ch <- update
 	})
 
-	return updatesChan
+	return ch
 }
 
 // AnswerInlineQuery sends a response to an inline query.
@@ -535,7 +562,7 @@ func (bot *BotAPI) AnswerCallbackQuery(config CallbackConfig) (APIResponse, erro
 // KickChatMember kicks a user from a chat. Note that this only will work
 // in supergroups, and requires the bot to be an admin. Also note they
 // will be unable to rejoin until they are unbanned.
-func (bot *BotAPI) KickChatMember(config ChatMemberConfig) (APIResponse, error) {
+func (bot *BotAPI) KickChatMember(config KickChatMemberConfig) (APIResponse, error) {
 	v := url.Values{}
 
 	if config.SuperGroupUsername == "" {
@@ -544,6 +571,10 @@ func (bot *BotAPI) KickChatMember(config ChatMemberConfig) (APIResponse, error) 
 		v.Add("chat_id", config.SuperGroupUsername)
 	}
 	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	if config.UntilDate != 0 {
+		v.Add("until_date", strconv.FormatInt(config.UntilDate, 10))
+	}
 
 	bot.debugLog("kickChatMember", v, nil)
 
@@ -662,20 +693,102 @@ func (bot *BotAPI) GetChatMember(config ChatConfigWithUser) (ChatMember, error) 
 }
 
 // UnbanChatMember unbans a user from a chat. Note that this only will work
-// in supergroups, and requires the bot to be an admin.
+// in supergroups and channels, and requires the bot to be an admin.
 func (bot *BotAPI) UnbanChatMember(config ChatMemberConfig) (APIResponse, error) {
 	v := url.Values{}
 
-	if config.SuperGroupUsername == "" {
-		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
-	} else {
+	if config.SuperGroupUsername != "" {
 		v.Add("chat_id", config.SuperGroupUsername)
+	} else if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
 	}
 	v.Add("user_id", strconv.Itoa(config.UserID))
 
 	bot.debugLog("unbanChatMember", v, nil)
 
 	return bot.MakeRequest("unbanChatMember", v)
+}
+
+// RestrictChatMember to restrict a user in a supergroup. The bot must be an
+//administrator in the supergroup for this to work and must have the
+//appropriate admin rights. Pass True for all boolean parameters to lift
+//restrictions from a user. Returns True on success.
+func (bot *BotAPI) RestrictChatMember(config RestrictChatMemberConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername != "" {
+		v.Add("chat_id", config.SuperGroupUsername)
+	} else if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	}
+	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	if &config.CanSendMessages != nil {
+		v.Add("can_send_messages", strconv.FormatBool(*config.CanSendMessages))
+	}
+	if &config.CanSendMediaMessages != nil {
+		v.Add("can_send_media_messages", strconv.FormatBool(*config.CanSendMediaMessages))
+	}
+	if &config.CanSendOtherMessages != nil {
+		v.Add("can_send_other_messages", strconv.FormatBool(*config.CanSendOtherMessages))
+	}
+	if &config.CanAddWebPagePreviews != nil {
+		v.Add("can_add_web_page_previews", strconv.FormatBool(*config.CanAddWebPagePreviews))
+	}
+	if config.UntilDate != 0 {
+		v.Add("until_date", strconv.FormatInt(config.UntilDate, 10))
+	}
+
+	bot.debugLog("restrictChatMember", v, nil)
+
+	return bot.MakeRequest("restrictChatMember", v)
+}
+
+// PromoteChatMember add admin rights to user
+func (bot *BotAPI) PromoteChatMember(config PromoteChatMemberConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername != "" {
+		v.Add("chat_id", config.SuperGroupUsername)
+	} else if config.ChannelUsername != "" {
+		v.Add("chat_id", config.ChannelUsername)
+	} else {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	}
+	v.Add("user_id", strconv.Itoa(config.UserID))
+
+	if &config.CanChangeInfo != nil {
+		v.Add("can_change_info", strconv.FormatBool(*config.CanChangeInfo))
+	}
+	if &config.CanPostMessages != nil {
+		v.Add("can_post_messages", strconv.FormatBool(*config.CanPostMessages))
+	}
+	if &config.CanEditMessages != nil {
+		v.Add("can_edit_messages", strconv.FormatBool(*config.CanEditMessages))
+	}
+	if &config.CanDeleteMessages != nil {
+		v.Add("can_delete_messages", strconv.FormatBool(*config.CanDeleteMessages))
+	}
+	if &config.CanInviteUsers != nil {
+		v.Add("can_invite_users", strconv.FormatBool(*config.CanInviteUsers))
+	}
+	if &config.CanRestrictMembers != nil {
+		v.Add("can_restrict_members", strconv.FormatBool(*config.CanRestrictMembers))
+	}
+	if &config.CanPinMessages != nil {
+		v.Add("can_pin_messages", strconv.FormatBool(*config.CanPinMessages))
+	}
+	if &config.CanPromoteMembers != nil {
+		v.Add("can_promote_members", strconv.FormatBool(*config.CanPromoteMembers))
+	}
+
+	bot.debugLog("promoteChatMember", v, nil)
+
+	return bot.MakeRequest("promoteChatMember", v)
 }
 
 // GetGameHighScores allows you to get the high scores for a game.
@@ -691,4 +804,97 @@ func (bot *BotAPI) GetGameHighScores(config GetGameHighScoresConfig) ([]GameHigh
 	err = json.Unmarshal(resp.Result, &highScores)
 
 	return highScores, err
+}
+
+// AnswerShippingQuery allows you to reply to Update with shipping_query parameter.
+func (bot *BotAPI) AnswerShippingQuery(config ShippingConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	v.Add("shipping_query_id", config.ShippingQueryID)
+	v.Add("ok", strconv.FormatBool(config.OK))
+	if config.OK == true {
+		data, err := json.Marshal(config.ShippingOptions)
+		if err != nil {
+			return APIResponse{}, err
+		}
+		v.Add("shipping_options", string(data))
+	} else {
+		v.Add("error_message", config.ErrorMessage)
+	}
+
+	bot.debugLog("answerShippingQuery", v, nil)
+
+	return bot.MakeRequest("answerShippingQuery", v)
+}
+
+// AnswerPreCheckoutQuery allows you to reply to Update with pre_checkout_query.
+func (bot *BotAPI) AnswerPreCheckoutQuery(config PreCheckoutConfig) (APIResponse, error) {
+	v := url.Values{}
+
+	v.Add("pre_checkout_query_id", config.PreCheckoutQueryID)
+	v.Add("ok", strconv.FormatBool(config.OK))
+	if config.OK != true {
+		v.Add("error", config.ErrorMessage)
+	}
+
+	bot.debugLog("answerPreCheckoutQuery", v, nil)
+
+	return bot.MakeRequest("answerPreCheckoutQuery", v)
+}
+
+// DeleteMessage deletes a message in a chat
+func (bot *BotAPI) DeleteMessage(config DeleteMessageConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
+}
+
+// GetInviteLink get InviteLink for a chat
+func (bot *BotAPI) GetInviteLink(config ChatConfig) (string, error) {
+	v := url.Values{}
+
+	if config.SuperGroupUsername == "" {
+		v.Add("chat_id", strconv.FormatInt(config.ChatID, 10))
+	} else {
+		v.Add("chat_id", config.SuperGroupUsername)
+	}
+
+	resp, err := bot.MakeRequest("exportChatInviteLink", v)
+	if err != nil {
+		return "", err
+	}
+
+	var inviteLink string
+	err = json.Unmarshal(resp.Result, &inviteLink)
+
+	return inviteLink, err
+}
+
+// PinChatMessage pin message in supergroup
+func (bot *BotAPI) PinChatMessage(config PinChatMessageConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
+}
+
+// UnpinChatMessage unpin message in supergroup
+func (bot *BotAPI) UnpinChatMessage(config UnpinChatMessageConfig) (APIResponse, error) {
+	v, err := config.values()
+	if err != nil {
+		return APIResponse{}, err
+	}
+
+	bot.debugLog(config.method(), v, nil)
+
+	return bot.MakeRequest(config.method(), v)
 }
