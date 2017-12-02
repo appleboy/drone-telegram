@@ -272,3 +272,31 @@ func TestConvertLocation(t *testing.T) {
 		Longitude: float64(139.704051),
 	}, result)
 }
+
+func TestHTMLMessage(t *testing.T) {
+	plugin := Plugin{
+		Repo: Repo{
+			Name:  "go-hello",
+			Owner: "appleboy",
+		},
+		Commit: Commit{
+			Sha:     "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
+			Author:  "Bo-Yi Wu",
+			Branch:  "master",
+			Message: "Freakin' macOS isn't fully case-sensitive..",
+		},
+		Build: Build{
+			Number: 101,
+			Status: "success",
+			Link:   "https://github.com/appleboy/go-hello",
+		},
+
+		Config: Config{
+			Token: os.Getenv("TELEGRAM_TOKEN"),
+			To:    []string{os.Getenv("TELEGRAM_TO")},
+		},
+	}
+
+	err := plugin.Exec()
+	assert.Nil(t, err)
+}
