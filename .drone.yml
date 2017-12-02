@@ -44,7 +44,7 @@ pipeline:
     pull: true
     secrets: [ docker_username, docker_password ]
     default_tags: true
-    repo: appleboy/drone-telegram
+    repo: ${DRONE_REPO}
     when:
       event: [ push, tag ]
       local: false
@@ -57,7 +57,7 @@ pipeline:
     secrets: [ docker_username, docker_password ]
     default_tags: true
     default_suffix: alpine
-    repo: appleboy/drone-telegram
+    repo: ${DRONE_REPO}
     when:
       event: [ push, tag ]
       local: false
