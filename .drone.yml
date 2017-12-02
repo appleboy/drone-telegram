@@ -1,6 +1,6 @@
 workspace:
-  base: /go
-  path: src/github.com/appleboy/drone-telegram
+  base: /go/src
+  path: github.com/appleboy/drone-telegram
 
 clone:
   git:
@@ -12,8 +12,6 @@ pipeline:
   test:
     image: appleboy/golang-testing
     pull: true
-    environment:
-      TAGS: netgo
     secrets: [ codecov_token, telegram_token, telegram_to ]
     commands:
       - make vet
@@ -35,7 +33,6 @@ pipeline:
       - make release
     when:
       event: [ tag ]
-      branch: [ refs/tags/* ]
 
   docker:
     image: plugins/docker
@@ -44,7 +41,6 @@ pipeline:
     secrets: [ docker_username, docker_password ]
     when:
       event: [ tag ]
-      branch: [ refs/tags/* ]
 
   docker:
     image: plugins/docker
@@ -62,7 +58,6 @@ pipeline:
       - dist/release/*
     when:
       event: [ tag ]
-      branch: [ refs/tags/* ]
 
   facebook:
     image: appleboy/drone-facebook
