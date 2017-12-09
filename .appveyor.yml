@@ -1,0 +1,41 @@
+version: '{build}'
+image: 'Visual Studio 2017'
+
+clone_folder: 'c:\go\src\github.com\appleboy\drone-telegram'
+
+environment:
+  docker_username:
+    secure: em/TNLUXxG19O/HvbvfJuQ==
+  docker_password:
+    secure: Yo9FJJqihaNz5q8T4Jz8tQ==
+
+install:
+  - ps: |
+      docker version
+      go version
+build_script:
+  - ps: |
+      if ( $env:APPVEYOR_REPO_TAG ) {
+        go build -v -ldflags "-X main.Version=$env:APPVEYOR_REPO_TAG_NAME" -a -o drone-telegram.exe
+      } else {
+        go build -v -ldflags "-X main.Version=master" -a -o drone-telegram.exe
+      }
+      docker pull microsoft/nanoserver:10.0.14393.1593
+      docker build -f Dockerfile.windows -t appleboy/drone-telegram:windows .
+test_script:
+  - ps: |
+      docker run --rm appleboy/drone-telegram:windows --version
+deploy_script:
+  - ps: |
+      $ErrorActionPreference = 'Stop';
+      if ( $env:APPVEYOR_PULL_REQUEST_NUMBER ) {
+        Write-Host Nothing to deploy.
+      } else {
+        docker login --username $env:DOCKER_USERNAME --password $env:DOCKER_PASSWORD
+        if ( $env:APPVEYOR_REPO_TAG ) {
+          docker tag appleboy/drone-telegram:windows appleboy/drone-telegram:$env:APPVEYOR_REPO_TAG_NAME-windows
+          docker push appleboy/drone-telegram:$env:APPVEYOR_REPO_TAG_NAME-windows
+        } else {
+          docker push appleboy/drone-telegram:windows
+        }
+      }
