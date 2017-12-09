@@ -25,3 +25,4 @@ _testmain.go
 drone-telegram
 coverage.txt
 .env
+release
