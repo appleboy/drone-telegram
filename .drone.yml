@@ -65,17 +65,6 @@ pipeline:
     when:
       event: [ tag ]
 
-  publish_server:
-    image: plugins/docker
-    group: release
-    pull: true
-    secrets: [ docker_username, docker_password ]
-    default_tags: true
-    repo: ${DRONE_REPO}
-    when:
-      event: [ push, tag ]
-      local: false
-
   publish_alpine:
     image: plugins/docker
     group: release
@@ -85,6 +74,57 @@ pipeline:
     default_tags: true
     default_suffix: alpine
     repo: ${DRONE_REPO}
+    when:
+      event: [ push, tag ]
+      local: false
+
+  publish_linux_amd64:
+    image: plugins/docker:17.05
+    pull: true
+    secrets: [ docker_username, docker_password ]
+    group: release
+    repo: ${DRONE_REPO}
+    auto_tag: true
+    dockerfile: Dockerfile
+    when:
+      event: [ push, tag ]
+      local: false
+
+  publish_linux_i386:
+    image: plugins/docker:17.05
+    pull: true
+    secrets: [ docker_username, docker_password ]
+    group: release
+    repo: ${DRONE_REPO}
+    auto_tag: true
+    auto_tag_suffix: i386
+    dockerfile: Dockerfile.i386
+    when:
+      event: [ push, tag ]
+      local: false
+
+  publish_linux_arm64:
+    image: plugins/docker:17.05
+    pull: true
+    secrets: [ docker_username, docker_password ]
+    group: release
+    repo: ${DRONE_REPO}
+    auto_tag: true
+    auto_tag_suffix: arm64
+    dockerfile: Dockerfile.arm64
+    when:
+      event: [ push, tag ]
+      local: false
+
+  publish_linux_arm:
+    image: plugins/docker:17.05
+    pull: true
+    secrets: [ docker_username, docker_password ]
+    group: release
+    repo: ${DRONE_REPO}
+    auto_tag: true
+    auto_tag_suffix: arm
+    dockerfile: Dockerfile.arm
     when:
       event: [ push, tag ]
       local: false
