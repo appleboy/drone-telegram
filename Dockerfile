@@ -1,7 +1,10 @@
-FROM centurylink/ca-certs
+FROM plugins/base:multiarch
 
-LABEL maintainer="Bo-Yi Wu <appleboy.tw@gmail.com>"
+LABEL maintainer="Bo-Yi Wu <appleboy.tw@gmail.com>" \
+  org.label-schema.name="Drone Telegram" \
+  org.label-schema.vendor="Bo-Yi Wu" \
+  org.label-schema.schema-version="1.0"
 
-ADD drone-telegram /
+ADD release/linux/amd64/drone-telegram /bin/
 
-ENTRYPOINT ["/drone-telegram"]
+ENTRYPOINT ["/bin/drone-telegram"]

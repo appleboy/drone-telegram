@@ -20,7 +20,34 @@ pipeline:
       - make misspell-check
       - make test
       - make coverage
-      - make static_build
+
+  build_linux_amd64:
+    image: appleboy/golang-testing
+    pull: true
+    group: build
+    commands:
+      - make build_linux_amd64
+
+  build_linux_i386:
+    image: appleboy/golang-testing
+    pull: true
+    group: build
+    commands:
+      - make build_linux_i386
+
+  build_linux_arm64:
+    image: appleboy/golang-testing
+    pull: true
+    group: build
+    commands:
+      - make build_linux_arm64
+
+  build_linux_arm:
+    image: appleboy/golang-testing
+    pull: true
+    group: build
+    commands:
+      - make build_linux_arm
 
   codecov:
     image: robertstettner/drone-codecov
