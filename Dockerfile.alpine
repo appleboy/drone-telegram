@@ -1,10 +1,13 @@
 FROM alpine:3.6
 
+LABEL maintainer="Bo-Yi Wu <appleboy.tw@gmail.com>" \
+  org.label-schema.name="Drone Telegram" \
+  org.label-schema.vendor="Bo-Yi Wu" \
+  org.label-schema.schema-version="1.0"
+
 RUN apk add -U --no-cache ca-certificates && \
   rm -rf /var/cache/apk/*
 
-LABEL maintainer="Bo-Yi Wu <appleboy.tw@gmail.com>"
+ADD release/linux/amd64/drone-telegram /bin/
 
-ADD drone-telegram /
-
-ENTRYPOINT ["/drone-telegram"]
+ENTRYPOINT ["/bin/drone-telegram"]
