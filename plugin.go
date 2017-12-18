@@ -209,8 +209,6 @@ func parseTo(to []string, authorEmail string, matchEmail bool) []int64 {
 func (p Plugin) Exec() error {
 
 	if len(p.Config.Token) == 0 || len(p.Config.To) == 0 {
-		log.Println("missing telegram token or user list")
-
 		return errors.New("missing telegram token or user list")
 	}
 
@@ -223,9 +221,12 @@ func (p Plugin) Exec() error {
 
 	bot, err := tgbotapi.NewBotAPI(p.Config.Token)
 
-	if err != nil {
-		log.Println("Initialize New Bot Error:", err.Error())
+	// enable bot debug mode
+	if p.Config.Debug {
+		bot.Debug = true
+	}
 
+	if err != nil {
 		return err
 	}
 
@@ -271,39 +272,53 @@ func (p Plugin) Exec() error {
 			msg := tgbotapi.NewMessage(user, txt)
 			msg.ParseMode = p.Config.Format
 			msg.DisableWebPagePreview = !p.Config.WebPreview
-			p.Send(bot, msg)
+			if err := p.Send(bot, msg); err != nil {
+				return err
+			}
 		}
 
 		for _, value := range photos {
 			msg := tgbotapi.NewPhotoUpload(user, value)
-			p.Send(bot, msg)
+			if err := p.Send(bot, msg); err != nil {
+				return err
+			}
 		}
 
 		for _, value := range documents {
 			msg := tgbotapi.NewDocumentUpload(user, value)
-			p.Send(bot, msg)
+			if err := p.Send(bot, msg); err != nil {
+				return err
+			}
 		}
 
 		for _, value := range stickers {
 			msg := tgbotapi.NewStickerUpload(user, value)
-			p.Send(bot, msg)
+			if err := p.Send(bot, msg); err != nil {
+				return err
+			}
 		}
 
 		for _, value := range audios {
 			msg := tgbotapi.NewAudioUpload(user, value)
 			msg.Title = "Audio Message."
-			p.Send(bot, msg)
+			if err := p.Send(bot, msg); err != nil {
+				return err
+			}
 		}
 
 		for _, value := range voices {
 			msg := tgbotapi.NewVoiceUpload(user, value)
-			p.Send(bot, msg)
+			if err := p.Send(bot, msg); err != nil {
+				return err
+			}
 		}
 
 		for _, value := range videos {
 			msg := tgbotapi.NewVideoUpload(user, value)
 			msg.Caption = "Video Message"
-			p.Send(bot, msg)
+			if err := p.Send(bot, msg); err != nil {
+				return err
+			}
 		}
 
 		for _, value := range locations {
@@ -314,7 +329,9 @@ func (p Plugin) Exec() error {
 			}
 
 			msg := tgbotapi.NewLocation(user, location.Latitude, location.Longitude)
-			p.Send(bot, msg)
+			if err := p.Send(bot, msg); err != nil {
+				return err
+			}
 		}
 
 		for _, value := range venues {
@@ -325,7 +342,9 @@ func (p Plugin) Exec() error {
 			}
 
 			msg := tgbotapi.NewVenue(user, location.Title, location.Address, location.Latitude, location.Longitude)
-			p.Send(bot, msg)
+			if err := p.Send(bot, msg); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -333,12 +352,16 @@ func (p Plugin) Exec() error {
 }
 
 // Send bot message.
-func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) {
-	_, err := bot.Send(msg)
+func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) error {
+	message, err := bot.Send(msg)
 
-	if err != nil {
-		log.Println(err.Error())
+	if p.Config.Debug == true {
+		log.Println("=====================")
+		log.Printf("Response Message: %#v\n", message)
+		log.Println("=====================")
 	}
+
+	return err
 }
 
 // Message is plugin default message.

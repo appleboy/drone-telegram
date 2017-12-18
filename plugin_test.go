@@ -88,17 +88,17 @@ func TestSendMessage(t *testing.T) {
 	}
 
 	err := plugin.Exec()
-	assert.Nil(t, err)
+	assert.NotNil(t, err)
 
 	plugin.Config.Format = "markdown"
 	plugin.Config.Message = []string{"Test escape under_score"}
 	err = plugin.Exec()
-	assert.Nil(t, err)
+	assert.NotNil(t, err)
 
 	// disable message
 	plugin.Config.Message = []string{}
 	err = plugin.Exec()
-	assert.Nil(t, err)
+	assert.NotNil(t, err)
 }
 
 func TestBotError(t *testing.T) {

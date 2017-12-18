@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -183,7 +184,10 @@ func main() {
 			EnvVar: "ENV_FILE",
 		},
 	}
-	app.Run(os.Args)
+
+	if err := app.Run(os.Args); err != nil {
+		log.Println(err)
+	}
 }
 
 func run(c *cli.Context) error {
