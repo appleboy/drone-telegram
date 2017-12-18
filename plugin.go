@@ -209,8 +209,6 @@ func parseTo(to []string, authorEmail string, matchEmail bool) []int64 {
 func (p Plugin) Exec() error {
 
 	if len(p.Config.Token) == 0 || len(p.Config.To) == 0 {
-		log.Println("missing telegram token or user list")
-
 		return errors.New("missing telegram token or user list")
 	}
 
@@ -224,8 +222,6 @@ func (p Plugin) Exec() error {
 	bot, err := tgbotapi.NewBotAPI(p.Config.Token)
 
 	if err != nil {
-		log.Println("Initialize New Bot Error:", err.Error())
-
 		return err
 	}
 
