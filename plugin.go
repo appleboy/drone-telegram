@@ -221,6 +221,11 @@ func (p Plugin) Exec() error {
 
 	bot, err := tgbotapi.NewBotAPI(p.Config.Token)
 
+	// enable bot debug mode
+	if p.Config.Debug {
+		bot.Debug = true
+	}
+
 	if err != nil {
 		return err
 	}
@@ -348,7 +353,13 @@ func (p Plugin) Exec() error {
 
 // Send bot message.
 func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) error {
-	_, err := bot.Send(msg)
+	message, err := bot.Send(msg)
+
+	if p.Config.Debug == true {
+		log.Println("=====================")
+		log.Printf("Response Message: %#v\n", message)
+		log.Println("=====================")
+	}
 
 	return err
 }
