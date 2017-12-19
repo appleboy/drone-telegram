@@ -1,7 +1,9 @@
 version: '{build}'
 image: 'Visual Studio 2017'
+platform: x64
 
 clone_folder: 'c:\go\src\github.com\appleboy\drone-telegram'
+max_jobs: 1
 
 environment:
   GOPATH: c:\go
@@ -24,7 +26,12 @@ install:
 
 build_script:
   - ps: |
-      go build .
+      if ( $env:APPVEYOR_REPO_TAG -eq 'false' ) {
+        go build -ldflags "-X main.build=$env:APPVEYOR_BUILD_VERSION" -a -o drone-telegram.exe
+      } else {
+        $version = $env:APPVEYOR_REPO_TAG_NAME.substring(1)
+        go build -ldflags "-X main.Version=$version -X main.build=$env:APPVEYOR_BUILD_VERSION" -a -o drone-telegram.exe
+      }
       docker pull microsoft/nanoserver:10.0.14393.1884
       docker build -f Dockerfile.windows -t appleboy/drone-telegram:windows .
 
