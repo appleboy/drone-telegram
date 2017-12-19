@@ -10,14 +10,16 @@ import (
 )
 
 // Version set at compile-time
-var Version string
+var (
+	Version  string
+	BuildNum string
+)
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "telegram plugin"
 	app.Usage = "telegram plugin"
 	app.Action = run
-	app.Version = Version
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "token",
@@ -183,6 +185,12 @@ func main() {
 			Usage:  "source env file",
 			EnvVar: "ENV_FILE",
 		},
+	}
+
+	app.Version = Version
+
+	if BuildNum != "" {
+		app.Version = app.Version + "+" + BuildNum
 	}
 
 	if err := app.Run(os.Args); err != nil {

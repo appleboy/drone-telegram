@@ -11,7 +11,7 @@ PACKAGES ?= $(shell go list ./... | grep -v /vendor/)
 GOFILES := $(shell find . -name "*.go" -type f -not -path "./vendor/*")
 SOURCES ?= $(shell find . -name "*.go" -type f)
 TAGS ?=
-LDFLAGS ?= -X 'main.Version=$(VERSION)'
+LDFLAGS ?= -X 'main.Version=$(VERSION)' -X 'main.BuildNum=$(DRONE_BUILD_NUMBER)'
 TMPDIR := $(shell mktemp -d 2>/dev/null || mktemp -d -t 'tempdir')
 
 ifneq ($(shell uname), Darwin)
