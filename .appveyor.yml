@@ -41,5 +41,23 @@ test_script:
 
 deploy_script:
   - ps: |
-      docker login --username $env:DOCKER_USERNAME --password $env:DOCKER_PASSWORD
-      docker push appleboy/drone-telegram:windows
+      $ErrorActionPreference = 'Stop';
+      if ( $env:APPVEYOR_PULL_REQUEST_NUMBER ) {
+        Write-Host Nothing to deploy.
+      } else {
+        docker login --username $env:DOCKER_USERNAME --password $env:DOCKER_PASSWORD
+        if ( $env:APPVEYOR_REPO_TAG -eq 'true' ) {
+          $major,$minor,$patch = $env:APPVEYOR_REPO_TAG_NAME.substring(1).split('.')
+          docker push appleboy/drone-telegram:windows
+          docker tag appleboy/drone-telegram:windows appleboy/drone-telegram:$major.$minor.$patch-windows
+          docker push appleboy/drone-telegram:$major.$minor.$patch-windows
+          docker tag appleboy/drone-telegram:windows appleboy/drone-telegram:$major.$minor-windows
+          docker push appleboy/drone-telegram:$major.$minor-windows
+          docker tag appleboy/drone-telegram:windows appleboy/drone-telegram:$major-windows
+          docker push appleboy/drone-telegram:$major-windows
+        } else {
+          if ( $env:APPVEYOR_REPO_BRANCH -eq 'master' ) {
+            docker push appleboy/drone-telegram:windows
+          }
+        }
+      }
