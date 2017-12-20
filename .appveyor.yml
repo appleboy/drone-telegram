@@ -27,10 +27,10 @@ install:
 build_script:
   - ps: |
       if ( $env:APPVEYOR_REPO_TAG -eq 'false' ) {
-        go build -ldflags "-X main.build=$env:APPVEYOR_BUILD_VERSION" -a -o drone-telegram.exe
+        go build -ldflags "-X main.BuildNum=$env:APPVEYOR_BUILD_VERSION" -a -o drone-telegram.exe
       } else {
         $version = $env:APPVEYOR_REPO_TAG_NAME
-        go build -ldflags "-X main.Version=$version -X main.build=$env:APPVEYOR_BUILD_VERSION" -a -o drone-telegram.exe
+        go build -ldflags "-X main.Version=$version -X main.BuildNum=$env:APPVEYOR_BUILD_VERSION" -a -o drone-telegram.exe
       }
       docker pull microsoft/nanoserver:10.0.14393.1884
       docker build -f Dockerfile.windows -t appleboy/drone-telegram:windows .
