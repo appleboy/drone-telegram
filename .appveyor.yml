@@ -27,7 +27,7 @@ install:
 build_script:
   - ps: |
       if ( $env:APPVEYOR_REPO_TAG -eq 'false' ) {
-        go build -ldflags "-X main.BuildNum=$env:APPVEYOR_BUILD_VERSION" -a -o drone-telegram.exe
+        go build -ldflags "-X main.Version=$env:APPVEYOR_REPO_COMMIT -X main.BuildNum=$env:APPVEYOR_BUILD_VERSION" -a -o drone-telegram.exe
       } else {
         $version = $env:APPVEYOR_REPO_TAG_NAME
         go build -ldflags "-X main.Version=$version -X main.BuildNum=$env:APPVEYOR_BUILD_VERSION" -a -o drone-telegram.exe
