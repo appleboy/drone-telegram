@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -112,14 +112,17 @@ func escapeMarkdownOne(str string) string {
 	return str
 }
 
-func fileExist(keys []string) []string {
+func globList(keys []string) []string {
 	var newKeys []string
 
-	for _, value := range keys {
-		if _, err := os.Stat(value); os.IsNotExist(err) {
+	for _, pattern := range keys {
+		pattern = strings.Trim(pattern, " ")
+		matches, err := filepath.Glob(pattern)
+		if err != nil {
+			fmt.Printf("Glob error for %q: %s\n", pattern, err)
 			continue
 		}
-		newKeys = append(newKeys, value)
+		newKeys = append(newKeys, matches...)
 	}
 
 	return newKeys
@@ -233,12 +236,12 @@ func (p Plugin) Exec() error {
 	bot.Debug = p.Config.Debug
 
 	ids := parseTo(p.Config.To, p.Commit.Email, p.Config.MatchEmail)
-	photos := fileExist(trimElement(p.Config.Photo))
-	documents := fileExist(trimElement(p.Config.Document))
-	stickers := fileExist(trimElement(p.Config.Sticker))
-	audios := fileExist(trimElement(p.Config.Audio))
-	voices := fileExist(trimElement(p.Config.Voice))
-	videos := fileExist(trimElement(p.Config.Video))
+	photos := globList(trimElement(p.Config.Photo))
+	documents := globList(trimElement(p.Config.Document))
+	stickers := globList(trimElement(p.Config.Sticker))
+	audios := globList(trimElement(p.Config.Audio))
+	voices := globList(trimElement(p.Config.Voice))
+	videos := globList(trimElement(p.Config.Video))
 	locations := trimElement(p.Config.Location)
 	venues := trimElement(p.Config.Venue)
 

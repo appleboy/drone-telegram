@@ -206,14 +206,17 @@ func TestParseTo(t *testing.T) {
 	assert.Equal(t, 0, len(ids))
 }
 
-func TestCheckFileExist(t *testing.T) {
+func TestGlobList(t *testing.T) {
 	var input []string
 	var result []string
 
 	input = []string{"tests/gophercolor.png", "測試", "3"}
 	result = []string{"tests/gophercolor.png"}
+	assert.Equal(t, result, globList(input))
 
-	assert.Equal(t, result, fileExist(input))
+	input = []string{"tests/*.mp3"}
+	result = []string{"tests/audio.mp3"}
+	assert.Equal(t, result, globList(input))
 }
 
 func TestConvertLocation(t *testing.T) {
