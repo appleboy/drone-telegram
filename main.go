@@ -194,7 +194,7 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 }
 
