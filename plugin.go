@@ -197,13 +197,11 @@ func parseTo(to []string, authorEmail string, matchEmail bool) []int64 {
 		ids = append(ids, id)
 	}
 
-	if matchEmail == true && attachEmail == false {
+	if matchEmail && !attachEmail {
 		return emails
 	}
 
-	for _, value := range emails {
-		ids = append(ids, value)
-	}
+	ids = append(ids, emails...)
 
 	return ids
 }
@@ -327,7 +325,7 @@ func (p Plugin) Exec() error {
 		for _, value := range locations {
 			location, empty := convertLocation(value)
 
-			if empty == true {
+			if empty {
 				continue
 			}
 
@@ -340,7 +338,7 @@ func (p Plugin) Exec() error {
 		for _, value := range venues {
 			location, empty := convertLocation(value)
 
-			if empty == true {
+			if empty {
 				continue
 			}
 
@@ -358,7 +356,7 @@ func (p Plugin) Exec() error {
 func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) error {
 	message, err := bot.Send(msg)
 
-	if p.Config.Debug == true {
+	if p.Config.Debug {
 		log.Println("=====================")
 		log.Printf("Response Message: %#v\n", message)
 		log.Println("=====================")
