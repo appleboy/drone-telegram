@@ -8,7 +8,6 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/appleboy/drone-telegram)](https://goreportcard.com/report/github.com/appleboy/drone-telegram)
 [![Docker Pulls](https://img.shields.io/docker/pulls/appleboy/drone-telegram.svg)](https://hub.docker.com/r/appleboy/drone-telegram/)
 [![](https://images.microbadger.com/badges/image/appleboy/drone-telegram.svg)](https://microbadger.com/images/appleboy/drone-telegram "Get your own image badge on microbadger.com")
-[![Release](https://github-release-version.herokuapp.com/github/appleboy/drone-telegram/release.svg?style=flat)](https://github.com/appleboy/drone-telegram/releases/latest)
 
 [Drone](https://github.com/drone/drone) plugin for sending telegram notifications. For the usage
 information and a listing of the available options please take a look at [the docs](http://plugins.drone.io/appleboy/drone-telegram/).
