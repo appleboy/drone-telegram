@@ -3,7 +3,7 @@
 # drone-telegram
 
 [![GoDoc](https://godoc.org/github.com/appleboy/drone-telegram?status.svg)](https://godoc.org/github.com/appleboy/drone-telegram)
-[![Build Status](http://drone.wu-boy.com/api/badges/appleboy/drone-telegram/status.svg)](http://drone.wu-boy.com/appleboy/drone-telegram)
+[![Build Status](https://cloud.drone.io/api/badges/appleboy/drone-telegram/status.svg)](https://cloud.drone.io/appleboy/drone-telegram)
 [![codecov](https://codecov.io/gh/appleboy/drone-telegram/branch/master/graph/badge.svg)](https://codecov.io/gh/appleboy/drone-telegram)
 [![Go Report Card](https://goreportcard.com/badge/github.com/appleboy/drone-telegram)](https://goreportcard.com/report/github.com/appleboy/drone-telegram)
 [![Docker Pulls](https://img.shields.io/docker/pulls/appleboy/drone-telegram.svg)](https://hub.docker.com/r/appleboy/drone-telegram/)
