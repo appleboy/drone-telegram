@@ -1,6 +1,324 @@
 ---
 kind: pipeline
-name: default
+name: testing
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: vet
+  pull: always
+  image: golang:1.11
+  commands:
+  - make vet
+  environment:
+    GO111MODULE: on
+  volumes:
+  - name: gopath
+    path: /go
+
+- name: lint
+  pull: always
+  image: golang:1.11
+  commands:
+  - make lint
+  environment:
+    GO111MODULE: on
+  volumes:
+  - name: gopath
+    path: /go
+
+- name: misspell
+  pull: always
+  image: golang:1.11
+  commands:
+  - make misspell-check
+  environment:
+    GO111MODULE: on
+  volumes:
+  - name: gopath
+    path: /go
+
+- name: test
+  pull: always
+  image: golang:1.11
+  commands:
+  - make test
+  - make coverage
+  environment:
+    GO111MODULE: on
+    TELEGRAM_TO:
+      from_secret: telegram_to
+    TELEGRAM_TOKEN:
+      from_secret: telegram_token
+  volumes:
+  - name: gopath
+    path: /go
+
+- name: codecov
+  pull: always
+  image: robertstettner/drone-codecov
+  settings:
+    token:
+      from_secret: codecov_token
+
+volumes:
+- name: gopath
+  temp: {}
+
+---
+kind: pipeline
+name: linux-amd64
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build-push
+  pull: always
+  image: golang:1.11
+  commands:
+  - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-telegram"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+      exclude:
+      - tag
+
+- name: build-tag
+  pull: always
+  image: golang:1.11
+  commands:
+  - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-telegram"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - tag
+
+- name: executable
+  pull: always
+  image: golang:1.11
+  commands:
+  - ./release/linux/amd64/drone-telegram --help
+
+- name: dryrun
+  pull: always
+  image: plugins/docker:linux-amd64
+  settings:
+    dockerfile: docker/Dockerfile.linux.amd64
+    dry_run: true
+    password:
+      from_secret: docker_password
+    repo: appleboy/drone-telegram
+    tags: linux-amd64
+    username:
+      from_secret: docker_username
+  when:
+    event:
+    - pull_request
+
+- name: publish
+  pull: always
+  image: plugins/docker:linux-amd64
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-amd64
+    daemon_off: false
+    dockerfile: docker/Dockerfile.linux.amd64
+    password:
+      from_secret: docker_password
+    repo: appleboy/drone-telegram
+    username:
+      from_secret: docker_username
+  when:
+    event:
+      exclude:
+      - pull_request
+
+trigger:
+  ref:
+  - refs/heads/master
+  - "refs/pull/**"
+  - "refs/tags/**"
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+name: linux-arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+- name: build-push
+  pull: always
+  image: golang:1.11
+  commands:
+  - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-telegram"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+      exclude:
+      - tag
+
+- name: build-tag
+  pull: always
+  image: golang:1.11
+  commands:
+  - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-telegram"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - tag
+
+- name: executable
+  pull: always
+  image: golang:1.11
+  commands:
+  - ./release/linux/arm64/drone-telegram --help
+
+- name: dryrun
+  pull: always
+  image: plugins/docker:linux-arm64
+  settings:
+    dockerfile: docker/Dockerfile.linux.arm64
+    dry_run: true
+    password:
+      from_secret: docker_password
+    repo: appleboy/drone-telegram
+    tags: linux-arm64
+    username:
+      from_secret: docker_username
+  when:
+    event:
+    - pull_request
+
+- name: publish
+  pull: always
+  image: plugins/docker:linux-arm64
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-arm64
+    daemon_off: false
+    dockerfile: docker/Dockerfile.linux.arm64
+    password:
+      from_secret: docker_password
+    repo: appleboy/drone-telegram
+    username:
+      from_secret: docker_username
+  when:
+    event:
+      exclude:
+      - pull_request
+
+trigger:
+  ref:
+  - refs/heads/master
+  - "refs/pull/**"
+  - "refs/tags/**"
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+name: linux-arm
+
+platform:
+  os: linux
+  arch: arm
+
+steps:
+- name: build-push
+  pull: always
+  image: golang:1.11
+  commands:
+  - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-telegram"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+      exclude:
+      - tag
+
+- name: build-tag
+  pull: always
+  image: golang:1.11
+  commands:
+  - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-telegram"
+  environment:
+    CGO_ENABLED: 0
+    GO111MODULE: on
+  when:
+    event:
+    - tag
+
+- name: executable
+  pull: always
+  image: golang:1.11
+  commands:
+  - ./release/linux/arm/drone-telegram --help
+
+- name: dryrun
+  pull: always
+  image: plugins/docker:linux-arm
+  settings:
+    dockerfile: docker/Dockerfile.linux.arm
+    dry_run: true
+    password:
+      from_secret: docker_password
+    repo: appleboy/drone-telegram
+    tags: linux-arm
+    username:
+      from_secret: docker_username
+  when:
+    event:
+    - pull_request
+
+- name: publish
+  pull: always
+  image: plugins/docker:linux-arm
+  settings:
+    auto_tag: true
+    auto_tag_suffix: linux-arm
+    daemon_off: false
+    dockerfile: docker/Dockerfile.linux.arm
+    password:
+      from_secret: docker_password
+    repo: appleboy/drone-telegram
+    username:
+      from_secret: docker_username
+  when:
+    event:
+      exclude:
+      - pull_request
+
+trigger:
+  ref:
+  - refs/heads/master
+  - "refs/pull/**"
+  - "refs/tags/**"
+
+depends_on:
+- testing
+
+---
+kind: pipeline
+name: notifications
 
 platform:
   os: linux
@@ -9,208 +327,24 @@ platform:
 clone:
   disable: true
 
-workspace:
-  base: /go/src
-  path: github.com/appleboy/drone-telegram
-
 steps:
-- name: git
-  pull: default
-  image: plugins/git
+- name: microbadger
+  pull: always
+  image: plugins/webhook:1
   settings:
-    depth: 50
-    tags: true
+    url:
+      from_secret: microbadger_url
 
-- name: test
-  pull: always
-  image: golang:1.11
-  commands:
-  - make vet
-  - make lint
-  - make test-vendor
-  - make misspell-check
-  - make test
-  - make coverage
-  environment:
-    TELEGRAM_TO:
-      from_secret: telegram_to
-    TELEGRAM_TOKEN:
-      from_secret: telegram_token
+trigger:
+  branch:
+  - master
+  event:
+  - push
+  - tag
 
-- name: build_linux_amd64
-  pull: always
-  image: golang:1.11
-  commands:
-  - make build_linux_amd64
-  settings:
-    group: build
-
-- name: build_linux_i386
-  pull: always
-  image: golang:1.11
-  commands:
-  - make build_linux_i386
-  settings:
-    group: build
-
-- name: build_linux_arm64
-  pull: always
-  image: golang:1.11
-  commands:
-  - make build_linux_arm64
-  settings:
-    group: build
-
-- name: build_linux_arm
-  pull: always
-  image: golang:1.11
-  commands:
-  - make build_linux_arm
-  settings:
-    group: build
-
-- name: codecov
-  pull: default
-  image: robertstettner/drone-codecov
-  settings:
-    files:
-    - .cover/coverage.txt
-  environment:
-    CODECOV_TOKEN:
-      from_secret: codecov_token
-  when:
-    event:
-    - push
-    - pull_request
-
-- name: release
-  pull: always
-  image: golang:1.11
-  commands:
-  - make release
-  when:
-    event:
-    - tag
-
-- name: publish_alpine
-  pull: always
-  image: plugins/docker
-  settings:
-    default_suffix: alpine
-    default_tags: true
-    dockerfile: Dockerfile.alpine
-    group: release
-    repo: "${DRONE_REPO}"
-  environment:
-    DOCKER_PASSWORD:
-      from_secret: docker_password
-    DOCKER_USERNAME:
-      from_secret: docker_username
-  when:
-    event:
-    - push
-    - tag
-
-- name: publish_linux_amd64
-  pull: always
-  image: plugins/docker:17.05
-  settings:
-    auto_tag: true
-    dockerfile: Dockerfile
-    group: release
-    repo: "${DRONE_REPO}"
-  environment:
-    DOCKER_PASSWORD:
-      from_secret: docker_password
-    DOCKER_USERNAME:
-      from_secret: docker_username
-  when:
-    event:
-    - push
-    - tag
-
-- name: publish_linux_i386
-  pull: always
-  image: plugins/docker:17.05
-  settings:
-    auto_tag: true
-    auto_tag_suffix: i386
-    dockerfile: Dockerfile.i386
-    group: release
-    repo: "${DRONE_REPO}"
-  environment:
-    DOCKER_PASSWORD:
-      from_secret: docker_password
-    DOCKER_USERNAME:
-      from_secret: docker_username
-  when:
-    event:
-    - push
-    - tag
-
-- name: publish_linux_arm64
-  pull: always
-  image: plugins/docker:17.05
-  settings:
-    auto_tag: true
-    auto_tag_suffix: arm64
-    dockerfile: Dockerfile.arm64
-    group: release
-    repo: "${DRONE_REPO}"
-  environment:
-    DOCKER_PASSWORD:
-      from_secret: docker_password
-    DOCKER_USERNAME:
-      from_secret: docker_username
-  when:
-    event:
-    - push
-    - tag
-
-- name: publish_linux_arm
-  pull: always
-  image: plugins/docker:17.05
-  settings:
-    auto_tag: true
-    auto_tag_suffix: arm
-    dockerfile: Dockerfile.arm
-    group: release
-    repo: "${DRONE_REPO}"
-  environment:
-    DOCKER_PASSWORD:
-      from_secret: docker_password
-    DOCKER_USERNAME:
-      from_secret: docker_username
-  when:
-    event:
-    - push
-    - tag
-
-- name: github
-  pull: always
-  image: plugins/github-release
-  settings:
-    files:
-    - "dist/release/*"
-    group: release
-  environment:
-    GITHUB_RELEASE_API_KEY:
-      from_secret: github_release_api_key
-  when:
-    event:
-    - tag
-
-- name: discord
-  pull: always
-  image: appleboy/drone-discord
-  environment:
-    DISCORD_WEBHOOK_ID:
-      from_secret: discord_webhook_id
-    DISCORD_WEBHOOK_TOKEN:
-      from_secret: discord_webhook_token
-  when:
-    status:
-    - changed
-    - failure
+depends_on:
+- linux-amd64
+- linux-arm64
+- linux-arm
 
 ...
