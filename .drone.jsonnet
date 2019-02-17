@@ -267,6 +267,11 @@ local PipelineNotifications(os='linux', arch='amd64', depends_on=[]) = {
   },
 };
 
+local Signature = {
+  kind: 'signature',
+  hmac: '9a4dcc3659b6f2cb98486e40e4cb0c16d6fc19ad783d3bca13d30c476daf8213',
+};
+
 [
   PipelineTesting,
   PipelineBuild(name, 'linux', 'amd64'),
@@ -279,4 +284,5 @@ local PipelineNotifications(os='linux', arch='amd64', depends_on=[]) = {
     'linux-arm',
     'release-binary',
   ]),
+  Signature,
 ]
