@@ -250,6 +250,17 @@ local PipelineNotifications(os='linux', arch='amd64', depends_on=[]) = {
   },
   steps: [
     {
+      name: 'manifest',
+      image: 'plugins/manifest',
+      pull: 'always',
+      settings: {
+        username: { from_secret: 'docker_username' },
+        password: { from_secret: 'docker_password' },
+        spec: 'docker/manifest.tmpl',
+        ignore_missing: true,
+      },
+    },
+    {
       name: 'microbadger',
       image: 'plugins/webhook:1',
       pull: 'always',
