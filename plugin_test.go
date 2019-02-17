@@ -51,29 +51,27 @@ func TestDefaultMessageFormat(t *testing.T) {
 	assert.Equal(t, []string{"[success] <https://github.com/appleboy/go-hello> (master)『update travis』by Bo-Yi Wu"}, message)
 }
 
-// func TestDefaultMessageFormatFromGitHub(t *testing.T) {
-// 	plugin := Plugin{
-// 		Repo: Repo{
-// 			Name:      "go-hello",
-// 			Namespace: "appleboy",
-// 		},
-// 		Commit: Commit{
-// 			Sha:     "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
-// 			Author:  "Bo-Yi Wu",
-// 			Branch:  "master",
-// 			Message: "update travis",
-// 		},
-// 		Build: Build{
-// 			Number: 101,
-// 			Status: "success",
-// 			Link:   "https://github.com/appleboy/go-hello",
-// 		},
-// 	}
+func TestDefaultMessageFormatFromGitHub(t *testing.T) {
+	plugin := Plugin{
+		Config: Config{
+			GitHub: true,
+		},
+		Repo: Repo{
+			FullName:  "appleboy/go-hello",
+			Name:      "go-hello",
+			Namespace: "appleboy",
+		},
+		GitHub: GitHub{
+			Workflow:  "test-workflow",
+			Action:    "send notification",
+			EventName: "push",
+		},
+	}
 
-// 	message := plugin.Message()
+	message := plugin.Message()
 
-// 	assert.Equal(t, []string{"[success] <https://github.com/appleboy/go-hello> (master)『update travis』by Bo-Yi Wu"}, message)
-// }
+	assert.Equal(t, []string{"appleboy/go-hello/test-workflow triggered by appleboy (push)"}, message)
+}
 
 func TestSendMessage(t *testing.T) {
 	plugin := Plugin{

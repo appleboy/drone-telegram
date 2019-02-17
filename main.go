@@ -200,6 +200,31 @@ func main() {
 			Usage:  "Boolean value, indicates the runtime environment is GitHub Action.",
 			EnvVar: "PLUGIN_GITHUB,GITHUB",
 		},
+		cli.StringFlag{
+			Name:   "github.workflow",
+			Usage:  "The name of the workflow.",
+			EnvVar: "GITHUB_WORKFLOW",
+		},
+		cli.StringFlag{
+			Name:   "github.action",
+			Usage:  "The name of the action.",
+			EnvVar: "GITHUB_ACTION",
+		},
+		cli.StringFlag{
+			Name:   "github.event.name",
+			Usage:  "The webhook name of the event that triggered the workflow.",
+			EnvVar: "GITHUB_EVENT_NAME",
+		},
+		cli.StringFlag{
+			Name:   "github.event.path",
+			Usage:  "The path to a file that contains the payload of the event that triggered the workflow. Value: /github/workflow/event.json.",
+			EnvVar: "GITHUB_EVENT_PATH",
+		},
+		cli.StringFlag{
+			Name:   "github.workspace",
+			Usage:  "The GitHub workspace path. Value: /github/workspace.",
+			EnvVar: "GITHUB_WORKSPACE",
+		},
 	}
 
 	app.Version = Version
@@ -219,6 +244,13 @@ func run(c *cli.Context) error {
 	}
 
 	plugin := Plugin{
+		GitHub: GitHub{
+			Workflow:  c.String("github.workflow"),
+			Workspace: c.String("github.workspace"),
+			Action:    c.String("github.action"),
+			EventName: c.String("github.event.name"),
+			EventPath: c.String("github.event.path"),
+		},
 		Repo: Repo{
 			FullName:  c.String("repo"),
 			Namespace: c.String("repo.namespace"),

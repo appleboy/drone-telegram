@@ -13,6 +13,15 @@ import (
 )
 
 type (
+	// GitHub information.
+	GitHub struct {
+		Workflow  string
+		Workspace string
+		Action    string
+		EventName string
+		EventPath string
+	}
+
 	// Repo information.
 	Repo struct {
 		FullName  string
@@ -65,6 +74,7 @@ type (
 
 	// Plugin values.
 	Plugin struct {
+		GitHub GitHub
 		Repo   Repo
 		Commit Commit
 		Build  Build
@@ -370,6 +380,15 @@ func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) error {
 
 // Message is plugin default message.
 func (p Plugin) Message() []string {
+	if p.Config.GitHub {
+		return []string{fmt.Sprintf("%s/%s triggered by %s (%s)",
+			p.Repo.FullName,
+			p.GitHub.Workflow,
+			p.Repo.Namespace,
+			p.GitHub.EventName,
+		)}
+	}
+
 	return []string{fmt.Sprintf("[%s] <%s> (%s)『%s』by %s",
 		p.Build.Status,
 		p.Build.Link,
