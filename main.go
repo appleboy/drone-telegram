@@ -98,9 +98,14 @@ func main() {
 			EnvVar: "PLUGIN_FORMAT",
 		},
 		cli.StringFlag{
-			Name:   "repo.owner",
-			Usage:  "repository owner",
-			EnvVar: "DRONE_REPO_OWNER",
+			Name:   "repo",
+			Usage:  "repository owner and repository name",
+			EnvVar: "DRONE_REPO,GITHUB_REPOSITORY",
+		},
+		cli.StringFlag{
+			Name:   "repo.namespace",
+			Usage:  "repository namespace",
+			EnvVar: "DRONE_REPO_NAMESPACE,GITHUB_ACTOR",
 		},
 		cli.StringFlag{
 			Name:   "repo.name",
@@ -190,6 +195,11 @@ func main() {
 			Usage:  "source env file",
 			EnvVar: "ENV_FILE",
 		},
+		cli.BoolFlag{
+			Name:   "github",
+			Usage:  "Boolean value, indicates the runtime environment is GitHub Action.",
+			EnvVar: "PLUGIN_GITHUB,GITHUB",
+		},
 	}
 
 	app.Version = Version
@@ -210,8 +220,9 @@ func run(c *cli.Context) error {
 
 	plugin := Plugin{
 		Repo: Repo{
-			Owner: c.String("repo.owner"),
-			Name:  c.String("repo.name"),
+			FullName:  c.String("repo"),
+			Namespace: c.String("repo.namespace"),
+			Name:      c.String("repo.name"),
 		},
 		Commit: Commit{
 			Sha:     c.String("commit.sha"),
@@ -248,6 +259,7 @@ func run(c *cli.Context) error {
 			Video:      c.StringSlice("video"),
 			Venue:      c.StringSlice("venue"),
 			Format:     c.String("format"),
+			GitHub:     c.Bool("github"),
 		},
 	}
 

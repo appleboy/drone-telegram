@@ -15,8 +15,9 @@ import (
 type (
 	// Repo information.
 	Repo struct {
-		Owner string
-		Name  string
+		FullName  string
+		Namespace string
+		Name      string
 	}
 
 	// Commit information.
@@ -59,6 +60,7 @@ type (
 		Video      []string
 		Venue      []string
 		Format     string
+		GitHub     bool
 	}
 
 	// Plugin values.
@@ -259,7 +261,7 @@ func (p Plugin) Exec() error {
 		p.Build.Link = escapeMarkdownOne(p.Build.Link)
 		p.Build.PR = escapeMarkdownOne(p.Build.PR)
 
-		p.Repo.Owner = escapeMarkdownOne(p.Repo.Owner)
+		p.Repo.Namespace = escapeMarkdownOne(p.Repo.Namespace)
 		p.Repo.Name = escapeMarkdownOne(p.Repo.Name)
 	}
 

@@ -30,8 +30,8 @@ func TestMissingUserConfig(t *testing.T) {
 func TestDefaultMessageFormat(t *testing.T) {
 	plugin := Plugin{
 		Repo: Repo{
-			Name:  "go-hello",
-			Owner: "appleboy",
+			Name:      "go-hello",
+			Namespace: "appleboy",
 		},
 		Commit: Commit{
 			Sha:     "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
@@ -54,8 +54,8 @@ func TestDefaultMessageFormat(t *testing.T) {
 func TestSendMessage(t *testing.T) {
 	plugin := Plugin{
 		Repo: Repo{
-			Name:  "go-hello",
-			Owner: "appleboy",
+			Name:      "go-hello",
+			Namespace: "appleboy",
 		},
 		Commit: Commit{
 			Sha:     "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
@@ -104,8 +104,8 @@ func TestSendMessage(t *testing.T) {
 func TestBotError(t *testing.T) {
 	plugin := Plugin{
 		Repo: Repo{
-			Name:  "go-hello",
-			Owner: "appleboy",
+			Name:      "go-hello",
+			Namespace: "appleboy",
 		},
 		Commit: Commit{
 			Sha:     "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
@@ -279,8 +279,8 @@ func TestConvertLocation(t *testing.T) {
 func TestHTMLMessage(t *testing.T) {
 	plugin := Plugin{
 		Repo: Repo{
-			Name:  "go-hello",
-			Owner: "appleboy",
+			Name:      "go-hello",
+			Namespace: "appleboy",
 		},
 		Commit: Commit{
 			Sha:     "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
