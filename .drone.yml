@@ -375,8 +375,6 @@ steps:
       from_secret: microbadger_url
 
 trigger:
-  branch:
-  - master
   event:
   - push
   - tag
