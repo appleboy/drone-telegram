@@ -220,7 +220,7 @@ func (p Plugin) Exec() error {
 	if len(p.Config.Message) > 0 {
 		message = p.Config.Message
 	} else {
-		message = p.Message(p.Repo, p.Commit, p.Build)
+		message = p.Message()
 	}
 
 	bot, err := tgbotapi.NewBotAPI(p.Config.Token)
@@ -369,12 +369,12 @@ func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) error {
 }
 
 // Message is plugin default message.
-func (p Plugin) Message(repo Repo, commit Commit, build Build) []string {
+func (p Plugin) Message() []string {
 	return []string{fmt.Sprintf("[%s] <%s> (%s)『%s』by %s",
-		build.Status,
-		build.Link,
-		commit.Branch,
-		commit.Message,
-		commit.Author,
+		p.Build.Status,
+		p.Build.Link,
+		p.Commit.Branch,
+		p.Commit.Message,
+		p.Commit.Author,
 	)}
 }
