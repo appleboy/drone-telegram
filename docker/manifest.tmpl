@@ -23,15 +23,3 @@ manifests:
       architecture: arm
       os: linux
       variant: v7
-  -
-    image: appleboy/drone-telegram:{{#if build.tag}}{{trimPrefix build.tag "v"}}-{{/if}}windows-1803
-    platform:
-      architecture: amd64
-      os: windows
-      version: 1803
-  -
-    image: appleboy/drone-telegram:{{#if build.tag}}{{trimPrefix build.tag "v"}}-{{/if}}windows-1809
-    platform:
-      architecture: amd64
-      os: windows
-      version: 1809
