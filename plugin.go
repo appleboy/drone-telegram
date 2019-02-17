@@ -375,7 +375,11 @@ func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) error {
 		log.Println("=====================")
 	}
 
-	return err
+	if err == nil {
+		return nil
+	}
+
+	return errors.New(strings.Replace(err.Error(), p.Config.Token, "<token>", -1))
 }
 
 // Message is plugin default message.
