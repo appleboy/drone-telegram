@@ -110,7 +110,12 @@ func main() {
 		cli.StringFlag{
 			Name:   "commit.sha",
 			Usage:  "git commit sha",
-			EnvVar: "DRONE_COMMIT_SHA",
+			EnvVar: "DRONE_COMMIT_SHA,GITHUB_SHA",
+		},
+		cli.StringFlag{
+			Name:   "commit.ref",
+			Usage:  "git commit ref",
+			EnvVar: "DRONE_COMMIT_REF,GITHUB_REF",
 		},
 		cli.StringFlag{
 			Name:   "commit.branch",
@@ -210,6 +215,7 @@ func run(c *cli.Context) error {
 		},
 		Commit: Commit{
 			Sha:     c.String("commit.sha"),
+			Ref:     c.String("commit.ref"),
 			Branch:  c.String("commit.branch"),
 			Link:    c.String("commit.link"),
 			Author:  c.String("commit.author"),

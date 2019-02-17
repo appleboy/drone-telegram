@@ -22,6 +22,7 @@ type (
 	// Commit information.
 	Commit struct {
 		Sha     string
+		Ref     string
 		Branch  string
 		Link    string
 		Author  string
