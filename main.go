@@ -79,7 +79,7 @@ func main() {
 		cli.BoolFlag{
 			Name:   "debug",
 			Usage:  "enable debug message",
-			EnvVar: "PLUGIN_DEBUG",
+			EnvVar: "PLUGIN_DEBUG,DEBUG",
 		},
 		cli.BoolFlag{
 			Name:   "match.email",
