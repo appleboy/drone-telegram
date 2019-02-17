@@ -377,7 +377,6 @@ steps:
 trigger:
   ref:
   - refs/heads/master
-  - "refs/pull/**"
   - "refs/tags/**"
 
 depends_on:

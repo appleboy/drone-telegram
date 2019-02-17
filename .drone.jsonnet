@@ -262,7 +262,6 @@ local PipelineNotifications(os='linux', arch='amd64', depends_on=[]) = {
   trigger: {
     ref: [
       'refs/heads/master',
-      'refs/pull/**',
       'refs/tags/**',
     ],
   },
