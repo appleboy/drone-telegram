@@ -260,7 +260,11 @@ local PipelineNotifications(os='linux', arch='amd64', depends_on=[]) = {
   ],
   depends_on: depends_on,
   trigger: {
-    event: [ 'push', 'tag' ],
+    ref: [
+      'refs/heads/master',
+      'refs/pull/**',
+      'refs/tags/**',
+    ],
   },
 };
 

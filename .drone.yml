@@ -375,9 +375,10 @@ steps:
       from_secret: microbadger_url
 
 trigger:
-  event:
-  - push
-  - tag
+  ref:
+  - refs/heads/master
+  - "refs/pull/**"
+  - "refs/tags/**"
 
 depends_on:
 - linux-amd64
