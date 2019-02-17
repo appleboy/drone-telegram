@@ -245,9 +245,6 @@ local PipelineNotifications(os='linux', arch='amd64', depends_on=[]) = {
     os: os,
     arch: arch,
   },
-  clone: {
-    disable: true,
-  },
   steps: [
     {
       name: 'manifest',
