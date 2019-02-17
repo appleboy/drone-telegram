@@ -193,6 +193,51 @@ local PipelineBuild(name, os='linux', arch='amd64') = {
   },
 };
 
+local PipelineRelease = {
+  kind: 'pipeline',
+  name: 'release-binary',
+  platform: {
+    os: 'linux',
+    arch: 'amd64',
+  },
+  steps: [
+    {
+      name: 'build-all-binary',
+      image: 'golang:1.11',
+      pull: 'always',
+      environment: {
+        GO111MODULE: 'on',
+      },
+      commands: [
+        'make release'
+      ],
+      when: {
+        event: [ 'tag' ],
+      },
+    },
+    {
+      name: 'deploy-all-binary',
+      image: 'plugins/github-release',
+      pull: 'always',
+      settings: {
+        files: [ 'dist/release/*' ],
+        api_key: { 'from_secret': 'github_release_api_key' },
+      },
+      when: {
+        event: [ 'tag' ],
+      },
+    },
+  ],
+  depends_on: [
+    'testing',
+  ],
+  trigger: {
+    ref: [
+      'refs/tags/**',
+    ],
+  },
+};
+
 local PipelineNotifications(os='linux', arch='amd64', depends_on=[]) = {
   kind: 'pipeline',
   name: 'notifications',
@@ -225,9 +270,11 @@ local PipelineNotifications(os='linux', arch='amd64', depends_on=[]) = {
   PipelineBuild(name, 'linux', 'amd64'),
   PipelineBuild(name, 'linux', 'arm64'),
   PipelineBuild(name, 'linux', 'arm'),
+  PipelineRelease,
   PipelineNotifications(depends_on=[
     'linux-amd64',
     'linux-arm64',
     'linux-arm',
+    'release-binary',
   ]),
 ]

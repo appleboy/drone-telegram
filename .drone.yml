@@ -318,6 +318,45 @@ depends_on:
 
 ---
 kind: pipeline
+name: release-binary
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build-all-binary
+  pull: always
+  image: golang:1.11
+  commands:
+  - make release
+  environment:
+    GO111MODULE: on
+  when:
+    event:
+    - tag
+
+- name: deploy-all-binary
+  pull: always
+  image: plugins/github-release
+  settings:
+    api_key:
+      from_secret: github_release_api_key
+    files:
+    - "dist/release/*"
+  when:
+    event:
+    - tag
+
+trigger:
+  ref:
+  - "refs/tags/**"
+
+depends_on:
+- testing
+
+---
+kind: pipeline
 name: notifications
 
 platform:
@@ -346,5 +385,6 @@ depends_on:
 - linux-amd64
 - linux-arm64
 - linux-arm
+- release-binary
 
 ...
