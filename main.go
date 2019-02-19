@@ -105,7 +105,7 @@ func main() {
 		cli.StringFlag{
 			Name:   "repo.namespace",
 			Usage:  "repository namespace",
-			EnvVar: "DRONE_REPO_NAMESPACE,GITHUB_ACTOR",
+			EnvVar: "DRONE_REPO_OWNER,DRONE_REPO_NAMESPACE,GITHUB_ACTOR",
 		},
 		cli.StringFlag{
 			Name:   "repo.name",
