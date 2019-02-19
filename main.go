@@ -39,42 +39,42 @@ func main() {
 		cli.StringSliceFlag{
 			Name:   "photo",
 			Usage:  "send photo message",
-			EnvVar: "PLUGIN_PHOTO",
+			EnvVar: "PLUGIN_PHOTO,PHOTO",
 		},
 		cli.StringSliceFlag{
 			Name:   "document",
 			Usage:  "send document message",
-			EnvVar: "PLUGIN_DOCUMENT",
+			EnvVar: "PLUGIN_DOCUMENT,DOCUMENT",
 		},
 		cli.StringSliceFlag{
 			Name:   "sticker",
 			Usage:  "send sticker message",
-			EnvVar: "PLUGIN_STICKER",
+			EnvVar: "PLUGIN_STICKER,STICKER",
 		},
 		cli.StringSliceFlag{
 			Name:   "audio",
 			Usage:  "send audio message",
-			EnvVar: "PLUGIN_AUDIO",
+			EnvVar: "PLUGIN_AUDIO,AUDIO",
 		},
 		cli.StringSliceFlag{
 			Name:   "voice",
 			Usage:  "send voice message",
-			EnvVar: "PLUGIN_VOICE",
+			EnvVar: "PLUGIN_VOICE,VOICE",
 		},
 		cli.StringSliceFlag{
 			Name:   "location",
 			Usage:  "send location message",
-			EnvVar: "PLUGIN_LOCATION",
+			EnvVar: "PLUGIN_LOCATION,LOCATION",
 		},
 		cli.StringSliceFlag{
 			Name:   "venue",
 			Usage:  "send venue message",
-			EnvVar: "PLUGIN_VENUE",
+			EnvVar: "PLUGIN_VENUE,VENUE",
 		},
 		cli.StringSliceFlag{
 			Name:   "video",
 			Usage:  "send video message",
-			EnvVar: "PLUGIN_VIDEO",
+			EnvVar: "PLUGIN_VIDEO,VIDEO",
 		},
 		cli.BoolFlag{
 			Name:   "debug",
@@ -95,7 +95,7 @@ func main() {
 			Name:   "format",
 			Value:  "markdown",
 			Usage:  "telegram message format",
-			EnvVar: "PLUGIN_FORMAT",
+			EnvVar: "PLUGIN_FORMAT,FORMAT",
 		},
 		cli.StringFlag{
 			Name:   "repo",
