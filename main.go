@@ -11,8 +11,7 @@ import (
 
 // Version set at compile-time
 var (
-	Version  string
-	BuildNum string
+	Version string
 )
 
 func main() {
@@ -20,6 +19,7 @@ func main() {
 	app.Name = "telegram plugin"
 	app.Usage = "telegram plugin"
 	app.Action = run
+	app.Version = Version
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "token",
@@ -225,12 +225,6 @@ func main() {
 			Usage:  "The GitHub workspace path. Value: /github/workspace.",
 			EnvVar: "GITHUB_WORKSPACE",
 		},
-	}
-
-	app.Version = Version
-
-	if BuildNum != "" {
-		app.Version = app.Version + "+" + BuildNum
 	}
 
 	if err := app.Run(os.Args); err != nil {
