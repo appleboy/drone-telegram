@@ -111,6 +111,7 @@ steps:
   pull: always
   image: plugins/docker:linux-amd64
   settings:
+    cache_from: appleboy/drone-telegram
     dockerfile: docker/Dockerfile.linux.amd64
     dry_run: true
     password:
@@ -129,6 +130,7 @@ steps:
   settings:
     auto_tag: true
     auto_tag_suffix: linux-amd64
+    cache_from: appleboy/drone-telegram
     daemon_off: false
     dockerfile: docker/Dockerfile.linux.amd64
     password:
@@ -194,6 +196,7 @@ steps:
   pull: always
   image: plugins/docker:linux-arm64
   settings:
+    cache_from: appleboy/drone-telegram
     dockerfile: docker/Dockerfile.linux.arm64
     dry_run: true
     password:
@@ -212,6 +215,7 @@ steps:
   settings:
     auto_tag: true
     auto_tag_suffix: linux-arm64
+    cache_from: appleboy/drone-telegram
     daemon_off: false
     dockerfile: docker/Dockerfile.linux.arm64
     password:
@@ -277,6 +281,7 @@ steps:
   pull: always
   image: plugins/docker:linux-arm
   settings:
+    cache_from: appleboy/drone-telegram
     dockerfile: docker/Dockerfile.linux.arm
     dry_run: true
     password:
@@ -295,6 +300,7 @@ steps:
   settings:
     auto_tag: true
     auto_tag_suffix: linux-arm
+    cache_from: appleboy/drone-telegram
     daemon_off: false
     dockerfile: docker/Dockerfile.linux.arm
     password:
