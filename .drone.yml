@@ -114,12 +114,8 @@ steps:
     cache_from: appleboy/drone-telegram
     dockerfile: docker/Dockerfile.linux.amd64
     dry_run: true
-    password:
-      from_secret: docker_password
     repo: appleboy/drone-telegram
     tags: linux-amd64
-    username:
-      from_secret: docker_username
   when:
     event:
     - pull_request
@@ -199,12 +195,8 @@ steps:
     cache_from: appleboy/drone-telegram
     dockerfile: docker/Dockerfile.linux.arm64
     dry_run: true
-    password:
-      from_secret: docker_password
     repo: appleboy/drone-telegram
     tags: linux-arm64
-    username:
-      from_secret: docker_username
   when:
     event:
     - pull_request
@@ -284,12 +276,8 @@ steps:
     cache_from: appleboy/drone-telegram
     dockerfile: docker/Dockerfile.linux.arm
     dry_run: true
-    password:
-      from_secret: docker_password
     repo: appleboy/drone-telegram
     tags: linux-arm
-    username:
-      from_secret: docker_username
   when:
     event:
     - pull_request

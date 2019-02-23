@@ -154,8 +154,6 @@
           dockerfile: 'docker/Dockerfile.' + os + '.' + arch,
           repo: 'appleboy/' + name,
           cache_from: 'appleboy/' + name,
-          username: { 'from_secret': 'docker_username' },
-          password: { 'from_secret': 'docker_password' },
         },
         when: {
           event: [ 'pull_request' ],
