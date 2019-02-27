@@ -9,7 +9,7 @@ platform:
 steps:
 - name: vet
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - make vet
   environment:
@@ -20,7 +20,7 @@ steps:
 
 - name: lint
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - make lint
   environment:
@@ -31,7 +31,7 @@ steps:
 
 - name: misspell
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - make misspell-check
   environment:
@@ -42,7 +42,7 @@ steps:
 
 - name: test
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - make test
   - make coverage
@@ -78,7 +78,7 @@ platform:
 steps:
 - name: build-push
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-telegram"
   environment:
@@ -91,7 +91,7 @@ steps:
 
 - name: build-tag
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-telegram"
   environment:
@@ -103,7 +103,7 @@ steps:
 
 - name: executable
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - ./release/linux/amd64/drone-telegram --help
 
@@ -159,7 +159,7 @@ platform:
 steps:
 - name: build-push
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-telegram"
   environment:
@@ -172,7 +172,7 @@ steps:
 
 - name: build-tag
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-telegram"
   environment:
@@ -184,7 +184,7 @@ steps:
 
 - name: executable
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - ./release/linux/arm64/drone-telegram --help
 
@@ -240,7 +240,7 @@ platform:
 steps:
 - name: build-push
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-telegram"
   environment:
@@ -253,7 +253,7 @@ steps:
 
 - name: build-tag
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-telegram"
   environment:
@@ -265,7 +265,7 @@ steps:
 
 - name: executable
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - ./release/linux/arm/drone-telegram --help
 
@@ -321,7 +321,7 @@ platform:
 steps:
 - name: build-all-binary
   pull: always
-  image: golang:1.11
+  image: golang:1.12
   commands:
   - make release
   environment:
