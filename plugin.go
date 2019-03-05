@@ -235,11 +235,6 @@ func (p Plugin) Exec() error {
 
 	bot, err := tgbotapi.NewBotAPI(p.Config.Token)
 
-	// enable bot debug mode
-	if p.Config.Debug {
-		bot.Debug = true
-	}
-
 	if err != nil {
 		return err
 	}
