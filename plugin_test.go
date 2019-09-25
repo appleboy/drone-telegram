@@ -286,7 +286,7 @@ func TestConvertLocation(t *testing.T) {
 		Longitude: float64(139.704051),
 	}, result)
 
-	input = "35.661777 139.704051 title,address"
+	input = "35.661777 139.704051 title address"
 	result, empty = convertLocation(input)
 
 	assert.Equal(t, false, empty)
