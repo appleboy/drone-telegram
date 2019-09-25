@@ -1,6 +1,6 @@
-<img src="images/logo.png" />
-
 # drone-telegram
+
+![logo](./images/logo.png)
 
 [![GoDoc](https://godoc.org/github.com/appleboy/drone-telegram?status.svg)](https://godoc.org/github.com/appleboy/drone-telegram)
 [![Build Status](https://cloud.drone.io/api/badges/appleboy/drone-telegram/status.svg)](https://cloud.drone.io/appleboy/drone-telegram)
@@ -8,7 +8,7 @@
 [![codecov](https://codecov.io/gh/appleboy/drone-telegram/branch/master/graph/badge.svg)](https://codecov.io/gh/appleboy/drone-telegram)
 [![Go Report Card](https://goreportcard.com/badge/github.com/appleboy/drone-telegram)](https://goreportcard.com/report/github.com/appleboy/drone-telegram)
 [![Docker Pulls](https://img.shields.io/docker/pulls/appleboy/drone-telegram.svg)](https://hub.docker.com/r/appleboy/drone-telegram/)
-[![](https://images.microbadger.com/badges/image/appleboy/drone-telegram.svg)](https://microbadger.com/images/appleboy/drone-telegram "Get your own image badge on microbadger.com")
+[![microbadger](https://images.microbadger.com/badges/image/appleboy/drone-telegram.svg)](https://microbadger.com/images/appleboy/drone-telegram "Get your own image badge on microbadger.com")
 
 [Drone](https://github.com/drone/drone) plugin for sending telegram notifications. For the usage
 information and a listing of the available options please take a look at [the docs](http://plugins.drone.io/appleboy/drone-telegram/).
@@ -35,45 +35,29 @@ The pre-compiled binaries can be downloaded from [release page](https://github.c
 
 With `Go` installed
 
+```sh
+go get -u -v github.com/appleboy/drone-telegram
 ```
-$ go get -u -v github.com/appleboy/drone-telegram
-``` 
 
 or build the binary with the following command:
 
-```
-$ export GOOS=linux
-$ export GOARCH=amd64
-$ export CGO_ENABLED=0
-$ export GO111MODULE=on
+```sh
+export GOOS=linux
+export GOARCH=amd64
+export CGO_ENABLED=0
+export GO111MODULE=on
 
-$ go test -cover ./...
+go test -cover ./...
 
-$ go build -v -a -tags netgo -o release/linux/amd64/drone-telegram .
+go build -v -a -tags netgo -o release/linux/amd64/drone-telegram .
 ```
 
 ## Testing
 
 Test the package with the following command:
 
-```
-$ make test
-```
-
-## Docker
-
-Build the docker image with the following commands:
-
-```
-$ make docker
-```
-
-Please note incorrectly building the image for the correct x64 linux and with
-GCO disabled will result in an error when running the Docker image:
-
-```
-docker: Error response from daemon: Container command
-'/bin/drone-telegram' not found or does not exist..
+```sh
+make test
 ```
 
 ## Usage
