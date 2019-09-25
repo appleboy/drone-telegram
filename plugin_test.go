@@ -102,8 +102,8 @@ func TestSendMessage(t *testing.T) {
 			Sticker:  []string{"tests/github-logo.png", "tests/github.png", "1234", " "},
 			Audio:    []string{"tests/audio.mp3", "1234", " "},
 			Voice:    []string{"tests/voice.ogg", "1234", " "},
-			Location: []string{"24.9163213,121.1424972", "1", " "},
-			Venue:    []string{"35.661777,139.704051,竹北體育館,新竹縣竹北市", "24.9163213,121.1424972", "1", " "},
+			Location: []string{"24.9163213 121.1424972", "1", " "},
+			Venue:    []string{"35.661777 139.704051 竹北體育館 新竹縣竹北市", "24.9163213 121.1424972", "1", " "},
 			Video:    []string{"tests/video.mp4", "1234", " "},
 			Debug:    false,
 		},
@@ -253,20 +253,20 @@ func TestConvertLocation(t *testing.T) {
 	assert.Equal(t, Location{}, result)
 
 	// strconv.ParseInt: parsing "測試": invalid syntax
-	input = "測試,139.704051"
+	input = "測試 139.704051"
 	result, empty = convertLocation(input)
 
 	assert.Equal(t, true, empty)
 	assert.Equal(t, Location{}, result)
 
 	// strconv.ParseInt: parsing "測試": invalid syntax
-	input = "35.661777,測試"
+	input = "35.661777 測試"
 	result, empty = convertLocation(input)
 
 	assert.Equal(t, true, empty)
 	assert.Equal(t, Location{}, result)
 
-	input = "35.661777,139.704051"
+	input = "35.661777 139.704051"
 	result, empty = convertLocation(input)
 
 	assert.Equal(t, false, empty)
@@ -275,7 +275,7 @@ func TestConvertLocation(t *testing.T) {
 		Longitude: float64(139.704051),
 	}, result)
 
-	input = "35.661777,139.704051,title"
+	input = "35.661777 139.704051 title"
 	result, empty = convertLocation(input)
 
 	assert.Equal(t, false, empty)
@@ -286,7 +286,7 @@ func TestConvertLocation(t *testing.T) {
 		Longitude: float64(139.704051),
 	}, result)
 
-	input = "35.661777,139.704051,title,address"
+	input = "35.661777 139.704051 title,address"
 	result, empty = convertLocation(input)
 
 	assert.Equal(t, false, empty)
