@@ -142,11 +142,10 @@ func globList(keys []string) []string {
 }
 
 func convertLocation(value string) (Location, bool) {
-	log.Println(value)
 	var latitude, longitude float64
 	var title, address string
 	var err error
-	values := trimElement(strings.Split(value, ","))
+	values := trimElement(strings.Split(value, " "))
 
 	if len(values) < 2 {
 		return Location{}, true

@@ -80,7 +80,7 @@ docker: Error response from daemon: Container command
 
 Execute from the working directory:
 
-```
+```sh
 docker run --rm \
   -e PLUGIN_TOKEN=xxxxxxx \
   -e PLUGIN_TO=xxxxxxx \
@@ -90,8 +90,8 @@ docker run --rm \
   -e PLUGIN_STICKER=tests/github-logo.png \
   -e PLUGIN_AUDIO=tests/audio.mp3 \
   -e PLUGIN_VOICE=tests/voice.ogg \
-  -e PLUGIN_LOCATION=24.9163213,121.1424972 \
-  -e PLUGIN_VENUE=24.9163213,121.1424972,title,address \
+  -e PLUGIN_LOCATION="24.9163213 121.1424972" \
+  -e PLUGIN_VENUE="24.9163213 121.1424972 title address" \
   -e PLUGIN_VIDEO=tests/video.mp4 \
   -e PLUGIN_DEBUG=true \
   -e PLUGIN_ONLY_MATCH_EMAIL=false \
