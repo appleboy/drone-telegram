@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/appleboy/drone-facebook/template"
-	"gopkg.in/telegram-bot-api.v4"
+	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
 type (
@@ -142,6 +142,7 @@ func globList(keys []string) []string {
 }
 
 func convertLocation(value string) (Location, bool) {
+	log.Println(value)
 	var latitude, longitude float64
 	var title, address string
 	var err error
