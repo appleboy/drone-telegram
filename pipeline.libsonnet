@@ -231,6 +231,16 @@
     },
     steps: [
       {
+        name: 'telegram',
+        image: 'appleboy/drone-telegram:1.3.1',
+        pull: 'always',
+        settings: {
+          to: { from_secret: 'telegram_to' },
+          token: { from_secret: 'telegram_token' },
+          message: '{{#success build.status}} ✅  Build #{{build.number}} of `{{repo.name}}` succeeded.\n\n📝 Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.     message}} ```\n\n🌐 {{ build.link }} {{else}} ❌  Build #{{build.number}} of `{{repo.name}}` failed.\n\n📝 Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.  message}} ```\n\n🌐 {{ build.link }} {{/success}}\n',
+        },
+      },
+      {
         name: 'manifest',
         image: 'plugins/manifest',
         pull: 'always',
