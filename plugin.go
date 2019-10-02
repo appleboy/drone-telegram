@@ -10,6 +10,8 @@ import (
 
 	"github.com/appleboy/drone-facebook/template"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
+  "net/url"
+  "net/http"
 )
 
 type (
@@ -70,6 +72,7 @@ type (
 		Venue      []string
 		Format     string
 		GitHub     bool
+    Socks5     string
 	}
 
 	// Plugin values.
@@ -233,7 +236,9 @@ func (p Plugin) Exec() error {
 		message = p.Message()
 	}
 
-	bot, err := tgbotapi.NewBotAPI(p.Config.Token)
+  proxyUrl, err := url.Parse(p.Config.Socks5)
+  proxyClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
+  bot, err := tgbotapi.NewBotAPIWithClient(p.Config.Token, proxyClient)
 
 	if err != nil {
 		return err
