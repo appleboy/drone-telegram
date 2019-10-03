@@ -236,9 +236,18 @@ func (p Plugin) Exec() error {
 		message = p.Message()
 	}
 
-  proxyUrl, err := url.Parse(p.Config.Socks5)
-  proxyClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
-  bot, err := tgbotapi.NewBotAPIWithClient(p.Config.Token, proxyClient)
+  var err error
+  var bot *tgbotapi.BotAPI
+  var proxyUrl *url.URL
+  if len(p.Config.Socks5) > 0 {
+    proxyUrl, err := url.Parse(p.Config.Socks5)
+    proxyClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
+    bot, err = tgbotapi.NewBotAPIWithClient(p.Config.Token, proxyClient)
+    return err
+  } else {
+    bot, err = tgbotapi.NewBotAPI(p.Config.Token)
+    return err
+  }
 
 	if err != nil {
 		return err
