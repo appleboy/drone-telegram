@@ -144,6 +144,11 @@ func main() {
 			EnvVar: "DRONE_COMMIT_AUTHOR_EMAIL",
 		},
 		cli.StringFlag{
+			Name:   "commit.author.avatar",
+			Usage:  "git author avatar",
+			EnvVar: "DRONE_COMMIT_AUTHOR_AVATAR",
+		},
+		cli.StringFlag{
 			Name:   "commit.message",
 			Usage:  "commit message",
 			EnvVar: "DRONE_COMMIT_MESSAGE",
@@ -225,6 +230,11 @@ func main() {
 			Usage:  "The GitHub workspace path. Value: /github/workspace.",
 			EnvVar: "GITHUB_WORKSPACE",
 		},
+		cli.StringFlag{
+			Name:   "deploy.to",
+			Usage:  "Provides the target deployment environment for the running build. This value is only available to promotion and rollback pipelines.",
+			EnvVar: "DRONE_DEPLOY_TO",
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
@@ -257,6 +267,7 @@ func run(c *cli.Context) error {
 			Link:    c.String("commit.link"),
 			Author:  c.String("commit.author"),
 			Email:   c.String("commit.author.email"),
+			Avatar:  c.String("commit.author.avatar"),
 			Message: c.String("commit.message"),
 		},
 		Build: Build{
@@ -268,6 +279,7 @@ func run(c *cli.Context) error {
 			Started:  c.Float64("job.started"),
 			Finished: c.Float64("job.finished"),
 			PR:       c.String("pull.request"),
+			DeployTo: c.String("deploy.to"),
 		},
 		Config: Config{
 			Token:      c.String("token"),

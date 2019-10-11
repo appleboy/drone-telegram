@@ -36,6 +36,7 @@ type (
 		Branch  string
 		Link    string
 		Author  string
+		Avatar  string
 		Email   string
 		Message string
 	}
@@ -50,6 +51,7 @@ type (
 		Started  float64
 		Finished float64
 		PR       string
+		DeployTo string
 	}
 
 	// Config for the plugin.
