@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/appleboy/drone-facebook/template"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
+	"github.com/drone/drone-template-lib/template"
 )
 
 type (
