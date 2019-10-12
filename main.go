@@ -185,15 +185,15 @@ func main() {
 			Usage:  "pull request",
 			EnvVar: "DRONE_PULL_REQUEST",
 		},
-		cli.Float64Flag{
+		cli.Int64Flag{
 			Name:   "job.started",
 			Usage:  "job started",
-			EnvVar: "DRONE_JOB_STARTED",
+			EnvVar: "DRONE_BUILD_STARTED",
 		},
-		cli.Float64Flag{
+		cli.Int64Flag{
 			Name:   "job.finished",
 			Usage:  "job finished",
-			EnvVar: "DRONE_JOB_FINISHED",
+			EnvVar: "DRONE_BUILD_FINISHED",
 		},
 		cli.StringFlag{
 			Name:   "env-file",
@@ -276,8 +276,8 @@ func run(c *cli.Context) error {
 			Event:    c.String("build.event"),
 			Status:   c.String("build.status"),
 			Link:     c.String("build.link"),
-			Started:  c.Float64("job.started"),
-			Finished: c.Float64("job.finished"),
+			Started:  c.Int64("job.started"),
+			Finished: c.Int64("job.finished"),
 			PR:       c.String("pull.request"),
 			DeployTo: c.String("deploy.to"),
 		},
