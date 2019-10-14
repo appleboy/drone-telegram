@@ -69,6 +69,7 @@ docker run --rm \
   -e PLUGIN_TOKEN=xxxxxxx \
   -e PLUGIN_TO=xxxxxxx \
   -e PLUGIN_MESSAGE=test \
+  -e PLUGIN_MESSAGE_FILE=testmessage.md \  
   -e PLUGIN_PHOTO=tests/github.png \
   -e PLUGIN_DOCUMENT=tests/gophercolor.png \
   -e PLUGIN_STICKER=tests/github-logo.png \

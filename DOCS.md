@@ -139,6 +139,16 @@ Example configuration with a custom message template:
 +     {{/success}}
 ```
 
+Example configuration with a custom message template loaded from file:
+
+```diff
+  image: appleboy/drone-telegram
+  settings:
+    token: xxxxxxxxxx
+    to: telegram_user_id
++   messageFile: message_file.tpl
+```
+
 ## Parameter Reference
 
 token
@@ -149,6 +159,9 @@ to
 
 message
 : overwrite the default message template
+
+message.file
+: overwrite the default message template with the contents of the specified file
 
 photo
 : local file path
