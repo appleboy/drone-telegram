@@ -281,7 +281,6 @@ func (p Plugin) Exec() (err error) {
 		message = escapeMarkdown(message)
 
 		p.Commit.Message = escapeMarkdownOne(p.Commit.Message)
-
 		p.Commit.Branch = escapeMarkdownOne(p.Commit.Branch)
 		p.Commit.Link = escapeMarkdownOne(p.Commit.Link)
 		p.Commit.Author = escapeMarkdownOne(p.Commit.Author)
