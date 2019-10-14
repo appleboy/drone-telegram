@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -56,22 +59,23 @@ type (
 
 	// Config for the plugin.
 	Config struct {
-		Token      string
-		Debug      bool
-		MatchEmail bool
-		WebPreview bool
-		To         []string
-		Message    []string
-		Photo      []string
-		Document   []string
-		Sticker    []string
-		Audio      []string
-		Voice      []string
-		Location   []string
-		Video      []string
-		Venue      []string
-		Format     string
-		GitHub     bool
+		Token       string
+		Debug       bool
+		MatchEmail  bool
+		WebPreview  bool
+		To          []string
+		Message     []string
+		MessageFile string
+		Photo       []string
+		Document    []string
+		Sticker     []string
+		Audio       []string
+		Voice       []string
+		Location    []string
+		Video       []string
+		Venue       []string
+		Format      string
+		GitHub      bool
 	}
 
 	// Plugin values.
@@ -184,6 +188,20 @@ func convertLocation(value string) (Location, bool) {
 	}, false
 }
 
+func loadTextFromFile(filename string) ([]string, error) {
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	r := bufio.NewReader(f)
+	content, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+	return []string{string(content)}, nil
+}
+
 func parseTo(to []string, authorEmail string, matchEmail bool) []int64 {
 	var emails []int64
 	var ids []int64
@@ -222,22 +240,26 @@ func parseTo(to []string, authorEmail string, matchEmail bool) []int64 {
 }
 
 // Exec executes the plugin.
-func (p Plugin) Exec() error {
-
+func (p Plugin) Exec() (err error) {
 	if len(p.Config.Token) == 0 || len(p.Config.To) == 0 {
 		return errors.New("missing telegram token or user list")
 	}
 
 	var message []string
-	if len(p.Config.Message) > 0 {
+	switch {
+	case len(p.Config.MessageFile) > 0:
+		message, err = loadTextFromFile(p.Config.MessageFile)
+		if err != nil {
+			return fmt.Errorf("error loading message file '%s': %v", p.Config.MessageFile, err)
+		}
+	case len(p.Config.Message) > 0:
 		message = p.Config.Message
-	} else {
+	default:
 		message = p.Message()
 	}
 
-	bot, err := tgbotapi.NewBotAPI(p.Config.Token)
-
-	if err != nil {
+	var bot *tgbotapi.BotAPI
+	if bot, err = tgbotapi.NewBotAPI(p.Config.Token); err != nil {
 		return err
 	}
 
@@ -259,6 +281,7 @@ func (p Plugin) Exec() error {
 		message = escapeMarkdown(message)
 
 		p.Commit.Message = escapeMarkdownOne(p.Commit.Message)
+
 		p.Commit.Branch = escapeMarkdownOne(p.Commit.Branch)
 		p.Commit.Link = escapeMarkdownOne(p.Commit.Link)
 		p.Commit.Author = escapeMarkdownOne(p.Commit.Author)
