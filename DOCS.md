@@ -146,7 +146,7 @@ Example configuration with a custom message template loaded from file:
   settings:
     token: xxxxxxxxxx
     to: telegram_user_id
-+   messageFile: message_file.tpl
++   message_file: message_file.tpl
 ```
 
 ## Parameter Reference
@@ -160,7 +160,7 @@ to
 message
 : overwrite the default message template
 
-message.file
+message_file
 : overwrite the default message template with the contents of the specified file
 
 photo
