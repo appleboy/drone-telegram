@@ -325,3 +325,32 @@ func TestHTMLMessage(t *testing.T) {
 	err := plugin.Exec()
 	assert.Nil(t, err)
 }
+
+func TestMessageFile(t *testing.T) {
+	plugin := Plugin{
+		Repo: Repo{
+			Name:      "go-hello",
+			Namespace: "appleboy",
+		},
+		Commit: Commit{
+			Sha:     "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
+			Author:  "Bo-Yi Wu",
+			Branch:  "master",
+			Message: "Freakin' macOS isn't fully case-sensitive..",
+		},
+		Build: Build{
+			Number: 101,
+			Status: "success",
+			Link:   "https://github.com/appleboy/go-hello",
+		},
+
+		Config: Config{
+			Token:       os.Getenv("TELEGRAM_TOKEN"),
+			To:          []string{os.Getenv("TELEGRAM_TO")},
+			MessageFile: "tests/.test.message",
+		},
+	}
+
+	err := plugin.Exec()
+	assert.Nil(t, err)
+}
