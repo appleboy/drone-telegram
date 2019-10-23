@@ -347,7 +347,7 @@ func TestMessageFile(t *testing.T) {
 		Config: Config{
 			Token:       os.Getenv("TELEGRAM_TOKEN"),
 			To:          []string{os.Getenv("TELEGRAM_TO")},
-			MessageFile: "tests/.test.message",
+			MessageFile: "tests/message.txt",
 		},
 	}
 
