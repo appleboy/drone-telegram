@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -59,23 +60,24 @@ type (
 
 	// Config for the plugin.
 	Config struct {
-		Token       string
-		Debug       bool
-		MatchEmail  bool
-		WebPreview  bool
-		To          []string
-		Message     []string
-		MessageFile string
-		Photo       []string
-		Document    []string
-		Sticker     []string
-		Audio       []string
-		Voice       []string
-		Location    []string
-		Video       []string
-		Venue       []string
-		Format      string
-		GitHub      bool
+		Token        string
+		Debug        bool
+		MatchEmail   bool
+		WebPreview   bool
+		To           []string
+		Message      []string
+		MessageFile  string
+		TemplateVars string
+		Photo        []string
+		Document     []string
+		Sticker      []string
+		Audio        []string
+		Voice        []string
+		Location     []string
+		Video        []string
+		Venue        []string
+		Format       string
+		GitHub       bool
 	}
 
 	// Plugin values.
@@ -85,6 +87,7 @@ type (
 		Commit Commit
 		Build  Build
 		Config Config
+		Tpl    map[string]string
 	}
 
 	// Location format
@@ -258,9 +261,16 @@ func (p Plugin) Exec() (err error) {
 		message = p.Message()
 	}
 
+	if p.Config.TemplateVars != "" {
+		p.Tpl = make(map[string]string)
+		if err = json.Unmarshal([]byte(p.Config.TemplateVars), &p.Tpl); err != nil {
+			return fmt.Errorf("unable to unmarshall template vars from JSON string '%s': %v", p.Config.TemplateVars, err)
+		}
+	}
+
 	var bot *tgbotapi.BotAPI
 	if bot, err = tgbotapi.NewBotAPI(p.Config.Token); err != nil {
-		return err
+		return
 	}
 
 	bot.Debug = p.Config.Debug
