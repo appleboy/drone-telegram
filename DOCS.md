@@ -152,11 +152,12 @@ Example configuration with a custom message template:
 Example configuration with a custom message template loaded from file:
 
 ```diff
-  image: appleboy/drone-telegram
-  settings:
-    token: xxxxxxxxxx
-    to: telegram_user_id
-+   message_file: message_file.tpl
+  - name: send telegram notification
+    image: appleboy/drone-telegram
+    settings:
+      token: xxxxxxxxxx
+      to: telegram_user_id
++     message_file: message_file.tpl
 ```
 
 ## Parameter Reference
