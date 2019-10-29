@@ -152,11 +152,37 @@ Example configuration with a custom message template:
 Example configuration with a custom message template loaded from file:
 
 ```diff
-  image: appleboy/drone-telegram
-  settings:
-    token: xxxxxxxxxx
-    to: telegram_user_id
-+   message_file: message_file.tpl
+  - name: send telegram notification
+    image: appleboy/drone-telegram
+    settings:
+      token: xxxxxxxxxx
+      to: telegram_user_id
++     message_file: message_file.tpl
+```
+
+Example configuration with a generic message template loaded from file, with additional extra vars:
+
+```diff
+  - name: send telegram notification
+    image: appleboy/drone-telegram
+    settings:
+      token: xxxxxxxxxx
+      to: telegram_user_id
++     message_file: message_file.tpl
++     template_vars:
++       env: testing
++       app: MyApp
+```
+
+Where `message_file.tpl` is:
+```
+Build finished for *{{tpl.app}}* - *{{tpl.env}}*
+
+{{#success build.status}}
+  build {{build.number}} succeeded. Good job.
+{{else}}
+  build {{build.number}} failed. Fix me please.
+{{/success}}
 ```
 
 ## Parameter Reference
@@ -172,6 +198,9 @@ message
 
 message_file
 : overwrite the default message template with the contents of the specified file
+
+template_vars
+: define additional template vars. Example: `var1: hello` can be used within the template as `tpl.var1`
 
 photo
 : local file path

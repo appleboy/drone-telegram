@@ -347,7 +347,38 @@ func TestMessageFile(t *testing.T) {
 		Config: Config{
 			Token:       os.Getenv("TELEGRAM_TOKEN"),
 			To:          []string{os.Getenv("TELEGRAM_TO")},
-			MessageFile: "tests/.test.message",
+			MessageFile: "tests/message.txt",
+		},
+	}
+
+	err := plugin.Exec()
+	assert.Nil(t, err)
+}
+
+func TestTemplateVars(t *testing.T) {
+	plugin := Plugin{
+		Repo: Repo{
+			Name:      "go-hello",
+			Namespace: "appleboy",
+		},
+		Commit: Commit{
+			Sha:     "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
+			Author:  "Bo-Yi Wu",
+			Branch:  "master",
+			Message: "This is a test commit msg",
+		},
+		Build: Build{
+			Number: 101,
+			Status: "success",
+			Link:   "https://github.com/appleboy/go-hello",
+		},
+
+		Config: Config{
+			Token:        os.Getenv("TELEGRAM_TOKEN"),
+			To:           []string{os.Getenv("TELEGRAM_TO")},
+			Format:       "markdown",
+			MessageFile:  "tests/message_template.txt",
+			TemplateVars: `{"env":"testing","version":"1.2.0-SNAPSHOT"}`,
 		},
 	}
 
