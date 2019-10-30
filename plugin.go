@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"log"
 	"os"
@@ -315,6 +316,8 @@ func (p Plugin) Exec() (err error) {
 			if err != nil {
 				return err
 			}
+
+			txt = html.UnescapeString(txt)
 
 			msg := tgbotapi.NewMessage(user, txt)
 			msg.ParseMode = p.Config.Format
