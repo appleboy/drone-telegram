@@ -16,6 +16,10 @@ import (
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
+const (
+	formatMarkdown = "markdown"
+)
+
 type (
 	// GitHub information.
 	GitHub struct {
@@ -287,7 +291,7 @@ func (p Plugin) Exec() (err error) {
 
 	message = trimElement(message)
 
-	if p.Config.Format == "markdown" {
+	if p.Config.Format == formatMarkdown {
 		message = escapeMarkdown(message)
 
 		p.Commit.Message = escapeMarkdownOne(p.Commit.Message)

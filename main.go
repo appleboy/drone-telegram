@@ -103,7 +103,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:   "format",
-			Value:  "markdown",
+			Value:  formatMarkdown,
 			Usage:  "telegram message format",
 			EnvVar: "PLUGIN_FORMAT,FORMAT,INPUT_FORMAT",
 		},
