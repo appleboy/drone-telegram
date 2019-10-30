@@ -112,7 +112,7 @@ func TestSendMessage(t *testing.T) {
 	err := plugin.Exec()
 	assert.NotNil(t, err)
 
-	plugin.Config.Format = "markdown"
+	plugin.Config.Format = formatMarkdown
 	plugin.Config.Message = []string{"Test escape under_score"}
 	err = plugin.Exec()
 	assert.NotNil(t, err)
@@ -376,7 +376,7 @@ func TestTemplateVars(t *testing.T) {
 		Config: Config{
 			Token:        os.Getenv("TELEGRAM_TOKEN"),
 			To:           []string{os.Getenv("TELEGRAM_TO")},
-			Format:       "markdown",
+			Format:       formatMarkdown,
 			MessageFile:  "tests/message_template.txt",
 			TemplateVars: `{"env":"testing","version":"1.2.0-SNAPSHOT"}`,
 		},

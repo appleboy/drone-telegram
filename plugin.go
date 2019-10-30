@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,6 +15,10 @@ import (
 
 	"github.com/drone/drone-template-lib/template"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
+)
+
+const (
+	formatMarkdown = "markdown"
 )
 
 type (
@@ -287,7 +292,7 @@ func (p Plugin) Exec() (err error) {
 
 	message = trimElement(message)
 
-	if p.Config.Format == "markdown" {
+	if p.Config.Format == formatMarkdown {
 		message = escapeMarkdown(message)
 
 		p.Commit.Message = escapeMarkdownOne(p.Commit.Message)
@@ -311,6 +316,8 @@ func (p Plugin) Exec() (err error) {
 			if err != nil {
 				return err
 			}
+
+			txt = html.UnescapeString(txt)
 
 			msg := tgbotapi.NewMessage(user, txt)
 			msg.ParseMode = p.Config.Format
