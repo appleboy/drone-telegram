@@ -29,7 +29,7 @@ func main() {
 		cli.StringSliceFlag{
 			Name:   "to",
 			Usage:  "telegram user",
-			EnvVar: "PLUGIN_TO,TELEGRAM_TO,INPUT_TOKEN",
+			EnvVar: "PLUGIN_TO,TELEGRAM_TO,INPUT_TO",
 		},
 		cli.StringSliceFlag{
 			Name:   "message",
