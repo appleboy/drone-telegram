@@ -10,6 +10,7 @@ environment:
     secure: em/TNLUXxG19O/HvbvfJuQ==
   docker_password:
     secure: Yo9FJJqihaNz5q8T4Jz8tQ==
+  GO111MODULE: on
 
 branches:
   only:
@@ -23,6 +24,7 @@ install:
 
 build_script:
   - ps: |
+      go mod download
       if ( $env:APPVEYOR_REPO_TAG -eq 'false' ) {
         $version = $env:APPVEYOR_REPO_COMMIT
       } else {
