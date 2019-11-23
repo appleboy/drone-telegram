@@ -5,5 +5,6 @@ LABEL maintainer="Bo-Yi Wu <appleboy.tw@gmail.com>" \
   org.label-schema.vendor="Bo-Yi Wu" \
   org.label-schema.schema-version="1.0"
 
-ADD release/drone-telegram.exe /drone-telegram.exe
+COPY release/drone-telegram.exe /drone-telegram.exe
+
 ENTRYPOINT [ "\\drone-telegram.exe" ]
