@@ -8,6 +8,8 @@ import (
 	"html"
 	"io/ioutil"
 	"log"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -83,6 +85,7 @@ type (
 		Venue        []string
 		Format       string
 		GitHub       bool
+		Socks5       string
 	}
 
 	// Plugin values.
@@ -273,9 +276,21 @@ func (p Plugin) Exec() (err error) {
 		}
 	}
 
+	var proxyURL *url.URL
+	if proxyURL, err = url.Parse(p.Config.Socks5); err != nil {
+		return fmt.Errorf("unable to unmarshall socks5 proxy url from string '%s': %v", p.Config.Socks5, err)
+	}
+
 	var bot *tgbotapi.BotAPI
-	if bot, err = tgbotapi.NewBotAPI(p.Config.Token); err != nil {
-		return
+	if len(p.Config.Socks5) > 0 {
+		proxyClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyURL)}}
+		bot, err = tgbotapi.NewBotAPIWithClient(p.Config.Token, proxyClient)
+	} else {
+		bot, err = tgbotapi.NewBotAPI(p.Config.Token)
+	}
+
+	if err != nil {
+		return err
 	}
 
 	bot.Debug = p.Config.Debug
