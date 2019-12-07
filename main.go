@@ -245,6 +245,11 @@ func main() {
 			Usage:  "Provides the target deployment environment for the running build. This value is only available to promotion and rollback pipelines.",
 			EnvVar: "DRONE_DEPLOY_TO",
 		},
+		cli.StringFlag{
+			Name:   "socks5",
+			Usage:  "Socks5 proxy URL",
+			EnvVar: "PLUGIN_SOCKS5,SOCKS5",
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
@@ -310,6 +315,7 @@ func run(c *cli.Context) error {
 			Venue:        c.StringSlice("venue"),
 			Format:       c.String("format"),
 			GitHub:       c.Bool("github"),
+			Socks5:       c.String("socks5"),
 		},
 	}
 
