@@ -407,32 +407,14 @@ func TestProxySendMessage(t *testing.T) {
 		},
 
 		Config: Config{
-			Token:    os.Getenv("TELEGRAM_TOKEN"),
-			To:       []string{os.Getenv("TELEGRAM_TO"), os.Getenv("TELEGRAM_TO") + ":appleboy@gmail.com", "中文ID", "1234567890"},
-			Message:  []string{"Test Telegram Chat Bot From Travis or Local", "commit message: 『{{ build.message }}』", " "},
-			Photo:    []string{"tests/github.png", "1234", " "},
-			Document: []string{"tests/gophercolor.png", "1234", " "},
-			Sticker:  []string{"tests/github-logo.png", "tests/github.png", "1234", " "},
-			Audio:    []string{"tests/audio.mp3", "1234", " "},
-			Voice:    []string{"tests/voice.ogg", "1234", " "},
-			Location: []string{"24.9163213 121.1424972", "1", " "},
-			Venue:    []string{"35.661777 139.704051 竹北體育館 新竹縣竹北市", "24.9163213 121.1424972", "1", " "},
-			Video:    []string{"tests/video.mp4", "1234", " "},
-			Debug:    false,
-			Socks5:   os.Getenv("SOCKS5"),
+			Token:   os.Getenv("TELEGRAM_TOKEN"),
+			To:      []string{os.Getenv("TELEGRAM_TO")},
+			Message: []string{"Send message from socks5 proxy URL."},
+			Debug:   false,
+			Socks5:  os.Getenv("SOCKS5"),
 		},
 	}
 
 	err := plugin.Exec()
-	assert.NotNil(t, err)
-
-	plugin.Config.Format = formatMarkdown
-	plugin.Config.Message = []string{"Test escape under_score"}
-	err = plugin.Exec()
-	assert.NotNil(t, err)
-
-	// disable message
-	plugin.Config.Message = []string{}
-	err = plugin.Exec()
 	assert.NotNil(t, err)
 }
