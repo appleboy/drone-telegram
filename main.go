@@ -248,7 +248,7 @@ func main() {
 		cli.StringFlag{
 			Name:   "socks5",
 			Usage:  "Socks5 proxy URL",
-			EnvVar: "PLUGIN_SOCKS5,SOCKS5",
+			EnvVar: "PLUGIN_SOCKS5,SOCKS5,INPUT_SOCKS5",
 		},
 	}
 
