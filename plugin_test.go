@@ -416,5 +416,5 @@ func TestProxySendMessage(t *testing.T) {
 	}
 
 	err := plugin.Exec()
-	assert.NotNil(t, err)
+	assert.Nil(t, err)
 }
