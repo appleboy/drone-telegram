@@ -175,7 +175,8 @@ Example configuration with a generic message template loaded from file, with add
 ```
 
 Where `message_file.tpl` is:
-```
+
+```bash
 Build finished for *{{tpl.app}}* - *{{tpl.env}}*
 
 {{#success build.status}}
@@ -183,6 +184,18 @@ Build finished for *{{tpl.app}}* - *{{tpl.env}}*
 {{else}}
   build {{build.number}} failed. Fix me please.
 {{/success}}
+```
+
+Example configuration with a custom socks5 URL:
+
+```diff
+  - name: send telegram notification
+    image: appleboy/drone-telegram
+    settings:
+      token: xxxxxxxxxx
+      to: telegram_user_id
+      message: send message using custom socks5 URL
++     socks5: socks5://67.204.21.1:64312
 ```
 
 ## Parameter Reference
