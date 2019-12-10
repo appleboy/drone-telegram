@@ -453,7 +453,7 @@ func (p Plugin) Message() []string {
 		)}
 	}
 
-	return []string{fmt.Sprintf("%s*%s* [%s](%s)『%s』by %s",
+	return []string{fmt.Sprintf("%s *%s*: [%s](%s)『%s』by %s",
 		icon,
 		p.Build.Status,
 		p.Repo.FullName,
