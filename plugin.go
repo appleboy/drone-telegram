@@ -107,6 +107,12 @@ type (
 	}
 )
 
+var icons = map[string]string{
+	"failure":   "❗",
+	"cancelled": "❕",
+	"success":   "✅",
+}
+
 func trimElement(keys []string) []string {
 	var newKeys []string
 
@@ -266,6 +272,7 @@ func (p Plugin) Exec() (err error) {
 	case len(p.Config.Message) > 0:
 		message = p.Config.Message
 	default:
+		p.Config.Format = formatMarkdown
 		message = p.Message()
 	}
 
@@ -435,6 +442,8 @@ func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) error {
 
 // Message is plugin default message.
 func (p Plugin) Message() []string {
+	icon := icons[strings.ToLower(p.Build.Status)]
+
 	if p.Config.GitHub {
 		return []string{fmt.Sprintf("%s/%s triggered by %s (%s)",
 			p.Repo.FullName,
@@ -444,10 +453,11 @@ func (p Plugin) Message() []string {
 		)}
 	}
 
-	return []string{fmt.Sprintf("[%s] <%s> (%s)『%s』by %s",
+	return []string{fmt.Sprintf("%s*%s* [%s](%s)『%s』by %s",
+		icon,
 		p.Build.Status,
+		p.Repo.FullName,
 		p.Build.Link,
-		p.Commit.Branch,
 		p.Commit.Message,
 		p.Commit.Author,
 	)}

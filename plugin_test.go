@@ -30,6 +30,7 @@ func TestMissingUserConfig(t *testing.T) {
 func TestDefaultMessageFormat(t *testing.T) {
 	plugin := Plugin{
 		Repo: Repo{
+			FullName:  "appleboy/go-hello",
 			Name:      "go-hello",
 			Namespace: "appleboy",
 		},
@@ -48,7 +49,7 @@ func TestDefaultMessageFormat(t *testing.T) {
 
 	message := plugin.Message()
 
-	assert.Equal(t, []string{"[success] <https://github.com/appleboy/go-hello> (master)『update travis』by Bo-Yi Wu"}, message)
+	assert.Equal(t, []string{"✅*success* [appleboy/go-hello](https://github.com/appleboy/go-hello)『update travis』by Bo-Yi Wu"}, message)
 }
 
 func TestDefaultMessageFormatFromGitHub(t *testing.T) {
