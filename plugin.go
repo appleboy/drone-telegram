@@ -108,7 +108,7 @@ type (
 )
 
 var icons = map[string]string{
-	"failure":   "❗",
+	"failure":   "❌",
 	"cancelled": "❕",
 	"success":   "✅",
 }
@@ -453,12 +453,20 @@ func (p Plugin) Message() []string {
 		)}
 	}
 
-	return []string{fmt.Sprintf("%s *%s*: [%s](%s)『%s』by %s",
+	// ✅  Build #106 of drone-telegram succeeded.
+	//
+	// 📝 Commit by appleboy on master:
+	//  chore: update default template
+	//
+	// 🌐 https://cloud.drone.io/appleboy/drone-telegram/106
+	return []string{fmt.Sprintf("%s Build #%d of `%s` %s.\n\n📝 Commit by %s on `%s`:\n``` %s ```\n\n🌐 %s",
 		icon,
-		p.Build.Status,
+		p.Build.Number,
 		p.Repo.FullName,
-		p.Build.Link,
-		p.Commit.Message,
+		p.Build.Status,
 		p.Commit.Author,
+		p.Commit.Branch,
+		p.Commit.Message,
+		p.Build.Link,
 	)}
 }

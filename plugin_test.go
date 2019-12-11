@@ -49,7 +49,7 @@ func TestDefaultMessageFormat(t *testing.T) {
 
 	message := plugin.Message()
 
-	assert.Equal(t, []string{"✅ *success*: [appleboy/go-hello](https://github.com/appleboy/go-hello)『update travis』by Bo-Yi Wu"}, message)
+	assert.Equal(t, []string{"✅ Build #101 of `appleboy/go-hello` success.\n\n📝 Commit by Bo-Yi Wu on `master`:\n``` update travis ```\n\n🌐 https://github.com/appleboy/go-hello"}, message)
 }
 
 func TestDefaultMessageFormatFromGitHub(t *testing.T) {
