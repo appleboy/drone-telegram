@@ -97,7 +97,7 @@ func TestSendMessage(t *testing.T) {
 		Config: Config{
 			Token:    os.Getenv("TELEGRAM_TOKEN"),
 			To:       []string{os.Getenv("TELEGRAM_TO"), os.Getenv("TELEGRAM_TO") + ":appleboy@gmail.com", "中文ID", "1234567890"},
-			Message:  []string{"Test Telegram Chat Bot From Travis or Local", "commit message: 『{{ build.message }}』", " "},
+			Message:  "Test Telegram Chat Bot From Travis or Local, commit message: 『{{ build.message }}』",
 			Photo:    []string{"tests/github.png", "1234", " "},
 			Document: []string{"tests/gophercolor.png", "1234", " "},
 			Sticker:  []string{"tests/github-logo.png", "tests/github.png", "1234", " "},
@@ -114,12 +114,12 @@ func TestSendMessage(t *testing.T) {
 	assert.NotNil(t, err)
 
 	plugin.Config.Format = formatMarkdown
-	plugin.Config.Message = []string{"Test escape under_score"}
+	plugin.Config.Message = "Test escape under_score"
 	err = plugin.Exec()
 	assert.NotNil(t, err)
 
 	// disable message
-	plugin.Config.Message = []string{}
+	plugin.Config.Message = ""
 	err = plugin.Exec()
 	assert.NotNil(t, err)
 }
@@ -145,7 +145,7 @@ func TestBotError(t *testing.T) {
 		Config: Config{
 			Token:   "appleboy",
 			To:      []string{os.Getenv("TELEGRAM_TO"), "中文ID", "1234567890"},
-			Message: []string{"Test Telegram Chat Bot From Travis or Local", " "},
+			Message: "Test Telegram Chat Bot From Travis or Local",
 		},
 	}
 
@@ -410,7 +410,7 @@ func TestProxySendMessage(t *testing.T) {
 		Config: Config{
 			Token:   os.Getenv("TELEGRAM_TOKEN"),
 			To:      []string{os.Getenv("TELEGRAM_TO")},
-			Message: []string{"Send message from socks5 proxy URL."},
+			Message: "Send message from socks5 proxy URL.",
 			Debug:   false,
 			Socks5:  os.Getenv("SOCKS5"),
 		},

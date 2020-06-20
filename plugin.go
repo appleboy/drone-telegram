@@ -72,7 +72,7 @@ type (
 		MatchEmail   bool
 		WebPreview   bool
 		To           []string
-		Message      []string
+		Message      string
 		MessageFile  string
 		TemplateVars string
 		Photo        []string
@@ -270,7 +270,7 @@ func (p Plugin) Exec() (err error) {
 			return fmt.Errorf("error loading message file '%s': %v", p.Config.MessageFile, err)
 		}
 	case len(p.Config.Message) > 0:
-		message = p.Config.Message
+		message = []string{p.Config.Message}
 	default:
 		p.Config.Format = formatMarkdown
 		message = p.Message()

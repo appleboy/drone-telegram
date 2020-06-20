@@ -31,7 +31,7 @@ func main() {
 			Usage:  "telegram user",
 			EnvVar: "PLUGIN_TO,TELEGRAM_TO,INPUT_TO",
 		},
-		cli.StringSliceFlag{
+		cli.StringFlag{
 			Name:   "message",
 			Usage:  "send telegram message",
 			EnvVar: "PLUGIN_MESSAGE,TELEGRAM_MESSAGE,INPUT_MESSAGE",
@@ -302,7 +302,7 @@ func run(c *cli.Context) error {
 			MatchEmail:   c.Bool("match.email"),
 			WebPreview:   c.Bool("webpage.preview"),
 			To:           c.StringSlice("to"),
-			Message:      c.StringSlice("message"),
+			Message:      c.String("message"),
 			MessageFile:  c.String("message.file"),
 			TemplateVars: c.String("template.vars"),
 			Photo:        c.StringSlice("photo"),
