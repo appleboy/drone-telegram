@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	_ "github.com/joho/godotenv/autoload"
 	"github.com/urfave/cli"
 )
 
@@ -15,6 +14,11 @@ var (
 )
 
 func main() {
+	// Load env-file if it exists first
+	if filename, found := os.LookupEnv("PLUGIN_ENV_FILE"); found {
+		_ = godotenv.Load(filename)
+	}
+
 	app := cli.NewApp()
 	app.Name = "telegram plugin"
 	app.Usage = "telegram plugin"
@@ -205,11 +209,6 @@ func main() {
 			Usage:  "job finished",
 			EnvVar: "DRONE_BUILD_FINISHED",
 		},
-		cli.StringFlag{
-			Name:   "env-file",
-			Usage:  "source env file",
-			EnvVar: "ENV_FILE",
-		},
 		cli.BoolFlag{
 			Name:   "github",
 			Usage:  "Boolean value, indicates the runtime environment is GitHub Action.",
@@ -258,10 +257,6 @@ func main() {
 }
 
 func run(c *cli.Context) error {
-	if c.String("env-file") != "" {
-		_ = godotenv.Load(c.String("env-file"))
-	}
-
 	plugin := Plugin{
 		GitHub: GitHub{
 			Workflow:  c.String("github.workflow"),

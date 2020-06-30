@@ -103,7 +103,7 @@ Load all environments from file.
 
 ```bash
 docker run --rm \
-  -e ENV_FILE=your_env_file_path \
+  -e PLUGIN_ENV_FILE=your_env_file_path \
   -v $(pwd):$(pwd) \
   -w $(pwd) \
   appleboy/drone-telegram
