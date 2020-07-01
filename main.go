@@ -16,7 +16,7 @@ var (
 func main() {
 	// Load env-file if it exists first
 	if filename, found := os.LookupEnv("PLUGIN_ENV_FILE"); found {
-		_ = godotenv.Load(filename)
+		godotenv.Load(filename)
 	}
 
 	app := cli.NewApp()
@@ -249,6 +249,10 @@ func main() {
 			Usage:  "Socks5 proxy URL",
 			EnvVar: "PLUGIN_SOCKS5,SOCKS5,INPUT_SOCKS5",
 		},
+	}
+
+	if _, err := os.Stat("/run/drone/env"); err == nil {
+		godotenv.Overload("/run/drone/env")
 	}
 
 	if err := app.Run(os.Args); err != nil {
