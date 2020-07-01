@@ -14,6 +14,15 @@ var (
 )
 
 func main() {
+	// in k8s pipelines the variables are provisioned beforehand
+	// that's why the build status cannot be actual
+	// however the actual variables are automatically provisioned in /run/drone/env
+	// see https://discourse.drone.io/t/drone-build-status-always-success-in-kubernetes/6627 for more info
+	if os.Getenv("DRONE_STAGE_TYPE") == "kubernetes" {
+		// overload is important here to overwrite the outdated env variables from the container
+		_ = godotenv.Overload("/run/drone/env")
+	}
+
 	// Load env-file if it exists first
 	if filename, found := os.LookupEnv("PLUGIN_ENV_FILE"); found {
 		_ = godotenv.Load(filename)
