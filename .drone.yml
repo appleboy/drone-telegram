@@ -73,7 +73,7 @@ steps:
   pull: always
   image: golang:1.13
   commands:
-  - go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-telegram
+  - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-telegram"
   environment:
     CGO_ENABLED: 0
   when:
@@ -85,7 +85,7 @@ steps:
   pull: always
   image: golang:1.13
   commands:
-  - go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-telegram
+  - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/amd64/drone-telegram"
   environment:
     CGO_ENABLED: 0
   when:
@@ -133,8 +133,8 @@ steps:
 trigger:
   ref:
   - refs/heads/master
-  - refs/pull/**
-  - refs/tags/**
+  - "refs/pull/**"
+  - "refs/tags/**"
 
 depends_on:
 - testing
@@ -152,7 +152,7 @@ steps:
   pull: always
   image: golang:1.13
   commands:
-  - go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-telegram
+  - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-telegram"
   environment:
     CGO_ENABLED: 0
   when:
@@ -164,7 +164,7 @@ steps:
   pull: always
   image: golang:1.13
   commands:
-  - go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-telegram
+  - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm64/drone-telegram"
   environment:
     CGO_ENABLED: 0
   when:
@@ -212,8 +212,8 @@ steps:
 trigger:
   ref:
   - refs/heads/master
-  - refs/pull/**
-  - refs/tags/**
+  - "refs/pull/**"
+  - "refs/tags/**"
 
 depends_on:
 - testing
@@ -231,7 +231,7 @@ steps:
   pull: always
   image: golang:1.13
   commands:
-  - go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-telegram
+  - "go build -v -ldflags '-X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-telegram"
   environment:
     CGO_ENABLED: 0
   when:
@@ -243,7 +243,7 @@ steps:
   pull: always
   image: golang:1.13
   commands:
-  - go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-telegram
+  - "go build -v -ldflags '-X main.version=${DRONE_TAG##v} -X main.build=${DRONE_BUILD_NUMBER}' -a -o release/linux/arm/drone-telegram"
   environment:
     CGO_ENABLED: 0
   when:
@@ -291,8 +291,8 @@ steps:
 trigger:
   ref:
   - refs/heads/master
-  - refs/pull/**
-  - refs/tags/**
+  - "refs/pull/**"
+  - "refs/tags/**"
 
 depends_on:
 - testing
@@ -322,14 +322,14 @@ steps:
     api_key:
       from_secret: github_release_api_key
     files:
-    - dist/release/*
+    - "dist/release/*"
   when:
     event:
     - tag
 
 trigger:
   ref:
-  - refs/tags/**
+  - "refs/tags/**"
 
 depends_on:
 - testing
@@ -347,7 +347,7 @@ steps:
   pull: always
   image: appleboy/drone-telegram
   settings:
-    message: "{{#success build.status}} ✅  Build #{{build.number}} of `{{repo.name}}` succeeded.\n\n📝 Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n\n🌐 {{ build.link }} {{else}} ❌  Build #{{build.number}} of `{{repo.name}}` failed.\n\n📝 Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n\n🌐 {{ build.link }} {{/success}}\n"
+    message: "{{#success build.status}} ✅  Build #{{build.number}} of `{{repo.name}}` succeeded.\n\n📝 Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n\n🌐 {{ build.link }} {{else}} ❌  Build #{{build.number}} of `{{repo.name}}` failed.\n\n📝 Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n\n🌐 {{ build.link }} {{/success}}\n\n timecost: {{since build.started}}\n"
     to:
       from_secret: telegram_to
     token:
@@ -367,7 +367,7 @@ steps:
 trigger:
   ref:
   - refs/heads/master
-  - refs/tags/**
+  - "refs/tags/**"
 
 depends_on:
 - linux-amd64

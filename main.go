@@ -19,6 +19,10 @@ func main() {
 		godotenv.Load(filename)
 	}
 
+	if _, err := os.Stat("/run/drone/env"); err == nil {
+		godotenv.Overload("/run/drone/env")
+	}
+
 	app := cli.NewApp()
 	app.Name = "telegram plugin"
 	app.Usage = "telegram plugin"
@@ -199,14 +203,14 @@ func main() {
 			Usage:  "pull request",
 			EnvVar: "DRONE_PULL_REQUEST",
 		},
-		cli.Float64Flag{
-			Name:   "job.started",
-			Usage:  "job started",
+		cli.Int64Flag{
+			Name:   "build.started",
+			Usage:  "build started",
 			EnvVar: "DRONE_BUILD_STARTED",
 		},
-		cli.Float64Flag{
-			Name:   "job.finished",
-			Usage:  "job finished",
+		cli.Int64Flag{
+			Name:   "build.finished",
+			Usage:  "build finished",
 			EnvVar: "DRONE_BUILD_FINISHED",
 		},
 		cli.BoolFlag{
@@ -251,10 +255,6 @@ func main() {
 		},
 	}
 
-	if _, err := os.Stat("/run/drone/env"); err == nil {
-		godotenv.Overload("/run/drone/env")
-	}
-
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
@@ -290,8 +290,8 @@ func run(c *cli.Context) error {
 			Event:    c.String("build.event"),
 			Status:   c.String("build.status"),
 			Link:     c.String("build.link"),
-			Started:  c.Float64("job.started"),
-			Finished: c.Float64("job.finished"),
+			Started:  c.Int64("build.started"),
+			Finished: c.Int64("build.finished"),
 			PR:       c.String("pull.request"),
 			DeployTo: c.String("deploy.to"),
 		},
