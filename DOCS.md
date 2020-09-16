@@ -242,6 +242,9 @@ message_file
 template_vars
 : define additional template vars. Example: `var1: hello` can be used within the template as `tpl.var1`
 
+template_vars_file
+: load additional template vars from json file. Example: given file content `{"var1":"hello"}`, variable can be used within the template as `tpl.var1`
+
 photo
 : local file path
 
