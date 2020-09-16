@@ -387,6 +387,37 @@ func TestTemplateVars(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestTemplateVarsFile(t *testing.T) {
+	plugin := Plugin{
+		Repo: Repo{
+			Name:      "go-hello",
+			Namespace: "appleboy",
+		},
+		Commit: Commit{
+			Sha:     "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
+			Author:  "Bo-Yi Wu",
+			Branch:  "master",
+			Message: "This is a test commit msg",
+		},
+		Build: Build{
+			Number: 101,
+			Status: "success",
+			Link:   "https://github.com/appleboy/go-hello",
+		},
+
+		Config: Config{
+			Token:            os.Getenv("TELEGRAM_TOKEN"),
+			To:               []string{os.Getenv("TELEGRAM_TO")},
+			Format:           formatMarkdown,
+			MessageFile:      "tests/message_template.txt",
+			TemplateVarsFile: "tests/vars.json",
+		},
+	}
+
+	err := plugin.Exec()
+	assert.Nil(t, err)
+}
+
 func TestProxySendMessage(t *testing.T) {
 	plugin := Plugin{
 		Repo: Repo{
