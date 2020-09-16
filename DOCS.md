@@ -186,6 +186,33 @@ Build finished for *{{tpl.app}}* - *{{tpl.env}}*
 {{/success}}
 ```
 
+Example configuration with a custom message template, with extra vars loaded from file (e.g. from previous build steps):
+
+```diff
+  - name: send telegram notification
+    image: appleboy/drone-telegram
+    settings:
+      token: xxxxxxxxxx
+      to: telegram_user_id
++     template_vars_file: build_report.json
++     message: >
++       {{#success build.status}}
++         build {{build.number}} succeeded, artefact version = {{tpl.artefact_version}}.
++       {{else}}
++         build {{build.number}} failed. Fix me please.
++       {{/success}}
+```
+
+Where `build_report.json` is:
+
+```
+{
+  ...
+  "artefact_version": "0.2.3452"
+  ...
+}
+```
+
 Example configuration with a custom socks5 URL:
 
 ```diff
