@@ -67,25 +67,26 @@ type (
 
 	// Config for the plugin.
 	Config struct {
-		Token        string
-		Debug        bool
-		MatchEmail   bool
-		WebPreview   bool
-		To           []string
-		Message      string
-		MessageFile  string
-		TemplateVars string
-		Photo        []string
-		Document     []string
-		Sticker      []string
-		Audio        []string
-		Voice        []string
-		Location     []string
-		Video        []string
-		Venue        []string
-		Format       string
-		GitHub       bool
-		Socks5       string
+		Token            string
+		Debug            bool
+		MatchEmail       bool
+		WebPreview       bool
+		To               []string
+		Message          string
+		MessageFile      string
+		TemplateVarsFile string
+		TemplateVars     string
+		Photo            []string
+		Document         []string
+		Sticker          []string
+		Audio            []string
+		Voice            []string
+		Location         []string
+		Video            []string
+		Venue            []string
+		Format           string
+		GitHub           bool
+		Socks5           string
 	}
 
 	// Plugin values.
@@ -280,6 +281,25 @@ func (p Plugin) Exec() (err error) {
 		p.Tpl = make(map[string]string)
 		if err = json.Unmarshal([]byte(p.Config.TemplateVars), &p.Tpl); err != nil {
 			return fmt.Errorf("unable to unmarshall template vars from JSON string '%s': %v", p.Config.TemplateVars, err)
+		}
+	}
+
+	if p.Config.TemplateVarsFile != "" {
+		content, err := ioutil.ReadFile(p.Config.TemplateVarsFile)
+		if err != nil {
+			return fmt.Errorf("unable to read file with template vars '%s': %v", p.Config.TemplateVarsFile, err)
+		}
+		var vars = make(map[string]string)
+		if err = json.Unmarshal(content, &vars); err != nil {
+			return fmt.Errorf("unable to unmarshall template vars from JSON file '%s': %v", p.Config.TemplateVarsFile, err)
+		}
+		// Merging templates variables from file to the variables form plugin settings (variables from file takes precedence)
+		if p.Tpl == nil {
+			p.Tpl = vars
+		} else {
+			for k, v := range vars {
+				p.Tpl[k] = v
+			}
 		}
 	}
 
