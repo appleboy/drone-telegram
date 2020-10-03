@@ -364,7 +364,7 @@ func (p Plugin) Exec() (err error) {
 
 			msg := tgbotapi.NewMessage(user, txt)
 			msg.ParseMode = p.Config.Format
-			msg.DisableWebPagePreview = !p.Config.DisableWebPagePreview
+			msg.DisableWebPagePreview = p.Config.DisableWebPagePreview
 			if err := p.Send(bot, msg); err != nil {
 				return err
 			}

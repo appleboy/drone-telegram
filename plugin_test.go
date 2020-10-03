@@ -140,12 +140,13 @@ func TestDisableWebPagePreviewMessage(t *testing.T) {
 	plugin.Config.Format = formatMarkdown
 	plugin.Config.Message = "DisableWebPagePreview https://www.google.com.tw"
 	err = plugin.Exec()
-	assert.NotNil(t, err)
+	assert.Nil(t, err)
 
 	// disable message
 	plugin.Config.DisableWebPagePreview = false
+	plugin.Config.Message = "EnableWebPagePreview https://www.google.com.tw"
 	err = plugin.Exec()
-	assert.NotNil(t, err)
+	assert.Nil(t, err)
 }
 
 func TestBotError(t *testing.T) {
