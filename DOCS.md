@@ -225,6 +225,18 @@ Example configuration with a custom socks5 URL:
 +     socks5: socks5://67.204.21.1:64312
 ```
 
+Disables link previews for links in this message
+
+```diff
+  - name: send telegram notification
+    image: appleboy/drone-telegram
+    settings:
+      token: xxxxxxxxxx
+      to: telegram_user_id
+      message: send message using custom socks5 URL
++     disable_web_page_preview: true
+```
+
 ## Parameter Reference
 
 token

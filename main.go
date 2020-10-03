@@ -112,7 +112,7 @@ func main() {
 		cli.BoolFlag{
 			Name:   "disable.webpage.preview",
 			Usage:  "disables link previews for links in this message",
-			EnvVar: "PLUGIN_WEBPAGE_PREVIEW,INPUT_DISABLE_WEB_PAGE_PREVIEW",
+			EnvVar: "PLUGIN_DISABLE_WEB_PAGE_PREVIEW,INPUT_DISABLE_WEB_PAGE_PREVIEW",
 		},
 		cli.StringFlag{
 			Name:   "format",
