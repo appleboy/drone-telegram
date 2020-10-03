@@ -109,10 +109,10 @@ func main() {
 			Usage:  "send message when only match email",
 			EnvVar: "PLUGIN_ONLY_MATCH_EMAIL,INPUT_ONLY_MATCH_EMAIL",
 		},
-		cli.BoolTFlag{
-			Name:   "webpage.preview",
-			Usage:  "toggle web-page preview",
-			EnvVar: "PLUGIN_WEBPAGE_PREVIEW,INPUT_WEBPAGE_PREVIEW",
+		cli.BoolFlag{
+			Name:   "disable.webpage.preview",
+			Usage:  "disables link previews for links in this message",
+			EnvVar: "PLUGIN_WEBPAGE_PREVIEW,INPUT_DISABLE_WEB_PAGE_PREVIEW",
 		},
 		cli.StringFlag{
 			Name:   "format",
@@ -304,7 +304,6 @@ func run(c *cli.Context) error {
 			Token:            c.String("token"),
 			Debug:            c.Bool("debug"),
 			MatchEmail:       c.Bool("match.email"),
-			WebPreview:       c.Bool("webpage.preview"),
 			To:               c.StringSlice("to"),
 			Message:          c.String("message"),
 			MessageFile:      c.String("message.file"),
@@ -321,6 +320,8 @@ func run(c *cli.Context) error {
 			Format:           c.String("format"),
 			GitHub:           c.Bool("github"),
 			Socks5:           c.String("socks5"),
+
+			DisableWebPagePreview: c.Bool("disable.webpage.preview"),
 		},
 	}
 

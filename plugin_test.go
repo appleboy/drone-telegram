@@ -124,6 +124,30 @@ func TestSendMessage(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+func TestDisableWebPagePreviewMessage(t *testing.T) {
+	plugin := Plugin{
+		Config: Config{
+			Token:                 os.Getenv("TELEGRAM_TOKEN"),
+			To:                    []string{os.Getenv("TELEGRAM_TO")},
+			DisableWebPagePreview: true,
+			Debug:                 false,
+		},
+	}
+
+	err := plugin.Exec()
+	assert.NotNil(t, err)
+
+	plugin.Config.Format = formatMarkdown
+	plugin.Config.Message = "DisableWebPagePreview https://www.google.com.tw"
+	err = plugin.Exec()
+	assert.NotNil(t, err)
+
+	// disable message
+	plugin.Config.DisableWebPagePreview = false
+	err = plugin.Exec()
+	assert.NotNil(t, err)
+}
+
 func TestBotError(t *testing.T) {
 	plugin := Plugin{
 		Repo: Repo{

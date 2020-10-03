@@ -70,7 +70,6 @@ type (
 		Token            string
 		Debug            bool
 		MatchEmail       bool
-		WebPreview       bool
 		To               []string
 		Message          string
 		MessageFile      string
@@ -87,6 +86,8 @@ type (
 		Format           string
 		GitHub           bool
 		Socks5           string
+
+		DisableWebPagePreview bool
 	}
 
 	// Plugin values.
@@ -363,7 +364,7 @@ func (p Plugin) Exec() (err error) {
 
 			msg := tgbotapi.NewMessage(user, txt)
 			msg.ParseMode = p.Config.Format
-			msg.DisableWebPagePreview = !p.Config.WebPreview
+			msg.DisableWebPagePreview = !p.Config.DisableWebPagePreview
 			if err := p.Send(bot, msg); err != nil {
 				return err
 			}
