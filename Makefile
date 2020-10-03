@@ -7,7 +7,7 @@ GO ?= go
 DEPLOY_ACCOUNT := appleboy
 DEPLOY_IMAGE := $(EXECUTABLE)
 
-TARGETS ?= linux darwin windows
+TARGETS ?= linux windows
 SOURCES ?= $(shell find . -name "*.go" -type f)
 TAGS ?=
 LDFLAGS ?= -X 'main.Version=$(VERSION)'
