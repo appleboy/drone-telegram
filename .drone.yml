@@ -345,7 +345,7 @@ platform:
 steps:
 - name: telegram
   pull: always
-  image: appleboy/drone-telegram
+  image: appleboy/drone-telegram:linux-amd64
   settings:
     message: "{{#success build.status}} ✅  Build #{{build.number}} of `{{repo.name}}` succeeded.\n\n📝 Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n\n🌐 {{ build.link }} {{else}} ❌  Build #{{build.number}} of `{{repo.name}}` failed.\n\n📝 Commit by {{commit.author}} on `{{commit.branch}}`:\n``` {{commit.message}} ```\n\n🌐 {{ build.link }} {{/success}}\n\n timecost: {{since build.started}}\n"
     to:

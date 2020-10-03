@@ -232,7 +232,7 @@
     steps: [
       {
         name: 'telegram',
-        image: 'appleboy/drone-telegram',
+        image: 'appleboy/drone-telegram:linux-amd64',
         pull: 'always',
         settings: {
           to: { from_secret: 'telegram_to' },
