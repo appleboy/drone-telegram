@@ -16,7 +16,7 @@ import (
 	"strings"
 
 	"github.com/drone/drone-template-lib/template"
-	tgbotapi "gopkg.in/telegram-bot-api.v4"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 const (
