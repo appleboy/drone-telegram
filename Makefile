@@ -1,13 +1,13 @@
 DIST := dist
 EXECUTABLE := drone-telegram
-GOFMT ?= gofmt "-s"
+GOFMT ?= gofumpt -l -s
 GO ?= go
 
 # for dockerhub
 DEPLOY_ACCOUNT := appleboy
 DEPLOY_IMAGE := $(EXECUTABLE)
 
-TARGETS ?= linux windows
+TARGETS ?= linux darwin
 SOURCES ?= $(shell find . -name "*.go" -type f)
 TAGS ?=
 LDFLAGS ?= -X 'main.Version=$(VERSION)'
@@ -27,6 +27,9 @@ endif
 all: build
 
 fmt:
+	@hash gofumpt > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		$(GO) get -u mvdan.cc/gofumpt; \
+	fi
 	$(GOFMT) -w $(SOURCES)
 
 vet:
@@ -54,6 +57,9 @@ misspell:
 
 .PHONY: fmt-check
 fmt-check:
+	@hash gofumpt > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		$(GO) get -u mvdan.cc/gofumpt; \
+	fi
 	@diff=$$($(GOFMT) -d $(SOURCES)); \
 	if [ -n "$$diff" ]; then \
 		echo "Please run 'make fmt' and commit the result:"; \
@@ -81,7 +87,7 @@ release-build:
 	@which gox > /dev/null; if [ $$? -ne 0 ]; then \
 		$(GO) get -u github.com/mitchellh/gox; \
 	fi
-	gox -os="$(TARGETS)" -arch="amd64 386" -tags="$(TAGS)" -ldflags="-s -w $(LDFLAGS)" -output="$(DIST)/binaries/$(EXECUTABLE)-$(VERSION)-{{.OS}}-{{.Arch}}"
+	gox -os="$(TARGETS)" -arch="amd64" -tags="$(TAGS)" -ldflags="-s -w $(LDFLAGS)" -output="$(DIST)/binaries/$(EXECUTABLE)-$(VERSION)-{{.OS}}-{{.Arch}}"
 
 release-copy:
 	$(foreach file,$(wildcard $(DIST)/binaries/$(EXECUTABLE)-*),cp $(file) $(DIST)/release/$(notdir $(file));)

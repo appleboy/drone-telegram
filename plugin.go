@@ -290,7 +290,7 @@ func (p Plugin) Exec() (err error) {
 		if err != nil {
 			return fmt.Errorf("unable to read file with template vars '%s': %v", p.Config.TemplateVarsFile, err)
 		}
-		var vars = make(map[string]string)
+		vars := make(map[string]string)
 		if err = json.Unmarshal(content, &vars); err != nil {
 			return fmt.Errorf("unable to unmarshall template vars from JSON file '%s': %v", p.Config.TemplateVarsFile, err)
 		}
