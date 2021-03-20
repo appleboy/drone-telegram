@@ -3,10 +3,11 @@ module github.com/appleboy/drone-telegram
 go 1.15
 
 require (
-	github.com/drone/drone-template-lib v1.0.1-0.20200922172814-d25f0a0b9a0e
+	github.com/drone/drone-template-lib v1.0.0
 	github.com/go-telegram-bot-api/telegram-bot-api v4.6.4+incompatible
 	github.com/joho/godotenv v1.3.0
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	github.com/urfave/cli v1.20.0
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
