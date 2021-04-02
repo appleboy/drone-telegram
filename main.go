@@ -114,6 +114,11 @@ func main() {
 			Usage:  "disables link previews for links in this message",
 			EnvVar: "PLUGIN_DISABLE_WEB_PAGE_PREVIEW,INPUT_DISABLE_WEB_PAGE_PREVIEW",
 		},
+		cli.BoolFlag{
+			Name:   "disable.notification",
+			Usage:  "sends the message silently. users will receive a notification with no sound.",
+			EnvVar: "PLUGIN_DISABLE_NOTIFICATION,INPUT_DISABLE_NOTIFICATION",
+		},
 		cli.StringFlag{
 			Name:   "format",
 			Value:  formatMarkdown,
@@ -322,6 +327,7 @@ func run(c *cli.Context) error {
 			Socks5:           c.String("socks5"),
 
 			DisableWebPagePreview: c.Bool("disable.webpage.preview"),
+			DisableNotification: c.Bool("disable.notification"),
 		},
 	}
 
