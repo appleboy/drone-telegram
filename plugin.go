@@ -88,7 +88,7 @@ type (
 		Socks5           string
 
 		DisableWebPagePreview bool
-		DisableNotification bool
+		DisableNotification   bool
 	}
 
 	// Plugin values.

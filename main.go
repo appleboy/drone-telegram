@@ -327,7 +327,7 @@ func run(c *cli.Context) error {
 			Socks5:           c.String("socks5"),
 
 			DisableWebPagePreview: c.Bool("disable.webpage.preview"),
-			DisableNotification: c.Bool("disable.notification"),
+			DisableNotification:   c.Bool("disable.notification"),
 		},
 	}
 

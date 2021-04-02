@@ -150,7 +150,7 @@ func TestDisableNotificationMessage(t *testing.T) {
 		Config: Config{
 			Token:                 os.Getenv("TELEGRAM_TOKEN"),
 			To:                    []string{os.Getenv("TELEGRAM_TO")},
-			DisableNotification: true,
+			DisableNotification:   true,
 			Debug:                 false,
 		},
 	}
