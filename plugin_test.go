@@ -148,10 +148,10 @@ func TestDisableWebPagePreviewMessage(t *testing.T) {
 func TestDisableNotificationMessage(t *testing.T) {
 	plugin := Plugin{
 		Config: Config{
-			Token:                 os.Getenv("TELEGRAM_TOKEN"),
-			To:                    []string{os.Getenv("TELEGRAM_TO")},
-			DisableNotification:   true,
-			Debug:                 false,
+			Token:               os.Getenv("TELEGRAM_TOKEN"),
+			To:                  []string{os.Getenv("TELEGRAM_TO")},
+			DisableNotification: true,
+			Debug:               false,
 		},
 	}
 
