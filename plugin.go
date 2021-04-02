@@ -88,6 +88,7 @@ type (
 		Socks5           string
 
 		DisableWebPagePreview bool
+		DisableNotification   bool
 	}
 
 	// Plugin values.
@@ -365,6 +366,7 @@ func (p Plugin) Exec() (err error) {
 			msg := tgbotapi.NewMessage(user, txt)
 			msg.ParseMode = p.Config.Format
 			msg.DisableWebPagePreview = p.Config.DisableWebPagePreview
+			msg.DisableNotification = p.Config.DisableNotification
 			if err := p.Send(bot, msg); err != nil {
 				return err
 			}

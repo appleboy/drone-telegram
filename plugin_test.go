@@ -145,6 +145,27 @@ func TestDisableWebPagePreviewMessage(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestDisableNotificationMessage(t *testing.T) {
+	plugin := Plugin{
+		Config: Config{
+			Token:               os.Getenv("TELEGRAM_TOKEN"),
+			To:                  []string{os.Getenv("TELEGRAM_TO")},
+			DisableNotification: true,
+			Debug:               false,
+		},
+	}
+
+	plugin.Config.Message = "DisableNotification https://www.google.com.tw"
+	err := plugin.Exec()
+	assert.Nil(t, err)
+
+	// disable message
+	plugin.Config.DisableNotification = false
+	plugin.Config.Message = "EnableNotification https://www.google.com.tw"
+	err = plugin.Exec()
+	assert.Nil(t, err)
+}
+
 func TestBotError(t *testing.T) {
 	plugin := Plugin{
 		Repo: Repo{

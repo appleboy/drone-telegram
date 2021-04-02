@@ -233,8 +233,20 @@ Disables link previews for links in this message
     settings:
       token: xxxxxxxxxx
       to: telegram_user_id
-      message: send message using custom socks5 URL
+      message: send message without a link preview
 +     disable_web_page_preview: true
+```
+
+Disables notifications for this message
+
+```diff
+  - name: send telegram notification
+    image: appleboy/drone-telegram
+    settings:
+      token: xxxxxxxxxx
+      to: telegram_user_id
+      message: send message message silently
++     disable_notification: true
 ```
 
 ## Parameter Reference
