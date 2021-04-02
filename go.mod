@@ -1,6 +1,6 @@
 module github.com/appleboy/drone-telegram
 
-go 1.15
+go 1.16
 
 require (
 	github.com/drone/drone-template-lib v1.0.0
@@ -8,6 +8,5 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/stretchr/testify v1.7.0
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
-	github.com/urfave/cli v1.20.0
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	github.com/urfave/cli v1.22.5
 )
