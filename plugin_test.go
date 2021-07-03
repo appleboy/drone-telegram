@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -382,9 +383,11 @@ func TestMessageFile(t *testing.T) {
 			Message: "Freakin' macOS isn't fully case-sensitive..",
 		},
 		Build: Build{
-			Number: 101,
-			Status: "success",
-			Link:   "https://github.com/appleboy/go-hello",
+			Number:   101,
+			Status:   "success",
+			Link:     "https://github.com/appleboy/go-hello",
+			Started:  time.Now().Unix(),
+			Finished: time.Now().Add(time.Duration(180 * time.Second)).Unix(),
 		},
 
 		Config: Config{
@@ -411,9 +414,11 @@ func TestTemplateVars(t *testing.T) {
 			Message: "This is a test commit msg",
 		},
 		Build: Build{
-			Number: 101,
-			Status: "success",
-			Link:   "https://github.com/appleboy/go-hello",
+			Number:   101,
+			Status:   "success",
+			Link:     "https://github.com/appleboy/go-hello",
+			Started:  time.Now().Unix(),
+			Finished: time.Now().Add(time.Duration(180 * time.Second)).Unix(),
 		},
 
 		Config: Config{
