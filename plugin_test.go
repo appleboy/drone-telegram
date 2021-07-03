@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -411,9 +412,11 @@ func TestTemplateVars(t *testing.T) {
 			Message: "This is a test commit msg",
 		},
 		Build: Build{
-			Number: 101,
-			Status: "success",
-			Link:   "https://github.com/appleboy/go-hello",
+			Number:   101,
+			Status:   "success",
+			Link:     "https://github.com/appleboy/go-hello",
+			Started:  time.Now().Unix(),
+			Finished: time.Now().Add(180 * time.Second).Unix(),
 		},
 
 		Config: Config{
