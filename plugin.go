@@ -15,7 +15,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/drone/drone-template-lib/template"
+	"github.com/appleboy/drone-template-lib/template"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 

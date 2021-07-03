@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/appleboy/drone-template-lib/template"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -495,5 +496,33 @@ func TestProxySendMessage(t *testing.T) {
 	}
 
 	err := plugin.Exec()
+	assert.Nil(t, err)
+}
+
+func TestBuildTemplate(t *testing.T) {
+	plugin := Plugin{
+		Commit: Commit{
+			Sha:     "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
+			Author:  "Bo-Yi Wu",
+			Branch:  "master",
+			Message: "This is a test commit msg",
+		},
+		Build: Build{
+			Number:   101,
+			Status:   "success",
+			Link:     "https://github.com/appleboy/go-hello",
+			Started:  time.Now().Unix(),
+			Finished: time.Now().Add(time.Duration(180 * time.Second)).Unix(),
+		},
+	}
+
+	_, err := template.RenderTrim(
+		`
+Sample message loaded from file.
+
+Commit msg:  {{uppercasefirst commit.message}}
+
+duration: {{duration build.started build.finished}}
+`, plugin)
 	assert.Nil(t, err)
 }
