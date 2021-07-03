@@ -383,9 +383,11 @@ func TestMessageFile(t *testing.T) {
 			Message: "Freakin' macOS isn't fully case-sensitive..",
 		},
 		Build: Build{
-			Number: 101,
-			Status: "success",
-			Link:   "https://github.com/appleboy/go-hello",
+			Number:   101,
+			Status:   "success",
+			Link:     "https://github.com/appleboy/go-hello",
+			Started:  time.Now().Unix(),
+			Finished: time.Now().Add(180 * time.Second).Unix(),
 		},
 
 		Config: Config{
