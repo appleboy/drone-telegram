@@ -387,7 +387,7 @@ func TestMessageFile(t *testing.T) {
 			Status:   "success",
 			Link:     "https://github.com/appleboy/go-hello",
 			Started:  time.Now().Unix(),
-			Finished: time.Now().Add(180 * time.Second).Unix(),
+			Finished: time.Now().Add(time.Duration(180 * time.Second)).Unix(),
 		},
 
 		Config: Config{
@@ -418,7 +418,7 @@ func TestTemplateVars(t *testing.T) {
 			Status:   "success",
 			Link:     "https://github.com/appleboy/go-hello",
 			Started:  time.Now().Unix(),
-			Finished: time.Now().Add(180 * time.Second).Unix(),
+			Finished: time.Now().Add(time.Duration(180 * time.Second)).Unix(),
 		},
 
 		Config: Config{
