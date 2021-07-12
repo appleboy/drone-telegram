@@ -353,7 +353,7 @@ func TestHTMLMessage(t *testing.T) {
 			Sha:     "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
 			Author:  "Bo-Yi Wu",
 			Branch:  "master",
-			Message: "Freakin' macOS isn't fully case-sensitive..",
+			Message: "Freakin' macOS isn't fully case-sensitive.. <br /> <a href='https://google.com'>Google .com</a>",
 		},
 		Build: Build{
 			Number: 101,

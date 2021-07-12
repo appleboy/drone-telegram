@@ -356,7 +356,7 @@ func (p Plugin) Exec() (err error) {
 	// send message.
 	for _, user := range ids {
 		for _, value := range message {
-			txt, err := template.RenderTrim(value, p)
+			txt, err := template.Render(value, p)
 			if err != nil {
 				return err
 			}
