@@ -364,7 +364,7 @@ func TestHTMLMessage(t *testing.T) {
 		Config: Config{
 			Token:   os.Getenv("TELEGRAM_TOKEN"),
 			To:      []string{os.Getenv("TELEGRAM_TO")},
-			Message: "Freakin' macOS isn't fully case-sensitive.. <br /> <a href='https://google.com'>Google .com</a>",
+			Message: "Test HTML Format \n<br /><br /> <a href='https://google.com'>Google .com</a>",
 			Format:  formatHtml,
 		},
 	}
