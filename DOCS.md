@@ -122,7 +122,7 @@ Example configuration with video message:
 +       - tests/video2.mp4
 ```
 
-Example configuration with message format:
+Example configuration with message format (`Markdown` or `HTML`), default as `Markdown`:
 
 ```diff
   - name: send telegram notification
@@ -130,7 +130,7 @@ Example configuration with message format:
     settings:
       token: xxxxxxxxxx
       to: telegram_user_id
-+     format: markdown
++     format: Markdown
 ```
 
 Example configuration with a custom message template:
