@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -366,7 +365,7 @@ func (p Plugin) Exec() (err error) {
 				return err
 			}
 
-			txt = html.UnescapeString(txt)
+			// txt = html.UnescapeString(txt)
 			log.Println(txt)
 			log.Println(p.Config.Format)
 
