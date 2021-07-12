@@ -367,16 +367,12 @@ func (p Plugin) Exec() (err error) {
 			}
 
 			txt = html.UnescapeString(txt)
-			log.Println(txt)
-			log.Println(p.Config.Format)
 
 			msg := tgbotapi.NewMessage(user, txt)
 			msg.ParseMode = p.Config.Format
 			msg.DisableWebPagePreview = p.Config.DisableWebPagePreview
 			msg.DisableNotification = p.Config.DisableNotification
 			if err := p.Send(bot, msg); err != nil {
-				log.Println(err)
-				log.Println("======")
 				return err
 			}
 		}

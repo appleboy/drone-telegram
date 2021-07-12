@@ -1,0 +1,5 @@
+Test HTML Format from file
+<a href='https://google.com'>Google .com 1</a>
+<a href='https://google.com'>Google .com 2</a>
+<a href='https://google.com'>Google .com 3</a>
+<a href='https://google.com'>Google .com 4</a>

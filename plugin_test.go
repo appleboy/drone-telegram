@@ -374,8 +374,10 @@ Test HTML Format
 		},
 	}
 
-	err := plugin.Exec()
-	assert.Nil(t, err)
+	assert.Nil(t, plugin.Exec())
+
+	plugin.Config.MessageFile = "tests/message_html.txt"
+	assert.Nil(t, plugin.Exec())
 }
 
 func TestMessageFile(t *testing.T) {
