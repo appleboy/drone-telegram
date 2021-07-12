@@ -20,7 +20,8 @@ import (
 )
 
 const (
-	formatMarkdown = "markdown"
+	formatMarkdown = "Markdown"
+	formatHtml     = "HTML"
 )
 
 type (
