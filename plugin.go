@@ -375,6 +375,8 @@ func (p Plugin) Exec() (err error) {
 			msg.DisableWebPagePreview = p.Config.DisableWebPagePreview
 			msg.DisableNotification = p.Config.DisableNotification
 			if err := p.Send(bot, msg); err != nil {
+				log.Println(err)
+				log.Println("======")
 				return err
 			}
 		}
