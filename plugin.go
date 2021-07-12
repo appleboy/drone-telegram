@@ -20,7 +20,8 @@ import (
 )
 
 const (
-	formatMarkdown = "markdown"
+	formatMarkdown = "Markdown"
+	formatHTML     = "HTML"
 )
 
 type (
@@ -259,6 +260,10 @@ func parseTo(to []string, authorEmail string, matchEmail bool) []int64 {
 	return ids
 }
 
+func templateMessage(t string, plugin Plugin) (string, error) {
+	return template.RenderTrim(t, plugin)
+}
+
 // Exec executes the plugin.
 func (p Plugin) Exec() (err error) {
 	if len(p.Config.Token) == 0 || len(p.Config.To) == 0 {
@@ -356,7 +361,7 @@ func (p Plugin) Exec() (err error) {
 	// send message.
 	for _, user := range ids {
 		for _, value := range message {
-			txt, err := template.RenderTrim(value, p)
+			txt, err := templateMessage(value, p)
 			if err != nil {
 				return err
 			}

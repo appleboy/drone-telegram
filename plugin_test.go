@@ -353,7 +353,7 @@ func TestHTMLMessage(t *testing.T) {
 			Sha:     "e7c4f0a63ceeb42a39ac7806f7b51f3f0d204fd2",
 			Author:  "Bo-Yi Wu",
 			Branch:  "master",
-			Message: "Freakin' macOS isn't fully case-sensitive..",
+			Message: "test",
 		},
 		Build: Build{
 			Number: 101,
@@ -364,11 +364,20 @@ func TestHTMLMessage(t *testing.T) {
 		Config: Config{
 			Token: os.Getenv("TELEGRAM_TOKEN"),
 			To:    []string{os.Getenv("TELEGRAM_TO")},
+			Message: `
+Test HTML Format
+<a href='https://google.com'>Google .com 1</a>
+<a href='https://google.com'>Google .com 2</a>
+<a href='https://google.com'>Google .com 3</a>
+`,
+			Format: formatHTML,
 		},
 	}
 
-	err := plugin.Exec()
-	assert.Nil(t, err)
+	assert.Nil(t, plugin.Exec())
+
+	plugin.Config.MessageFile = "tests/message_html.txt"
+	assert.Nil(t, plugin.Exec())
 }
 
 func TestMessageFile(t *testing.T) {
