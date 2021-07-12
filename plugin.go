@@ -21,7 +21,7 @@ import (
 
 const (
 	formatMarkdown = "Markdown"
-	formatHtml     = "HTML"
+	formatHTML     = "HTML"
 )
 
 type (

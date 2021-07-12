@@ -365,7 +365,7 @@ func TestHTMLMessage(t *testing.T) {
 			Token:   os.Getenv("TELEGRAM_TOKEN"),
 			To:      []string{os.Getenv("TELEGRAM_TO")},
 			Message: "Test HTML Format \n<br /><br /> <a href='https://google.com'>Google .com</a>",
-			Format:  formatHtml,
+			Format:  formatHTML,
 		},
 	}
 
