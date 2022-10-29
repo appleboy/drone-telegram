@@ -148,6 +148,8 @@ func escapeMarkdown(keys []string) []string {
 func escapeMarkdownOne(str string) string {
 	str = strings.Replace(str, `\_`, `_`, -1)
 	str = strings.Replace(str, `_`, `\_`, -1)
+	str = strings.Replace(str, `\*`, `*`, -1)
+	str = strings.Replace(str, `*`, `\*`, -1)
 
 	return str
 }
