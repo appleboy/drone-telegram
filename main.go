@@ -216,7 +216,7 @@ func main() {
 		cli.Int64Flag{
 			Name:   "build.started",
 			Usage:  "build started",
-			EnvVar: "DRONE_BUILD_STARTED",
+			EnvVar: "DRONE_STAGE_STARTED",
 		},
 		cli.Int64Flag{
 			Name:   "build.finished",
