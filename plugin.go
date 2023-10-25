@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"html"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -293,7 +292,7 @@ func (p Plugin) Exec() (err error) {
 	}
 
 	if p.Config.TemplateVarsFile != "" {
-		content, err := ioutil.ReadFile(p.Config.TemplateVarsFile)
+		content, err := os.ReadFile(p.Config.TemplateVarsFile)
 		if err != nil {
 			return fmt.Errorf("unable to read file with template vars '%s': %v", p.Config.TemplateVarsFile, err)
 		}
