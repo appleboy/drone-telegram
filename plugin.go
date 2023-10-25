@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"html"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -216,7 +217,7 @@ func loadTextFromFile(filename string) ([]string, error) {
 	}
 	defer f.Close()
 	r := bufio.NewReader(f)
-	content, err := ioutil.ReadAll(r)
+	content, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
