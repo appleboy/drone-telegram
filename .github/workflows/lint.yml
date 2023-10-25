@@ -27,14 +27,14 @@ jobs:
 
   testing:
     runs-on: ubuntu-latest
-    container: golang:1.19-alpine
+    container: golang:1.21-alpine
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: setup related tools
         run: |
-          apk add make
+          apk add make build-base zlib-dev ucl-dev
 
       - name: testing
         run: |
