@@ -32,6 +32,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: setup related tools
+        run: |
+          apk add make
+
       - name: testing
         run: |
           make test
