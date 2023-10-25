@@ -26,3 +26,4 @@ drone-telegram
 coverage.txt
 .env
 release
+bin
