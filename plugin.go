@@ -146,8 +146,8 @@ func escapeMarkdown(keys []string) []string {
 }
 
 func escapeMarkdownOne(str string) string {
-	str = strings.Replace(str, `\_`, `_`, -1)
-	str = strings.Replace(str, `_`, `\_`, -1)
+	str = strings.ReplaceAll(str, `\_`, `_`)
+	str = strings.ReplaceAll(str, `_`, `\_`)
 
 	return str
 }
@@ -188,14 +188,12 @@ func convertLocation(value string) (Location, bool) {
 	}
 
 	latitude, err = strconv.ParseFloat(values[0], 64)
-
 	if err != nil {
 		log.Println(err.Error())
 		return Location{}, true
 	}
 
 	longitude, err = strconv.ParseFloat(values[1], 64)
-
 	if err != nil {
 		log.Println(err.Error())
 		return Location{}, true
@@ -465,7 +463,7 @@ func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) error {
 		return nil
 	}
 
-	return errors.New(strings.Replace(err.Error(), p.Config.Token, "<token>", -1))
+	return errors.New(strings.ReplaceAll(err.Error(), p.Config.Token, "<token>"))
 }
 
 // Message is plugin default message.
