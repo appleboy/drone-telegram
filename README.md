@@ -3,11 +3,8 @@
 ![logo](./images/logo.png)
 
 [![GoDoc](https://godoc.org/github.com/appleboy/drone-telegram?status.svg)](https://godoc.org/github.com/appleboy/drone-telegram)
-[![Build Status](https://cloud.drone.io/api/badges/appleboy/drone-telegram/status.svg)](https://cloud.drone.io/appleboy/drone-telegram)
-[![Build status](https://ci.appveyor.com/api/projects/status/cm4l9udn8ywkif42?svg=true)](https://ci.appveyor.com/project/appleboy/drone-telegram-cd47y)
 [![codecov](https://codecov.io/gh/appleboy/drone-telegram/branch/master/graph/badge.svg)](https://codecov.io/gh/appleboy/drone-telegram)
 [![Go Report Card](https://goreportcard.com/badge/github.com/appleboy/drone-telegram)](https://goreportcard.com/report/github.com/appleboy/drone-telegram)
-[![Docker Pulls](https://img.shields.io/docker/pulls/appleboy/drone-telegram.svg)](https://hub.docker.com/r/appleboy/drone-telegram/)
 
 [Drone](https://github.com/drone/drone) plugin for sending telegram notifications. For the usage
 information and a listing of the available options please take a look at [the docs](http://plugins.drone.io/appleboy/drone-telegram/).
