@@ -1,6 +1,6 @@
 module github.com/appleboy/drone-telegram
 
-go 1.20
+go 1.22
 
 require (
 	github.com/appleboy/drone-template-lib v1.3.0
