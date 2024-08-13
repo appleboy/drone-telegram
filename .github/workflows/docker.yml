@@ -26,8 +26,8 @@ jobs:
       - name: Build binary
         run: |
           make build_linux_amd64
-          make build_linux_arm
           make build_linux_arm64
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -61,10 +61,10 @@ jobs:
             type=semver,pattern={{major}}
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/amd64,linux/arm,linux/arm64
+          platforms: linux/amd64,linux/arm64
           file: docker/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker-meta.outputs.tags }}
