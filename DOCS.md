@@ -1,11 +1,17 @@
 ---
 date: 2019-10-19T00:00:00+00:00
-title: Telegram
 author: appleboy
-tags: [ notifications, chat ]
-repo: appleboy/drone-telegram
-logo: telegram.svg
+containerImage: docker.io/appleboy/drone-telegram
+containerImageUrl: https://hub.docker.com/r/appleboy/drone-telegram
+description: Plugin for sending Telegram notifications
+icon: https://raw.githubusercontent.com/appleboy/drone-telegram/refs/heads/master/images/logo.svg
 image: appleboy/drone-telegram
+logo: telegram.svg
+name: Telegram
+repo: appleboy/drone-telegram
+tags: [ notifications, chat ]
+title: Telegram
+url: https://github.com/appleboy/drone-telegram
 ---
 
 The Telegram plugin posts build status messages to your account. The below pipeline configuration demonstrates simple usage:
