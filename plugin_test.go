@@ -254,19 +254,19 @@ func TestEscapeMarkdownOne(t *testing.T) {
 }
 
 func TestParseTo(t *testing.T) {
-	input := []string{"0", "1:1@gmail.com", "2:2@gmail.com", "3:3@gmail.com", "4", "5"}
+	input := []string{"0", "1:1@gmail.com", "2:2@gmail.com", "3:3@gmail.com", "4", "5#7"}
 
 	ids := parseTo(input, "1@gmail.com", false)
-	assert.Equal(t, []int64{0, 4, 5, 1}, ids)
+	assert.Equal(t, []Chat{Chat{0, 0}, Chat{4, 0}, Chat{5, 7}, Chat{1, 0}}, ids)
 
 	ids = parseTo(input, "1@gmail.com", true)
-	assert.Equal(t, []int64{1}, ids)
+	assert.Equal(t, []Chat{Chat{1, 0}}, ids)
 
 	ids = parseTo(input, "a@gmail.com", false)
-	assert.Equal(t, []int64{0, 4, 5}, ids)
+	assert.Equal(t, []Chat{Chat{0, 0}, Chat{4, 0}, Chat{5, 7}}, ids)
 
 	ids = parseTo(input, "a@gmail.com", true)
-	assert.Equal(t, []int64{0, 4, 5}, ids)
+	assert.Equal(t, []Chat{Chat{0, 0}, Chat{4, 0}, Chat{5, 7}}, ids)
 
 	// test empty ids
 	ids = parseTo([]string{"", " ", "   "}, "a@gmail.com", true)

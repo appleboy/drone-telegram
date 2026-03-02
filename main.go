@@ -263,6 +263,11 @@ func main() {
 			Usage:  "Socks5 proxy URL",
 			EnvVar: "PLUGIN_SOCKS5,SOCKS5,INPUT_SOCKS5",
 		},
+		cli.BoolFlag{
+			Name:   "skipgetme",
+			Usage:  "Boolean value, indicates to skip getMe request",
+			EnvVar: "PLUGIN_SKIP_GETME,SKIP_GETME",
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
@@ -324,6 +329,7 @@ func run(c *cli.Context) error {
 			Venue:            c.StringSlice("venue"),
 			Format:           c.String("format"),
 			GitHub:           c.Bool("github"),
+			SkipGetMe:        c.Bool("skipgetme"),
 			Socks5:           c.String("socks5"),
 
 			DisableWebPagePreview: c.Bool("disable.webpage.preview"),

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,9 +15,11 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/appleboy/drone-template-lib/template"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram/bot"
+	"github.com/go-telegram/bot/models"
 )
 
 const (
@@ -86,6 +89,7 @@ type (
 		Venue            []string
 		Format           string
 		GitHub           bool
+		SkipGetMe        bool
 		Socks5           string
 
 		DisableWebPagePreview bool
@@ -108,6 +112,11 @@ type (
 		Address   string
 		Latitude  float64
 		Longitude float64
+	}
+
+	Chat struct {
+		ChatID          int64
+		MessageThreadID int
 	}
 )
 
@@ -221,41 +230,54 @@ func loadTextFromFile(filename string) ([]string, error) {
 	return []string{string(content)}, nil
 }
 
-func parseTo(to []string, authorEmail string, matchEmail bool) []int64 {
-	var emails []int64
-	var ids []int64
+func parseTo(to []string, authorEmail string, matchEmail bool) []Chat {
+	var emails []Chat
+	var chats []Chat
 	attachEmail := true
 
 	for _, value := range trimElement(to) {
-		idArray := trimElement(strings.Split(value, ":"))
+		items := trimElement(strings.Split(value, ":"))
+
+		chatStr := items[0]
+		var threadStr string
+
+		if strings.Contains(chatStr, "#") {
+			pos := strings.Index(chatStr, "#")
+			threadStr = chatStr[pos+1:]
+			chatStr = chatStr[:pos]
+		}
 
 		// check id
-		id, err := strconv.ParseInt(idArray[0], 10, 64)
+		id, err := strconv.ParseInt(chatStr, 10, 64)
 		if err != nil {
 			continue
 		}
+		thread, err := strconv.ParseInt(threadStr, 10, 32)
+		if err != nil {
+			thread = 0
+		}
 
 		// check match author email
-		if len(idArray) > 1 {
-			if email := idArray[1]; email != authorEmail {
+		if len(items) > 1 {
+			if email := items[1]; email != authorEmail {
 				continue
 			}
 
-			emails = append(emails, id)
+			emails = append(emails, Chat{ChatID: id, MessageThreadID: int(thread)})
 			attachEmail = false
 			continue
 		}
 
-		ids = append(ids, id)
+		chats = append(chats, Chat{ChatID: id, MessageThreadID: int(thread)})
 	}
 
 	if matchEmail && !attachEmail {
 		return emails
 	}
 
-	ids = append(ids, emails...)
+	chats = append(chats, emails...)
 
-	return ids
+	return chats
 }
 
 func templateMessage(t string, plugin Plugin) (string, error) {
@@ -308,26 +330,12 @@ func (p Plugin) Exec() (err error) {
 		}
 	}
 
-	var proxyURL *url.URL
-	if proxyURL, err = url.Parse(p.Config.Socks5); err != nil {
-		return fmt.Errorf("unable to unmarshall socks5 proxy url from string '%s': %v", p.Config.Socks5, err)
-	}
-
-	var bot *tgbotapi.BotAPI
-	if len(p.Config.Socks5) > 0 {
-		proxyClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyURL)}}
-		bot, err = tgbotapi.NewBotAPIWithClient(p.Config.Token, proxyClient)
-	} else {
-		bot, err = tgbotapi.NewBotAPI(p.Config.Token)
-	}
-
+	bot, err := p.newBot()
 	if err != nil {
 		return err
 	}
 
-	bot.Debug = p.Config.Debug
-
-	ids := parseTo(p.Config.To, p.Commit.Email, p.Config.MatchEmail)
+	chats := parseTo(p.Config.To, p.Commit.Email, p.Config.MatchEmail)
 	photos := globList(trimElement(p.Config.Photo))
 	documents := globList(trimElement(p.Config.Document))
 	stickers := globList(trimElement(p.Config.Sticker))
@@ -356,8 +364,9 @@ func (p Plugin) Exec() (err error) {
 		p.Repo.Name = escapeMarkdownOne(p.Repo.Name)
 	}
 
+	background := context.Background()
 	// send message.
-	for _, user := range ids {
+	for _, chat := range chats {
 		for _, value := range message {
 			txt, err := templateMessage(value, p)
 			if err != nil {
@@ -365,56 +374,119 @@ func (p Plugin) Exec() (err error) {
 			}
 
 			txt = html.UnescapeString(txt)
-
-			msg := tgbotapi.NewMessage(user, txt)
-			msg.ParseMode = p.Config.Format
-			msg.DisableWebPagePreview = p.Config.DisableWebPagePreview
-			msg.DisableNotification = p.Config.DisableNotification
-			if err := p.Send(bot, msg); err != nil {
+			_, err = bot.SendMessage(background, &tgbotapi.SendMessageParams{
+				ChatID:          chat.ChatID,
+				MessageThreadID: chat.MessageThreadID,
+				Text:            txt,
+				ParseMode:       models.ParseMode(p.Config.Format),
+				LinkPreviewOptions: &models.LinkPreviewOptions{
+					IsDisabled: &p.Config.DisableWebPagePreview,
+				},
+				DisableNotification: p.Config.DisableNotification,
+			})
+			if err != nil {
 				return err
 			}
 		}
 
 		for _, value := range photos {
-			msg := tgbotapi.NewPhotoUpload(user, value)
-			if err := p.Send(bot, msg); err != nil {
+			f, err := os.Open(value)
+			if err != nil {
+				return err
+			}
+			defer f.Close()
+			_, err = bot.SendPhoto(background, &tgbotapi.SendPhotoParams{
+				ChatID:          chat.ChatID,
+				MessageThreadID: chat.MessageThreadID,
+				Photo:           &models.InputFileUpload{Filename: value, Data: f},
+			})
+			if err != nil {
 				return err
 			}
 		}
 
 		for _, value := range documents {
-			msg := tgbotapi.NewDocumentUpload(user, value)
-			if err := p.Send(bot, msg); err != nil {
+			f, err := os.Open(value)
+			if err != nil {
 				return err
+			}
+			defer f.Close()
+			_, err = bot.SendDocument(background, &tgbotapi.SendDocumentParams{
+				ChatID:              chat.ChatID,
+				MessageThreadID:     chat.MessageThreadID,
+				Document:            &models.InputFileUpload{Filename: value, Data: f},
+				DisableNotification: p.Config.DisableNotification,
+			})
+			if err != nil {
+				return nil
 			}
 		}
 
 		for _, value := range stickers {
-			msg := tgbotapi.NewStickerUpload(user, value)
-			if err := p.Send(bot, msg); err != nil {
+			f, err := os.Open(value)
+			if err != nil {
+				return err
+			}
+			defer f.Close()
+			_, err = bot.SendSticker(background, &tgbotapi.SendStickerParams{
+				ChatID:              chat.ChatID,
+				MessageThreadID:     chat.MessageThreadID,
+				Sticker:             &models.InputFileUpload{Filename: value, Data: f},
+				DisableNotification: p.Config.DisableNotification,
+			})
+			if err != nil {
 				return err
 			}
 		}
 
 		for _, value := range audios {
-			msg := tgbotapi.NewAudioUpload(user, value)
-			msg.Title = "Audio Message."
-			if err := p.Send(bot, msg); err != nil {
+			f, err := os.Open(value)
+			if err != nil {
 				return err
 			}
+			defer f.Close()
+			_, err = bot.SendAudio(background, &tgbotapi.SendAudioParams{
+				ChatID:              chat.ChatID,
+				MessageThreadID:     chat.MessageThreadID,
+				Audio:               &models.InputFileUpload{Filename: value, Data: f},
+				DisableNotification: p.Config.DisableNotification,
+			})
+			if err != nil {
+				return err
+			}
+
 		}
 
 		for _, value := range voices {
-			msg := tgbotapi.NewVoiceUpload(user, value)
-			if err := p.Send(bot, msg); err != nil {
+			f, err := os.Open(value)
+			if err != nil {
+				return err
+			}
+			defer f.Close()
+			_, err = bot.SendVoice(background, &tgbotapi.SendVoiceParams{
+				ChatID:              chat.ChatID,
+				MessageThreadID:     chat.MessageThreadID,
+				Voice:               &models.InputFileUpload{Filename: value, Data: f},
+				DisableNotification: p.Config.DisableNotification,
+			})
+			if err != nil {
 				return err
 			}
 		}
 
 		for _, value := range videos {
-			msg := tgbotapi.NewVideoUpload(user, value)
-			msg.Caption = "Video Message"
-			if err := p.Send(bot, msg); err != nil {
+			f, err := os.Open(value)
+			if err != nil {
+				return err
+			}
+			defer f.Close()
+			_, err = bot.SendVideo(background, &tgbotapi.SendVideoParams{
+				ChatID:              chat.ChatID,
+				MessageThreadID:     chat.MessageThreadID,
+				Video:               &models.InputFileUpload{Filename: value, Data: f},
+				DisableNotification: p.Config.DisableNotification,
+			})
+			if err != nil {
 				return err
 			}
 		}
@@ -426,8 +498,13 @@ func (p Plugin) Exec() (err error) {
 				continue
 			}
 
-			msg := tgbotapi.NewLocation(user, location.Latitude, location.Longitude)
-			if err := p.Send(bot, msg); err != nil {
+			_, err = bot.SendLocation(background, &tgbotapi.SendLocationParams{
+				ChatID:          chat.ChatID,
+				MessageThreadID: chat.MessageThreadID,
+				Latitude:        location.Latitude,
+				Longitude:       location.Longitude,
+			})
+			if err != nil {
 				return err
 			}
 		}
@@ -439,31 +516,21 @@ func (p Plugin) Exec() (err error) {
 				continue
 			}
 
-			msg := tgbotapi.NewVenue(user, location.Title, location.Address, location.Latitude, location.Longitude)
-			if err := p.Send(bot, msg); err != nil {
+			_, err = bot.SendVenue(background, &tgbotapi.SendVenueParams{
+				ChatID:          chat.ChatID,
+				MessageThreadID: chat.MessageThreadID,
+				Title:           location.Title,
+				Address:         location.Address,
+				Latitude:        location.Latitude,
+				Longitude:       location.Longitude,
+			})
+			if err != nil {
 				return err
 			}
 		}
 	}
 
 	return nil
-}
-
-// Send bot message.
-func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) error {
-	message, err := bot.Send(msg)
-
-	if p.Config.Debug {
-		log.Println("=====================")
-		log.Printf("Response Message: %#v\n", message)
-		log.Println("=====================")
-	}
-
-	if err == nil {
-		return nil
-	}
-
-	return errors.New(strings.ReplaceAll(err.Error(), p.Config.Token, "<token>"))
 }
 
 // Message is plugin default message.
@@ -495,4 +562,26 @@ func (p Plugin) Message() []string {
 		p.Commit.Message,
 		p.Build.Link,
 	)}
+}
+
+func (p Plugin) newBot() (*tgbotapi.Bot, error) {
+	var err error
+	var proxyURL *url.URL
+	if proxyURL, err = url.Parse(p.Config.Socks5); err != nil {
+		return nil, fmt.Errorf("unable to unmarshall socks5 proxy url from string '%s': %v", p.Config.Socks5, err)
+	}
+
+	var options []tgbotapi.Option
+	if len(p.Config.Socks5) > 0 {
+		proxyClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyURL)}}
+		httpOpts := tgbotapi.WithHTTPClient(time.Minute, proxyClient)
+		options = append(options, httpOpts)
+	}
+	if p.Config.Debug {
+		options = append(options, tgbotapi.WithDebug())
+	}
+	if p.Config.SkipGetMe {
+		options = append(options, tgbotapi.WithSkipGetMe())
+	}
+	return tgbotapi.New(p.Config.Token, options...)
 }
