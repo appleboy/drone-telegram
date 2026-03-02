@@ -3,12 +3,12 @@ FROM alpine:3.17
 ARG TARGETOS
 ARG TARGETARCH
 
-LABEL maintainer="Bo-Yi Wu <appleboy.tw@gmail.com>" \
+LABEL maintainer="Nik Ushmodin <ushmodin@gmail.com>" \
   org.label-schema.name="Telegram Plugin" \
-  org.label-schema.vendor="Bo-Yi Wu" \
+  org.label-schema.vendor="Nik Ushmodin" \
   org.label-schema.schema-version="1.0"
 
-LABEL org.opencontainers.image.source=https://github.com/appleboy/drone-telegram
+LABEL org.opencontainers.image.source=https://github.com/ushmodin/drone-telegram
 LABEL org.opencontainers.image.description="plugin for sending telegram notifications"
 LABEL org.opencontainers.image.licenses=MIT
 

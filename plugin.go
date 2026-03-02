@@ -89,6 +89,7 @@ type (
 		Venue            []string
 		Format           string
 		GitHub           bool
+		SkipGetMe        bool
 		Socks5           string
 
 		DisableWebPagePreview bool
@@ -578,6 +579,9 @@ func (p Plugin) newBot() (*tgbotapi.Bot, error) {
 	}
 	if p.Config.Debug {
 		options = append(options, tgbotapi.WithDebug())
+	}
+	if p.Config.SkipGetMe {
+		options = append(options, tgbotapi.WithSkipGetMe())
 	}
 	return tgbotapi.New(p.Config.Token, options...)
 }
