@@ -157,7 +157,7 @@ func globList(keys []string) []string {
 		pattern = strings.Trim(pattern, " ")
 		matches, err := filepath.Glob(pattern)
 		if err != nil {
-			fmt.Printf("Glob error for %q: %s\n", pattern, err)
+			log.Printf("Glob error for %q: %s", pattern, err)
 			continue
 		}
 		newKeys = append(newKeys, matches...)
@@ -276,18 +276,30 @@ func (p *Plugin) Exec() (err error) {
 	if p.Config.TemplateVars != "" {
 		p.Tpl = make(map[string]string)
 		if err = json.Unmarshal([]byte(p.Config.TemplateVars), &p.Tpl); err != nil {
-			return fmt.Errorf("unable to unmarshal template vars from JSON string '%s': %w", p.Config.TemplateVars, err)
+			return fmt.Errorf(
+				"unable to unmarshal template vars from JSON string '%s': %w",
+				p.Config.TemplateVars,
+				err,
+			)
 		}
 	}
 
 	if p.Config.TemplateVarsFile != "" {
 		content, err := os.ReadFile(p.Config.TemplateVarsFile)
 		if err != nil {
-			return fmt.Errorf("unable to read file with template vars '%s': %w", p.Config.TemplateVarsFile, err)
+			return fmt.Errorf(
+				"unable to read file with template vars '%s': %w",
+				p.Config.TemplateVarsFile,
+				err,
+			)
 		}
 		vars := make(map[string]string)
 		if err = json.Unmarshal(content, &vars); err != nil {
-			return fmt.Errorf("unable to unmarshal template vars from JSON file '%s': %w", p.Config.TemplateVarsFile, err)
+			return fmt.Errorf(
+				"unable to unmarshal template vars from JSON file '%s': %w",
+				p.Config.TemplateVarsFile,
+				err,
+			)
 		}
 		// Merging templates variables from file to the variables form plugin settings (variables from file takes precedence)
 		if p.Tpl == nil {
@@ -301,7 +313,8 @@ func (p *Plugin) Exec() (err error) {
 
 	var bot *tgbotapi.BotAPI
 	if len(p.Config.Socks5) > 0 {
-		proxyURL, err := url.Parse(p.Config.Socks5)
+		var proxyURL *url.URL
+		proxyURL, err = url.Parse(p.Config.Socks5)
 		if err != nil {
 			return fmt.Errorf("unable to parse socks5 proxy URL '%s': %w", p.Config.Socks5, err)
 		}
@@ -429,7 +442,13 @@ func (p *Plugin) Exec() (err error) {
 				continue
 			}
 
-			msg := tgbotapi.NewVenue(user, location.Title, location.Address, location.Latitude, location.Longitude)
+			msg := tgbotapi.NewVenue(
+				user,
+				location.Title,
+				location.Address,
+				location.Latitude,
+				location.Longitude,
+			)
 			if err := p.Send(bot, msg); err != nil {
 				return err
 			}
@@ -475,14 +494,16 @@ func (p *Plugin) Message() []string {
 	//  chore: update default template
 	//
 	// 🌐 https://cloud.drone.io/appleboy/drone-telegram/106
-	return []string{fmt.Sprintf("%s Build #%d of `%s` %s.\n\n📝 Commit by %s on `%s`:\n``` %s ```\n\n🌐 %s",
-		icon,
-		p.Build.Number,
-		p.Repo.FullName,
-		p.Build.Status,
-		p.Commit.Author,
-		p.Commit.Branch,
-		p.Commit.Message,
-		p.Build.Link,
-	)}
+	return []string{
+		fmt.Sprintf("%s Build #%d of `%s` %s.\n\n📝 Commit by %s on `%s`:\n``` %s ```\n\n🌐 %s",
+			icon,
+			p.Build.Number,
+			p.Repo.FullName,
+			p.Build.Status,
+			p.Commit.Author,
+			p.Commit.Branch,
+			p.Commit.Message,
+			p.Build.Link,
+		),
+	}
 }

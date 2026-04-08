@@ -7,6 +7,7 @@ import (
 
 	"github.com/appleboy/drone-template-lib/template"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMissingDefaultConfig(t *testing.T) {
@@ -14,7 +15,7 @@ func TestMissingDefaultConfig(t *testing.T) {
 
 	err := plugin.Exec()
 
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestMissingUserConfig(t *testing.T) {
@@ -26,7 +27,7 @@ func TestMissingUserConfig(t *testing.T) {
 
 	err := plugin.Exec()
 
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestDefaultMessageFormat(t *testing.T) {
@@ -51,7 +52,13 @@ func TestDefaultMessageFormat(t *testing.T) {
 
 	message := plugin.Message()
 
-	assert.Equal(t, []string{"✅ Build #101 of `appleboy/go-hello` success.\n\n📝 Commit by Bo-Yi Wu on `master`:\n``` update travis ```\n\n🌐 https://github.com/appleboy/go-hello"}, message)
+	assert.Equal(
+		t,
+		[]string{
+			"✅ Build #101 of `appleboy/go-hello` success.\n\n📝 Commit by Bo-Yi Wu on `master`:\n``` update travis ```\n\n🌐 https://github.com/appleboy/go-hello",
+		},
+		message,
+	)
 }
 
 func TestDefaultMessageFormatFromGitHub(t *testing.T) {
@@ -73,7 +80,11 @@ func TestDefaultMessageFormatFromGitHub(t *testing.T) {
 
 	message := plugin.Message()
 
-	assert.Equal(t, []string{"appleboy/go-hello/test-workflow triggered by appleboy (push)"}, message)
+	assert.Equal(
+		t,
+		[]string{"appleboy/go-hello/test-workflow triggered by appleboy (push)"},
+		message,
+	)
 }
 
 func TestSendMessage(t *testing.T) {
@@ -97,8 +108,13 @@ func TestSendMessage(t *testing.T) {
 		},
 
 		Config: Config{
-			Token:    os.Getenv("TELEGRAM_TOKEN"),
-			To:       []string{os.Getenv("TELEGRAM_TO"), os.Getenv("TELEGRAM_TO") + ":appleboy@gmail.com", "中文ID", "1234567890"},
+			Token: os.Getenv("TELEGRAM_TOKEN"),
+			To: []string{
+				os.Getenv("TELEGRAM_TO"),
+				os.Getenv("TELEGRAM_TO") + ":appleboy@gmail.com",
+				"中文ID",
+				"1234567890",
+			},
 			Message:  "Test Telegram Chat Bot From Travis or Local, commit message: 『{{ build.message }}』",
 			Photo:    []string{"tests/github.png", "1234", " "},
 			Document: []string{"tests/gophercolor.png", "1234", " "},
@@ -106,24 +122,29 @@ func TestSendMessage(t *testing.T) {
 			Audio:    []string{"tests/audio.mp3", "1234", " "},
 			Voice:    []string{"tests/voice.ogg", "1234", " "},
 			Location: []string{"24.9163213 121.1424972", "1", " "},
-			Venue:    []string{"35.661777 139.704051 竹北體育館 新竹縣竹北市", "24.9163213 121.1424972", "1", " "},
-			Video:    []string{"tests/video.mp4", "1234", " "},
-			Debug:    false,
+			Venue: []string{
+				"35.661777 139.704051 竹北體育館 新竹縣竹北市",
+				"24.9163213 121.1424972",
+				"1",
+				" ",
+			},
+			Video: []string{"tests/video.mp4", "1234", " "},
+			Debug: false,
 		},
 	}
 
 	err := plugin.Exec()
-	assert.NotNil(t, err)
+	require.Error(t, err)
 
 	plugin.Config.Format = formatMarkdown
 	plugin.Config.Message = "Test escape under_score"
 	err = plugin.Exec()
-	assert.NotNil(t, err)
+	require.Error(t, err)
 
 	// disable message
 	plugin.Config.Message = ""
 	err = plugin.Exec()
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestDisableWebPagePreviewMessage(t *testing.T) {
@@ -138,13 +159,13 @@ func TestDisableWebPagePreviewMessage(t *testing.T) {
 
 	plugin.Config.Message = "DisableWebPagePreview https://www.google.com.tw"
 	err := plugin.Exec()
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	// disable message
 	plugin.Config.DisableWebPagePreview = false
 	plugin.Config.Message = "EnableWebPagePreview https://www.google.com.tw"
 	err = plugin.Exec()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestDisableNotificationMessage(t *testing.T) {
@@ -159,13 +180,13 @@ func TestDisableNotificationMessage(t *testing.T) {
 
 	plugin.Config.Message = "DisableNotification https://www.google.com.tw"
 	err := plugin.Exec()
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	// disable message
 	plugin.Config.DisableNotification = false
 	plugin.Config.Message = "EnableNotification https://www.google.com.tw"
 	err = plugin.Exec()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestBotError(t *testing.T) {
@@ -194,7 +215,7 @@ func TestBotError(t *testing.T) {
 	}
 
 	err := plugin.Exec()
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestTrimElement(t *testing.T) {
@@ -270,7 +291,7 @@ func TestParseTo(t *testing.T) {
 
 	// test empty ids
 	ids = parseTo([]string{"", " ", "   "}, "a@gmail.com", true)
-	assert.Equal(t, 0, len(ids))
+	assert.Empty(t, ids)
 }
 
 func TestGlobList(t *testing.T) {
@@ -294,27 +315,27 @@ func TestConvertLocation(t *testing.T) {
 	input = "1"
 	result, empty = convertLocation(input)
 
-	assert.Equal(t, true, empty)
+	assert.True(t, empty)
 	assert.Equal(t, Location{}, result)
 
 	// strconv.ParseInt: parsing "測試": invalid syntax
 	input = "測試 139.704051"
 	result, empty = convertLocation(input)
 
-	assert.Equal(t, true, empty)
+	assert.True(t, empty)
 	assert.Equal(t, Location{}, result)
 
 	// strconv.ParseInt: parsing "測試": invalid syntax
 	input = "35.661777 測試"
 	result, empty = convertLocation(input)
 
-	assert.Equal(t, true, empty)
+	assert.True(t, empty)
 	assert.Equal(t, Location{}, result)
 
 	input = "35.661777 139.704051"
 	result, empty = convertLocation(input)
 
-	assert.Equal(t, false, empty)
+	assert.False(t, empty)
 	assert.Equal(t, Location{
 		Latitude:  float64(35.661777),
 		Longitude: float64(139.704051),
@@ -323,7 +344,7 @@ func TestConvertLocation(t *testing.T) {
 	input = "35.661777 139.704051 title"
 	result, empty = convertLocation(input)
 
-	assert.Equal(t, false, empty)
+	assert.False(t, empty)
 	assert.Equal(t, Location{
 		Title:     "title",
 		Address:   "",
@@ -334,7 +355,7 @@ func TestConvertLocation(t *testing.T) {
 	input = "35.661777 139.704051 title address"
 	result, empty = convertLocation(input)
 
-	assert.Equal(t, false, empty)
+	assert.False(t, empty)
 	assert.Equal(t, Location{
 		Title:     "title",
 		Address:   "address",
@@ -374,10 +395,10 @@ Test HTML Format
 		},
 	}
 
-	assert.Nil(t, plugin.Exec())
+	assert.NoError(t, plugin.Exec())
 
 	plugin.Config.MessageFile = "tests/message_html.txt"
-	assert.Nil(t, plugin.Exec())
+	assert.NoError(t, plugin.Exec())
 }
 
 func TestMessageFile(t *testing.T) {
@@ -408,7 +429,7 @@ func TestMessageFile(t *testing.T) {
 	}
 
 	err := plugin.Exec()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestTemplateVars(t *testing.T) {
@@ -441,7 +462,7 @@ func TestTemplateVars(t *testing.T) {
 	}
 
 	err := plugin.Exec()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestTemplateVarsFile(t *testing.T) {
@@ -472,7 +493,7 @@ func TestTemplateVarsFile(t *testing.T) {
 	}
 
 	err := plugin.Exec()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestProxySendMessage(t *testing.T) {
@@ -505,7 +526,7 @@ func TestProxySendMessage(t *testing.T) {
 	}
 
 	err := plugin.Exec()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestBuildTemplate(t *testing.T) {
@@ -533,5 +554,5 @@ Commit msg:  {{uppercasefirst commit.message}}
 
 duration: {{duration build.started build.finished}}
 `, plugin)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
