@@ -116,10 +116,10 @@ var icons = map[string]string{
 }
 
 func trimElement(keys []string) []string {
-	var newKeys []string
+	newKeys := make([]string, 0, len(keys))
 
 	for _, value := range keys {
-		value = strings.Trim(value, " ")
+		value = strings.TrimSpace(value)
 		if len(value) == 0 {
 			continue
 		}
@@ -130,7 +130,7 @@ func trimElement(keys []string) []string {
 }
 
 func escapeMarkdown(keys []string) []string {
-	var newKeys []string
+	newKeys := make([]string, 0, len(keys))
 
 	for _, value := range keys {
 		value = escapeMarkdownOne(value)
@@ -150,11 +150,17 @@ func escapeMarkdownOne(str string) string {
 	return str
 }
 
+func escapeMarkdownFields(fields ...*string) {
+	for _, f := range fields {
+		*f = escapeMarkdownOne(*f)
+	}
+}
+
 func globList(keys []string) []string {
-	var newKeys []string
+	newKeys := make([]string, 0, len(keys))
 
 	for _, pattern := range keys {
-		pattern = strings.Trim(pattern, " ")
+		pattern = strings.TrimSpace(pattern)
 		matches, err := filepath.Glob(pattern)
 		if err != nil {
 			log.Printf("Glob error for %q: %s", pattern, err)
@@ -249,10 +255,6 @@ func parseTo(to []string, authorEmail string, matchEmail bool) []int64 {
 	return ids
 }
 
-func templateMessage(t string, plugin *Plugin) (string, error) {
-	return template.RenderTrim(t, plugin)
-}
-
 // Exec executes the plugin.
 func (p *Plugin) Exec() (err error) {
 	if len(p.Config.Token) == 0 || len(p.Config.To) == 0 {
@@ -301,7 +303,7 @@ func (p *Plugin) Exec() (err error) {
 				err,
 			)
 		}
-		// Merging templates variables from file to the variables form plugin settings (variables from file takes precedence)
+		// File variables take precedence over inline variables
 		if p.Tpl == nil {
 			p.Tpl = vars
 		} else {
@@ -345,30 +347,43 @@ func (p *Plugin) Exec() (err error) {
 	if p.Config.Format == formatMarkdown {
 		message = escapeMarkdown(message)
 
-		p.Commit.Message = escapeMarkdownOne(p.Commit.Message)
-		p.Commit.Branch = escapeMarkdownOne(p.Commit.Branch)
-		p.Commit.Link = escapeMarkdownOne(p.Commit.Link)
-		p.Commit.Author = escapeMarkdownOne(p.Commit.Author)
-		p.Commit.Email = escapeMarkdownOne(p.Commit.Email)
-
-		p.Build.Tag = escapeMarkdownOne(p.Build.Tag)
-		p.Build.Link = escapeMarkdownOne(p.Build.Link)
-		p.Build.PR = escapeMarkdownOne(p.Build.PR)
-
-		p.Repo.Namespace = escapeMarkdownOne(p.Repo.Namespace)
-		p.Repo.Name = escapeMarkdownOne(p.Repo.Name)
+		escapeMarkdownFields(
+			&p.Commit.Message, &p.Commit.Branch, &p.Commit.Link,
+			&p.Commit.Author, &p.Commit.Email,
+			&p.Build.Tag, &p.Build.Link, &p.Build.PR,
+			&p.Repo.Namespace, &p.Repo.Name,
+		)
 	}
 
-	// send message.
+	// pre-render message templates (identical for all users)
+	var renderedMessages []string
+	for _, value := range message {
+		txt, err := template.RenderTrim(value, p)
+		if err != nil {
+			return err
+		}
+		renderedMessages = append(renderedMessages, html.UnescapeString(txt))
+	}
+
+	// pre-parse locations and venues (identical for all users)
+	var parsedLocations []Location
+	for _, value := range locations {
+		loc, empty := convertLocation(value)
+		if !empty {
+			parsedLocations = append(parsedLocations, loc)
+		}
+	}
+
+	var parsedVenues []Location
+	for _, value := range venues {
+		loc, empty := convertLocation(value)
+		if !empty {
+			parsedVenues = append(parsedVenues, loc)
+		}
+	}
+
 	for _, user := range ids {
-		for _, value := range message {
-			txt, err := templateMessage(value, p)
-			if err != nil {
-				return err
-			}
-
-			txt = html.UnescapeString(txt)
-
+		for _, txt := range renderedMessages {
 			msg := tgbotapi.NewMessage(user, txt)
 			msg.ParseMode = p.Config.Format
 			msg.DisableWebPagePreview = p.Config.DisableWebPagePreview
@@ -401,7 +416,7 @@ func (p *Plugin) Exec() (err error) {
 
 		for _, value := range audios {
 			msg := tgbotapi.NewAudioUpload(user, value)
-			msg.Title = "Audio Message."
+			msg.Title = "Audio Message"
 			if err := p.Send(bot, msg); err != nil {
 				return err
 			}
@@ -422,32 +437,20 @@ func (p *Plugin) Exec() (err error) {
 			}
 		}
 
-		for _, value := range locations {
-			location, empty := convertLocation(value)
-
-			if empty {
-				continue
-			}
-
-			msg := tgbotapi.NewLocation(user, location.Latitude, location.Longitude)
+		for _, loc := range parsedLocations {
+			msg := tgbotapi.NewLocation(user, loc.Latitude, loc.Longitude)
 			if err := p.Send(bot, msg); err != nil {
 				return err
 			}
 		}
 
-		for _, value := range venues {
-			location, empty := convertLocation(value)
-
-			if empty {
-				continue
-			}
-
+		for _, loc := range parsedVenues {
 			msg := tgbotapi.NewVenue(
 				user,
-				location.Title,
-				location.Address,
-				location.Latitude,
-				location.Longitude,
+				loc.Title,
+				loc.Address,
+				loc.Latitude,
+				loc.Longitude,
 			)
 			if err := p.Send(bot, msg); err != nil {
 				return err
