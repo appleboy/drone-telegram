@@ -39,6 +39,11 @@ func main() {
 			Usage:  "telegram user",
 			EnvVar: "PLUGIN_TO,TELEGRAM_TO,INPUT_TO",
 		},
+		cli.IntFlag{
+			Name:   "message.thread",
+			Usage:  "telegram message thread id (forum topic)",
+			EnvVar: "PLUGIN_MESSAGE_THREAD_ID,TELEGRAM_MESSAGE_THREAD_ID,INPUT_MESSAGE_THREAD_ID",
+		},
 		cli.StringFlag{
 			Name:   "message",
 			Usage:  "send telegram message",
@@ -310,6 +315,7 @@ func run(c *cli.Context) error {
 			Debug:            c.Bool("debug"),
 			MatchEmail:       c.Bool("match.email"),
 			To:               c.StringSlice("to"),
+			MessageThreadID:  c.Int("message.thread"),
 			Message:          c.String("message"),
 			MessageFile:      c.String("message.file"),
 			TemplateVars:     c.String("template.vars"),
