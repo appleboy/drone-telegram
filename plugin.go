@@ -1,12 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"html"
-	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -183,7 +181,6 @@ func convertLocation(value string) (Location, bool) {
 	}
 
 	if len(values) > 3 {
-		title = values[2]
 		address = values[3]
 	}
 
@@ -208,13 +205,7 @@ func convertLocation(value string) (Location, bool) {
 }
 
 func loadTextFromFile(filename string) ([]string, error) {
-	f, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	r := bufio.NewReader(f)
-	content, err := io.ReadAll(r)
+	content, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -258,12 +249,12 @@ func parseTo(to []string, authorEmail string, matchEmail bool) []int64 {
 	return ids
 }
 
-func templateMessage(t string, plugin Plugin) (string, error) {
+func templateMessage(t string, plugin *Plugin) (string, error) {
 	return template.RenderTrim(t, plugin)
 }
 
 // Exec executes the plugin.
-func (p Plugin) Exec() (err error) {
+func (p *Plugin) Exec() (err error) {
 	if len(p.Config.Token) == 0 || len(p.Config.To) == 0 {
 		return errors.New("missing telegram token or user list")
 	}
@@ -273,7 +264,7 @@ func (p Plugin) Exec() (err error) {
 	case len(p.Config.MessageFile) > 0:
 		message, err = loadTextFromFile(p.Config.MessageFile)
 		if err != nil {
-			return fmt.Errorf("error loading message file '%s': %v", p.Config.MessageFile, err)
+			return fmt.Errorf("error loading message file '%s': %w", p.Config.MessageFile, err)
 		}
 	case len(p.Config.Message) > 0:
 		message = []string{p.Config.Message}
@@ -285,18 +276,18 @@ func (p Plugin) Exec() (err error) {
 	if p.Config.TemplateVars != "" {
 		p.Tpl = make(map[string]string)
 		if err = json.Unmarshal([]byte(p.Config.TemplateVars), &p.Tpl); err != nil {
-			return fmt.Errorf("unable to unmarshall template vars from JSON string '%s': %v", p.Config.TemplateVars, err)
+			return fmt.Errorf("unable to unmarshal template vars from JSON string '%s': %w", p.Config.TemplateVars, err)
 		}
 	}
 
 	if p.Config.TemplateVarsFile != "" {
 		content, err := os.ReadFile(p.Config.TemplateVarsFile)
 		if err != nil {
-			return fmt.Errorf("unable to read file with template vars '%s': %v", p.Config.TemplateVarsFile, err)
+			return fmt.Errorf("unable to read file with template vars '%s': %w", p.Config.TemplateVarsFile, err)
 		}
 		vars := make(map[string]string)
 		if err = json.Unmarshal(content, &vars); err != nil {
-			return fmt.Errorf("unable to unmarshall template vars from JSON file '%s': %v", p.Config.TemplateVarsFile, err)
+			return fmt.Errorf("unable to unmarshal template vars from JSON file '%s': %w", p.Config.TemplateVarsFile, err)
 		}
 		// Merging templates variables from file to the variables form plugin settings (variables from file takes precedence)
 		if p.Tpl == nil {
@@ -308,13 +299,12 @@ func (p Plugin) Exec() (err error) {
 		}
 	}
 
-	var proxyURL *url.URL
-	if proxyURL, err = url.Parse(p.Config.Socks5); err != nil {
-		return fmt.Errorf("unable to unmarshall socks5 proxy url from string '%s': %v", p.Config.Socks5, err)
-	}
-
 	var bot *tgbotapi.BotAPI
 	if len(p.Config.Socks5) > 0 {
+		proxyURL, err := url.Parse(p.Config.Socks5)
+		if err != nil {
+			return fmt.Errorf("unable to parse socks5 proxy URL '%s': %w", p.Config.Socks5, err)
+		}
 		proxyClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyURL)}}
 		bot, err = tgbotapi.NewBotAPIWithClient(p.Config.Token, proxyClient)
 	} else {
@@ -328,12 +318,12 @@ func (p Plugin) Exec() (err error) {
 	bot.Debug = p.Config.Debug
 
 	ids := parseTo(p.Config.To, p.Commit.Email, p.Config.MatchEmail)
-	photos := globList(trimElement(p.Config.Photo))
-	documents := globList(trimElement(p.Config.Document))
-	stickers := globList(trimElement(p.Config.Sticker))
-	audios := globList(trimElement(p.Config.Audio))
-	voices := globList(trimElement(p.Config.Voice))
-	videos := globList(trimElement(p.Config.Video))
+	photos := globList(p.Config.Photo)
+	documents := globList(p.Config.Document)
+	stickers := globList(p.Config.Sticker)
+	audios := globList(p.Config.Audio)
+	voices := globList(p.Config.Voice)
+	videos := globList(p.Config.Video)
 	locations := trimElement(p.Config.Location)
 	venues := trimElement(p.Config.Venue)
 
@@ -450,7 +440,7 @@ func (p Plugin) Exec() (err error) {
 }
 
 // Send bot message.
-func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) error {
+func (p *Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) error {
 	message, err := bot.Send(msg)
 
 	if p.Config.Debug {
@@ -467,7 +457,7 @@ func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) error {
 }
 
 // Message is plugin default message.
-func (p Plugin) Message() []string {
+func (p *Plugin) Message() []string {
 	icon := icons[strings.ToLower(p.Build.Status)]
 
 	if p.Config.GitHub {

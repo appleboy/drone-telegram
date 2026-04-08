@@ -1,4 +1,3 @@
-DIST := dist
 EXECUTABLE := drone-telegram
 GOFMT ?= gofumpt -l
 DIST := dist
@@ -9,7 +8,7 @@ GOFILES := $(shell find . -name "*.go" -type f)
 HAS_GO = $(shell hash $(GO) > /dev/null 2>&1 && echo "GO" || echo "NOGO" )
 XGO_PACKAGE ?= src.techknowlogick.com/xgo@latest
 XGO_VERSION := go-1.19.x
-GXZ_PAGAGE ?= github.com/ulikunitz/xz/cmd/gxz@v0.5.11
+GXZ_PACKAGE ?= github.com/ulikunitz/xz/cmd/gxz@v0.5.11
 
 LINUX_ARCHS ?= linux/amd64,linux/arm64
 DARWIN_ARCHS ?= darwin-10.12/amd64,darwin-10.12/arm64
@@ -116,7 +115,7 @@ coverage:
 .PHONY: deps-backend
 deps-backend:
 	$(GO) mod download
-	$(GO) install $(GXZ_PAGAGE)
+	$(GO) install $(GXZ_PACKAGE)
 	$(GO) install $(XGO_PACKAGE)
 
 .PHONY: release
@@ -156,7 +155,7 @@ release-check: | $(DIST_DIRS)
 
 .PHONY: release-compress
 release-compress: | $(DIST_DIRS)
-	cd $(DIST)/release/; for file in `find . -type f -name "*"`; do echo "compressing $${file}" && $(GO) run $(GXZ_PAGAGE) -k -9 $${file}; done;
+	cd $(DIST)/release/; for file in `find . -type f -name "*"`; do echo "compressing $${file}" && $(GO) run $(GXZ_PACKAGE) -k -9 $${file}; done;
 
 clean:
 	$(GO) clean -x -i ./...
