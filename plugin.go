@@ -72,7 +72,7 @@ type (
 		Debug            bool
 		MatchEmail       bool
 		To               []string
-		MessageThreadID  int
+		MessageThreadID  int64
 		Message          string
 		MessageFile      string
 		TemplateVarsFile string
@@ -481,17 +481,19 @@ func (p Plugin) Send(bot *tgbotapi.BotAPI, msg tgbotapi.Chattable) error {
 // threadIDTransport wraps an http.RoundTripper to inject message_thread_id
 // into all outgoing requests via URL query parameters. The Telegram Bot API
 // accepts parameters via query string for all request types (form, multipart, JSON).
-// This allows forum topic support without modifying the telegram-bot-api library.
+// This allows forum topic support without modifying the telegram-bot-api library,
+// which does not natively support this parameter in v4 or v5.
 type threadIDTransport struct {
 	base     http.RoundTripper
-	threadID int
+	threadID int64
 }
 
 func (t *threadIDTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	q := req.URL.Query()
-	q.Set("message_thread_id", strconv.Itoa(t.threadID))
-	req.URL.RawQuery = q.Encode()
-	return t.base.RoundTrip(req)
+	r := req.Clone(req.Context())
+	q := r.URL.Query()
+	q.Set("message_thread_id", strconv.FormatInt(t.threadID, 10))
+	r.URL.RawQuery = q.Encode()
+	return t.base.RoundTrip(r)
 }
 
 // Message is plugin default message.

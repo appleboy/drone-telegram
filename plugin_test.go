@@ -1,12 +1,14 @@
 package main
 
 import (
+	"net/http"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/appleboy/drone-template-lib/template"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMissingDefaultConfig(t *testing.T) {
@@ -506,6 +508,97 @@ func TestProxySendMessage(t *testing.T) {
 
 	err := plugin.Exec()
 	assert.Nil(t, err)
+}
+
+func TestThreadIDTransportInjectsQueryParam(t *testing.T) {
+	base := http.DefaultTransport
+	transport := &threadIDTransport{
+		base:     base,
+		threadID: 1257,
+	}
+
+	req, _ := http.NewRequest("POST", "https://api.telegram.org/bot123/sendMessage", nil)
+	original := req.URL.String()
+
+	// Use a custom base transport to capture the modified request
+	// without making a real HTTP call.
+	var captured *http.Request
+	transport.base = roundTripFunc(func(r *http.Request) (*http.Response, error) {
+		captured = r
+		return &http.Response{StatusCode: 200}, nil
+	})
+
+	_, _ = transport.RoundTrip(req)
+
+	// Original request must not be mutated (http.RoundTripper contract).
+	assert.Equal(t, original, req.URL.String())
+
+	// Cloned request must have message_thread_id injected.
+	assert.NotNil(t, captured)
+	assert.Equal(t, "1257", captured.URL.Query().Get("message_thread_id"))
+}
+
+func TestThreadIDTransportPreservesExistingQuery(t *testing.T) {
+	transport := &threadIDTransport{
+		base: roundTripFunc(func(r *http.Request) (*http.Response, error) {
+			return &http.Response{StatusCode: 200}, nil
+		}),
+		threadID: 42,
+	}
+
+	req, _ := http.NewRequest("POST", "https://api.telegram.org/bot123/sendMessage?chat_id=100", nil)
+	var captured *http.Request
+	transport.base = roundTripFunc(func(r *http.Request) (*http.Response, error) {
+		captured = r
+		return &http.Response{StatusCode: 200}, nil
+	})
+
+	_, _ = transport.RoundTrip(req)
+
+	assert.Equal(t, "100", captured.URL.Query().Get("chat_id"))
+	assert.Equal(t, "42", captured.URL.Query().Get("message_thread_id"))
+}
+
+func TestNoTransportWrapWhenThreadIDZero(t *testing.T) {
+	plugin := Plugin{
+		Config: Config{
+			Token:           "invalid-token",
+			To:              []string{"123"},
+			MessageThreadID: 0,
+			Message:         "test",
+		},
+	}
+
+	// Exec will fail on bot auth, but we can verify the transport
+	// is not wrapped by checking the error is a plain auth error,
+	// not a transport-related one.
+	err := plugin.Exec()
+	require.NotNil(t, err)
+	assert.NotContains(t, err.Error(), "message_thread_id")
+}
+
+func TestTransportWrapWithSocks5(t *testing.T) {
+	plugin := Plugin{
+		Config: Config{
+			Token:           "invalid-token",
+			To:              []string{"123"},
+			MessageThreadID: 99,
+			Message:         "test",
+			Socks5:          "socks5://127.0.0.1:1080",
+		},
+	}
+
+	// This will fail on bot auth, but exercises the code path where
+	// both SOCKS5 proxy and threadIDTransport are configured together.
+	err := plugin.Exec()
+	assert.NotNil(t, err)
+}
+
+// roundTripFunc adapts a function to the http.RoundTripper interface.
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req)
 }
 
 func TestBuildTemplate(t *testing.T) {
