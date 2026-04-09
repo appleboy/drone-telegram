@@ -27,3 +27,7 @@ coverage.txt
 .env
 release
 bin
+
+# IDE files
+.idea
+.vscode
