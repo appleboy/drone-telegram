@@ -3,6 +3,7 @@
 ![logo](./images/logo.png)
 
 [![GoDoc](https://godoc.org/github.com/appleboy/drone-telegram?status.svg)](https://godoc.org/github.com/appleboy/drone-telegram)
+[![Trivy Security Scan](https://github.com/appleboy/drone-telegram/actions/workflows/trivy.yml/badge.svg?branch=master)](https://github.com/appleboy/drone-telegram/actions/workflows/trivy.yml)
 [![codecov](https://codecov.io/gh/appleboy/drone-telegram/branch/master/graph/badge.svg)](https://codecov.io/gh/appleboy/drone-telegram)
 [![Go Report Card](https://goreportcard.com/badge/github.com/appleboy/drone-telegram)](https://goreportcard.com/report/github.com/appleboy/drone-telegram)
 
