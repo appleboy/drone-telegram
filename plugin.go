@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html"
 	"log"
+	"maps"
 	"net/http"
 	"net/url"
 	"os"
@@ -307,9 +308,7 @@ func (p *Plugin) Exec() (err error) {
 		if p.Tpl == nil {
 			p.Tpl = vars
 		} else {
-			for k, v := range vars {
-				p.Tpl[k] = v
-			}
+			maps.Copy(p.Tpl, vars)
 		}
 	}
 

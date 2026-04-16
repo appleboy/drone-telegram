@@ -10,6 +10,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func skipIfNoTelegramSecrets(t *testing.T) {
+	t.Helper()
+	if os.Getenv("TELEGRAM_TOKEN") == "" || os.Getenv("TELEGRAM_TO") == "" {
+		t.Skip("TELEGRAM_TOKEN/TELEGRAM_TO not set; skipping integration test")
+	}
+}
+
 func TestMissingDefaultConfig(t *testing.T) {
 	var plugin Plugin
 
@@ -148,6 +155,7 @@ func TestSendMessage(t *testing.T) {
 }
 
 func TestDisableWebPagePreviewMessage(t *testing.T) {
+	skipIfNoTelegramSecrets(t)
 	plugin := Plugin{
 		Config: Config{
 			Token:                 os.Getenv("TELEGRAM_TOKEN"),
@@ -169,6 +177,7 @@ func TestDisableWebPagePreviewMessage(t *testing.T) {
 }
 
 func TestDisableNotificationMessage(t *testing.T) {
+	skipIfNoTelegramSecrets(t)
 	plugin := Plugin{
 		Config: Config{
 			Token:               os.Getenv("TELEGRAM_TOKEN"),
@@ -365,6 +374,7 @@ func TestConvertLocation(t *testing.T) {
 }
 
 func TestHTMLMessage(t *testing.T) {
+	skipIfNoTelegramSecrets(t)
 	plugin := Plugin{
 		Repo: Repo{
 			Name:      "go-hello",
@@ -402,6 +412,7 @@ Test HTML Format
 }
 
 func TestMessageFile(t *testing.T) {
+	skipIfNoTelegramSecrets(t)
 	plugin := Plugin{
 		Repo: Repo{
 			Name:      "go-hello",
@@ -433,6 +444,7 @@ func TestMessageFile(t *testing.T) {
 }
 
 func TestTemplateVars(t *testing.T) {
+	skipIfNoTelegramSecrets(t)
 	plugin := Plugin{
 		Repo: Repo{
 			Name:      "go-hello",
@@ -466,6 +478,7 @@ func TestTemplateVars(t *testing.T) {
 }
 
 func TestTemplateVarsFile(t *testing.T) {
+	skipIfNoTelegramSecrets(t)
 	plugin := Plugin{
 		Repo: Repo{
 			Name:      "go-hello",
@@ -497,6 +510,7 @@ func TestTemplateVarsFile(t *testing.T) {
 }
 
 func TestProxySendMessage(t *testing.T) {
+	skipIfNoTelegramSecrets(t)
 	plugin := Plugin{
 		Repo: Repo{
 			Name:      "go-hello",
