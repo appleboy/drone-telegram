@@ -255,6 +255,18 @@ Disables notifications for this message
 +     disable_notification: true
 ```
 
+Send the message to a specific topic (message thread) of a forum supergroup
+
+```diff
+  - name: send telegram notification
+    image: appleboy/drone-telegram
+    settings:
+      token: xxxxxxxxxx
+      to: telegram_group_id
+      message: send message to a forum topic
++     message_thread_id: 12345
+```
+
 ## Parameter Reference
 
 token
@@ -262,6 +274,9 @@ token
 
 to
 : telegram user id (can be requested from the @userinfobot inside Telegram)
+
+message_thread_id
+: unique identifier of the target message thread (forum topic) of a forum supergroup; only needed when sending to a specific topic
 
 message
 : overwrite the default message template
