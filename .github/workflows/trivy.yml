@@ -32,6 +32,7 @@ jobs:
           format: "sarif"
           output: "trivy-repo-results.sarif"
           severity: "CRITICAL,HIGH"
+          trivyignores: .trivyignore
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
@@ -76,6 +77,7 @@ jobs:
           format: "sarif"
           output: "trivy-image-results.sarif"
           severity: "CRITICAL,HIGH"
+          trivyignores: .trivyignore
 
       - name: Upload Trivy image scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4

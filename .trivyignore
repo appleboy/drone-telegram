@@ -1,0 +1,4 @@
+# golang.org/x/crypto/openpgp is flagged as unmaintained, but this project
+# never imports it. x/crypto is an indirect dependency (sprig -> bcrypt only);
+# verified with `go list -deps ./... | grep openpgp` and govulncheck.
+GO-2026-5932
