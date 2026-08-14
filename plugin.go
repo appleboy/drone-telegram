@@ -14,8 +14,8 @@ import (
 	"strconv"
 	"strings"
 
+	tgbotapi "github.com/OvyFlash/telegram-bot-api"
 	"github.com/appleboy/drone-template-lib/template"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 const (
@@ -71,6 +71,7 @@ type (
 		Debug            bool
 		MatchEmail       bool
 		To               []string
+		MessageThreadID  int
 		Message          string
 		MessageFile      string
 		TemplateVarsFile string
@@ -312,7 +313,7 @@ func (p *Plugin) Exec() (err error) {
 		}
 	}
 
-	var bot *tgbotapi.BotAPI
+	var opts []tgbotapi.BotAPIOption
 	if len(p.Config.Socks5) > 0 {
 		var proxyURL *url.URL
 		proxyURL, err = url.Parse(p.Config.Socks5)
@@ -320,11 +321,10 @@ func (p *Plugin) Exec() (err error) {
 			return fmt.Errorf("unable to parse socks5 proxy URL '%s': %w", p.Config.Socks5, err)
 		}
 		proxyClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyURL)}}
-		bot, err = tgbotapi.NewBotAPIWithClient(p.Config.Token, proxyClient)
-	} else {
-		bot, err = tgbotapi.NewBotAPI(p.Config.Token)
+		opts = append(opts, tgbotapi.WithHTTPClient(proxyClient))
 	}
 
+	bot, err := tgbotapi.NewBotAPIWithOptions(p.Config.Token, opts...)
 	if err != nil {
 		return err
 	}
@@ -384,8 +384,9 @@ func (p *Plugin) Exec() (err error) {
 	for _, user := range ids {
 		for _, txt := range renderedMessages {
 			msg := tgbotapi.NewMessage(user, txt)
+			msg.MessageThreadID = p.Config.MessageThreadID
 			msg.ParseMode = p.Config.Format
-			msg.DisableWebPagePreview = p.Config.DisableWebPagePreview
+			msg.LinkPreviewOptions.IsDisabled = p.Config.DisableWebPagePreview
 			msg.DisableNotification = p.Config.DisableNotification
 			if err := p.Send(bot, msg); err != nil {
 				return err
@@ -393,28 +394,32 @@ func (p *Plugin) Exec() (err error) {
 		}
 
 		for _, value := range photos {
-			msg := tgbotapi.NewPhotoUpload(user, value)
+			msg := tgbotapi.NewPhoto(user, tgbotapi.FilePath(value))
+			msg.MessageThreadID = p.Config.MessageThreadID
 			if err := p.Send(bot, msg); err != nil {
 				return err
 			}
 		}
 
 		for _, value := range documents {
-			msg := tgbotapi.NewDocumentUpload(user, value)
+			msg := tgbotapi.NewDocument(user, tgbotapi.FilePath(value))
+			msg.MessageThreadID = p.Config.MessageThreadID
 			if err := p.Send(bot, msg); err != nil {
 				return err
 			}
 		}
 
 		for _, value := range stickers {
-			msg := tgbotapi.NewStickerUpload(user, value)
+			msg := tgbotapi.NewSticker(user, tgbotapi.FilePath(value))
+			msg.MessageThreadID = p.Config.MessageThreadID
 			if err := p.Send(bot, msg); err != nil {
 				return err
 			}
 		}
 
 		for _, value := range audios {
-			msg := tgbotapi.NewAudioUpload(user, value)
+			msg := tgbotapi.NewAudio(user, tgbotapi.FilePath(value))
+			msg.MessageThreadID = p.Config.MessageThreadID
 			msg.Title = "Audio Message"
 			if err := p.Send(bot, msg); err != nil {
 				return err
@@ -422,14 +427,16 @@ func (p *Plugin) Exec() (err error) {
 		}
 
 		for _, value := range voices {
-			msg := tgbotapi.NewVoiceUpload(user, value)
+			msg := tgbotapi.NewVoice(user, tgbotapi.FilePath(value))
+			msg.MessageThreadID = p.Config.MessageThreadID
 			if err := p.Send(bot, msg); err != nil {
 				return err
 			}
 		}
 
 		for _, value := range videos {
-			msg := tgbotapi.NewVideoUpload(user, value)
+			msg := tgbotapi.NewVideo(user, tgbotapi.FilePath(value))
+			msg.MessageThreadID = p.Config.MessageThreadID
 			msg.Caption = "Video Message"
 			if err := p.Send(bot, msg); err != nil {
 				return err
@@ -438,6 +445,7 @@ func (p *Plugin) Exec() (err error) {
 
 		for _, loc := range parsedLocations {
 			msg := tgbotapi.NewLocation(user, loc.Latitude, loc.Longitude)
+			msg.MessageThreadID = p.Config.MessageThreadID
 			if err := p.Send(bot, msg); err != nil {
 				return err
 			}
@@ -451,6 +459,7 @@ func (p *Plugin) Exec() (err error) {
 				loc.Latitude,
 				loc.Longitude,
 			)
+			msg.MessageThreadID = p.Config.MessageThreadID
 			if err := p.Send(bot, msg); err != nil {
 				return err
 			}
