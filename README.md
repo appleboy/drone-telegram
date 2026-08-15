@@ -2,12 +2,12 @@
 
 ![logo](./images/logo.png)
 
-[![GoDoc](https://godoc.org/github.com/appleboy/drone-telegram?status.svg)](https://godoc.org/github.com/appleboy/drone-telegram)
+[![GoDoc](https://pkg.go.dev/badge/github.com/appleboy/drone-telegram.svg)](https://pkg.go.dev/github.com/appleboy/drone-telegram)
 [![Trivy Security Scan](https://github.com/appleboy/drone-telegram/actions/workflows/trivy.yml/badge.svg?branch=master)](https://github.com/appleboy/drone-telegram/actions/workflows/trivy.yml)
 [![codecov](https://codecov.io/gh/appleboy/drone-telegram/branch/master/graph/badge.svg)](https://codecov.io/gh/appleboy/drone-telegram)
 
-[Drone](https://github.com/drone/drone) plugin for sending telegram notifications. For the usage
-information and a listing of the available options please take a look at [the docs](http://plugins.drone.io/appleboy/drone-telegram/).
+[Drone](https://github.com/harness/drone) plugin for sending telegram notifications. For the usage
+information and a listing of the available options please take a look at [the docs](https://plugins.drone.io/plugins/telegram).
 
 ## Feature
 
@@ -25,14 +25,15 @@ information and a listing of the available options please take a look at [the do
 
 The pre-compiled binaries can be downloaded from [release page](https://github.com/appleboy/drone-telegram/releases). Support the following OS type.
 
-* Windows amd64/386
-* Linux arm/amd64/386
-* Darwin amd64/386
+* Linux amd64/arm/arm64
+* Darwin amd64/arm64
+* Windows amd64
+* FreeBSD amd64
 
 With `Go` installed
 
 ```sh
-go get -u -v github.com/appleboy/drone-telegram
+go install github.com/appleboy/drone-telegram@latest
 ```
 
 or build the binary with the following command:
@@ -65,7 +66,7 @@ docker run --rm \
   -e PLUGIN_TOKEN=xxxxxxx \
   -e PLUGIN_TO=xxxxxxx \
   -e PLUGIN_MESSAGE=test \
-  -e PLUGIN_MESSAGE_FILE=testmessage.md \  
+  -e PLUGIN_MESSAGE_FILE=testmessage.md \
   -e PLUGIN_PHOTO=tests/github.png \
   -e PLUGIN_DOCUMENT=tests/gophercolor.png \
   -e PLUGIN_STICKER=tests/github-logo.png \
