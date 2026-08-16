@@ -5,21 +5,26 @@
 [![GoDoc](https://pkg.go.dev/badge/github.com/appleboy/drone-telegram.svg)](https://pkg.go.dev/github.com/appleboy/drone-telegram)
 [![Trivy Security Scan](https://github.com/appleboy/drone-telegram/actions/workflows/trivy.yml/badge.svg?branch=master)](https://github.com/appleboy/drone-telegram/actions/workflows/trivy.yml)
 [![codecov](https://codecov.io/gh/appleboy/drone-telegram/branch/master/graph/badge.svg)](https://codecov.io/gh/appleboy/drone-telegram)
+[![GitHub release](https://img.shields.io/github/v/release/appleboy/drone-telegram)](https://github.com/appleboy/drone-telegram/releases)
 
 [Drone](https://github.com/harness/drone) plugin for sending telegram notifications. For the usage
-information and a listing of the available options please take a look at [the docs](https://plugins.drone.io/plugins/telegram).
+information and a listing of the available options please take a look at [DOCS.md](DOCS.md) or
+[the docs](https://plugins.drone.io/plugins/telegram).
 
-## Feature
+Using GitHub Actions instead? See [appleboy/telegram-action](https://github.com/appleboy/telegram-action).
 
-* [x] Send with Text Message. (`markdown` or `html` format)
-* [x] Send with New Photo.
-* [x] Send with New Document.
-* [x] Send with New Audio.
-* [x] Send with New Voice.
-* [x] Send with New Location.
-* [x] Send with New Venue.
-* [x] Send with New Video.
-* [x] Send with New Sticker.
+## Features
+
+* Send text message in `markdown` or `html` format
+* Send photo, document, audio, voice, video and sticker messages
+* Send location and venue messages
+* Send message to a forum topic via `message_thread_id`
+* Customize the message with a [template](DOCS.md) and `template_vars` / `template_vars_file`
+* Load the message from a file with `message_file`
+* Filter notifications by commit author email with `only_match_email`
+* Disable notification sound (`disable_notification`) or link preview (`disable_web_page_preview`)
+* Connect through a SOCKS5 proxy
+* Load all settings from an env file with `env_file`
 
 ## Build or Download a binary
 
@@ -42,9 +47,6 @@ or build the binary with the following command:
 export GOOS=linux
 export GOARCH=amd64
 export CGO_ENABLED=0
-export GO111MODULE=on
-
-go test -cover ./...
 
 go build -v -a -tags netgo -o release/linux/amd64/drone-telegram .
 ```
@@ -59,7 +61,41 @@ make test
 
 ## Usage
 
-Execute from the working directory:
+### Drone pipeline
+
+Add the plugin as a step in your `.drone.yml`:
+
+```yaml
+- name: send telegram notification
+  image: appleboy/drone-telegram
+  settings:
+    token:
+      from_secret: telegram_token
+    to:
+      from_secret: telegram_to
+    message: >
+      {{#success build.status}}
+        build {{build.number}} succeeded. Good job.
+      {{else}}
+        build {{build.number}} failed. Fix me please.
+      {{/success}}
+```
+
+See [DOCS.md](DOCS.md) for all available settings and template variables.
+
+### Docker
+
+Send a message with the minimum required settings:
+
+```sh
+docker run --rm \
+  -e PLUGIN_TOKEN=xxxxxxx \
+  -e PLUGIN_TO=xxxxxxx \
+  -e PLUGIN_MESSAGE=test \
+  appleboy/drone-telegram
+```
+
+Full example with all message types and build metadata:
 
 ```sh
 docker run --rm \
@@ -105,3 +141,7 @@ docker run --rm \
   -w $(pwd) \
   appleboy/drone-telegram
 ```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
