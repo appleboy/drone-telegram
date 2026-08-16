@@ -101,23 +101,26 @@ release:
 changelog:
   use: github
   groups:
+    - title: "Breaking changes"
+      regexp: ^.*?\w+(\(.+\))??!:.+$
+      order: 0
     - title: Features
       regexp: "^.*feat[(\\w)]*:+.*$"
-      order: 0
+      order: 1
     - title: "Bug fixes"
       regexp: "^.*fix[(\\w)]*:+.*$"
-      order: 1
+      order: 2
     - title: "Enhancements"
       regexp: "^.*chore[(\\w)]*:+.*$"
-      order: 2
+      order: 3
     - title: "Refactor"
       regexp: "^.*refactor[(\\w)]*:+.*$"
-      order: 3
+      order: 4
     - title: "Build process updates"
       regexp: ^.*?(build|ci)(\(.+\))??!?:.+$
-      order: 4
+      order: 5
     - title: "Documentation updates"
       regexp: ^.*?docs?(\(.+\))??!?:.+$
-      order: 4
+      order: 6
     - title: Others
       order: 999
