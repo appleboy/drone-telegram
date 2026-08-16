@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli"
@@ -22,6 +23,16 @@ func main() {
 	if _, err := os.Stat("/run/drone/env"); err == nil {
 		_ = godotenv.Overload("/run/drone/env")
 	}
+
+	// GitHub Actions exports every declared input as INPUT_* even when the
+	// user leaves it empty, and urfave/cli cannot parse "" for numeric
+	// flags. Treat empty values as unset so the plugin does not fail.
+	unsetEmptyEnv(
+		"PLUGIN_MESSAGE_THREAD_ID", "TELEGRAM_MESSAGE_THREAD_ID", "INPUT_MESSAGE_THREAD_ID",
+		"DRONE_BUILD_NUMBER",
+		"DRONE_STAGE_STARTED",
+		"DRONE_BUILD_FINISHED",
+	)
 
 	app := cli.NewApp()
 	app.Name = "telegram plugin"
@@ -272,6 +283,17 @@ func main() {
 
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
+	}
+}
+
+// unsetEmptyEnv removes environment variables whose value is empty or
+// whitespace so numeric flags fall back to their defaults instead of
+// failing to parse.
+func unsetEmptyEnv(keys ...string) {
+	for _, key := range keys {
+		if val, ok := os.LookupEnv(key); ok && strings.TrimSpace(val) == "" {
+			os.Unsetenv(key)
+		}
 	}
 }
 
