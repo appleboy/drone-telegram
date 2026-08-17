@@ -6,8 +6,8 @@ require (
 	github.com/OvyFlash/telegram-bot-api v0.0.0-20260715235732-aca8bf3898bb
 	github.com/appleboy/drone-template-lib v1.3.0
 	github.com/joho/godotenv v1.5.1
-	github.com/stretchr/testify v1.9.0
-	github.com/urfave/cli v1.22.15
+	github.com/stretchr/testify v1.10.0
+	github.com/urfave/cli v1.22.17
 )
 
 require (
@@ -15,7 +15,7 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.3.0 // indirect
 	github.com/Masterminds/sprig/v3 v3.3.0 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
