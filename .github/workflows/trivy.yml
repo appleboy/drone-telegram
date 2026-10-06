@@ -32,6 +32,8 @@ jobs:
           format: "sarif"
           output: "trivy-repo-results.sarif"
           severity: "CRITICAL,HIGH"
+          limit-severities-for-sarif: true
+          exit-code: "1"
           trivyignores: .trivyignore
 
       - name: Upload Trivy scan results to GitHub Security tab
@@ -77,6 +79,8 @@ jobs:
           format: "sarif"
           output: "trivy-image-results.sarif"
           severity: "CRITICAL,HIGH"
+          limit-severities-for-sarif: true
+          exit-code: "1"
           trivyignores: .trivyignore
 
       - name: Upload Trivy image scan results to GitHub Security tab
