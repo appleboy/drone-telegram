@@ -74,6 +74,7 @@ type (
 		MessageThreadID  int
 		Message          string
 		MessageFile      string
+		RichMessageFile  string
 		TemplateVarsFile string
 		TemplateVars     string
 		Photo            []string
@@ -263,8 +264,21 @@ func (p *Plugin) Exec() (err error) {
 		return errors.New("missing telegram token or user list")
 	}
 
+	var richMessage *tgbotapi.InputRichMessage
+	if p.Config.RichMessageFile != "" {
+		if p.Config.Message != "" || p.Config.MessageFile != "" {
+			return errors.New("rich_message_file cannot be combined with message or message_file")
+		}
+		richMessage, err = loadRichMessage(p.Config.RichMessageFile)
+		if err != nil {
+			return err
+		}
+	}
+
 	var message []string
 	switch {
+	case richMessage != nil:
+		// Rich messages are already rendered; do not process them as templates.
 	case len(p.Config.MessageFile) > 0:
 		message, err = loadTextFromFile(p.Config.MessageFile)
 		if err != nil {
@@ -382,6 +396,14 @@ func (p *Plugin) Exec() (err error) {
 	}
 
 	for _, user := range ids {
+		if richMessage != nil {
+			msg := tgbotapi.NewSendRichMessage(user, *richMessage)
+			msg.MessageThreadID = p.Config.MessageThreadID
+			msg.DisableNotification = p.Config.DisableNotification
+			if err := p.Send(bot, msg); err != nil {
+				return err
+			}
+		}
 		for _, txt := range renderedMessages {
 			msg := tgbotapi.NewMessage(user, txt)
 			msg.MessageThreadID = p.Config.MessageThreadID
