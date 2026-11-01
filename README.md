@@ -26,6 +26,43 @@ Using GitHub Actions instead? See [appleboy/telegram-action](https://github.com/
 * Connect through a SOCKS5 proxy
 * Load all settings from an env file with `env_file`
 
+## Markdown messages
+
+With `format: Markdown` (the default), underscores in ordinary text are escaped
+automatically: `user_name` is sent as `user\_name`. Underscores inside complete
+inline code, triple-backtick code blocks, Markdown links (both the label and
+destination), and bare HTTP(S) URLs are preserved. For example:
+
+```yaml
+format: Markdown
+message: |
+  Built release_name
+  Directory: `_site`
+  [_site](https://example.com/_site)
+```
+
+Escaping happens **after template rendering**, so the same variable can appear in
+ordinary text and inside code or links. Template fields are no longer modified
+before rendering. This also applies to custom `tpl` values: their underscores in
+ordinary text are now escaped, including values such as `_italic_`. Template
+helpers receive the original field values.
+
+Existing `\_` sequences are preserved, including inside code and links. In those
+contexts, supply `_` directly if you do not want a literal backslash. Unclosed
+code or link syntax falls back to ordinary-text underscore handling; the plugin
+does not validate or repair all Markdown syntax. This behavior targets Telegram's
+legacy `Markdown` format, not MarkdownV2, and does not change the existing
+underscore-based italic behavior in ordinary text.
+
+As an alternative, use `format: HTML` and rewrite the formatting as HTML:
+
+```yaml
+format: HTML
+message: |
+  <code>_site</code>
+  <a href="https://example.com/_site">_site</a>
+```
+
 ## Build or Download a binary
 
 The pre-compiled binaries can be downloaded from [release page](https://github.com/appleboy/drone-telegram/releases). Support the following OS type.

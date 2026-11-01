@@ -2,6 +2,8 @@ package main
 
 import (
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -281,6 +283,181 @@ func TestEscapeMarkdownOne(t *testing.T) {
 	for _, testCase := range provider {
 		assert.Equal(t, testCase[1], escapeMarkdownOne(testCase[0]))
 	}
+}
+
+func TestEscapeMarkdownContexts(t *testing.T) {
+	cases := []struct {
+		name, input, want string
+	}{
+		{"inline code", "`_Some text`", "`_Some text`"},
+		{"code block", "```go\nuser_name\n```", "```go\nuser_name\n```"},
+		{
+			"link",
+			"[_Some text](https://example.com/some_path)",
+			"[_Some text](https://example.com/some_path)",
+		},
+		{
+			"bare URL",
+			"https://example.com/some_path?q=a_b#c_d",
+			"https://example.com/some_path?q=a_b#c_d",
+		},
+		{
+			"mixed",
+			"user_name `_code` [_label](https://example.com/a_b) tail_end",
+			"user\\_name `_code` [_label](https://example.com/a_b) tail\\_end",
+		},
+		{"empty", "", ""},
+		{"Unicode", "中文_🙂 `中文_🙂`", "中文\\_🙂 `中文_🙂`"},
+		{"adjacent code", "`a_b` `c_d`", "`a_b` `c_d`"},
+		{"backtick inside fence", "```a_`b`_c``` tail_end", "```a_`b`_c``` tail\\_end"},
+		{"escaped code delimiter", "\\`a_b\\` tail_end", "\\`a\\_b\\` tail\\_end"},
+		{"even backslashes", "\\\\`a_b`", "\\\\`a_b`"},
+		{"escaped bracket", `\[a_b](path_name)`, `\[a\_b](path\_name)`},
+		{"escaped label end", `[a\]_b](path_name)`, `[a\]_b](path_name)`},
+		{
+			"balanced target",
+			`[a_b](https://example.com/a_(b_c)) tail_end`,
+			`[a_b](https://example.com/a_(b_c)) tail\_end`,
+		},
+		{"escaped target end", `[a_b](path\)_name) tail_end`, `[a_b](path\)_name) tail\_end`},
+		{"multiple links", `[a_b](one_two) [c_d](three_four)`, `[a_b](one_two) [c_d](three_four)`},
+		{"preserve explicit code escape", "`a\\_b`", "`a\\_b`"},
+		{"preserve explicit link escape", `[a\_b](one\_two)`, `[a\_b](one\_two)`},
+		{"ordinary escapes", `a\_b c\\_d e\\\_f`, `a\_b c\\_d e\\\_f`},
+		{"unclosed code", "`a_b tail_end", "`a\\_b tail\\_end"},
+		{"unclosed fence", "```a_b\ntail_end", "```a\\_b\ntail\\_end"},
+		{"unclosed link", `[a_b](path_name tail_end`, `[a\_b](path\_name tail\_end`},
+		{"unclosed label", `[a_b tail_end`, `[a\_b tail\_end`},
+		{
+			"bare URL parentheses",
+			`(http://example.com/a_(b_c)) tail_end`,
+			`(http://example.com/a_(b_c)) tail\_end`,
+		},
+		{
+			"URL Unicode whitespace",
+			"https://example.com/a_b\u3000tail_end",
+			"https://example.com/a_b\u3000tail\\_end",
+		},
+		{
+			"URL before code",
+			"https://example.com/a_b`c_d` tail_end",
+			"https://example.com/a_b`c_d` tail\\_end",
+		},
+		{"not a URL boundary", `abchttps://example.com/a_b`, `abchttps://example.com/a\_b`},
+		{"existing italic behavior", `_italic_`, `\_italic\_`},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.want, escapeMarkdownOne(tc.input))
+		})
+	}
+}
+
+func TestEscapeMarkdownUnmatchedDelimiters(t *testing.T) {
+	input := strings.Repeat("[(_中文🙂", 10000)
+	want := strings.Repeat("[(\\_中文🙂", 10000)
+	assert.Equal(t, want, escapeMarkdownOne(input))
+}
+
+func TestRenderMessagesMarkdownTemplates(t *testing.T) {
+	p := Plugin{
+		Config: Config{Format: formatMarkdown},
+		Commit: Commit{Branch: "feature_one", Message: "fix_one"},
+		Build:  Build{Tag: "tag_one", Link: "https://example.com/build_one"},
+		Repo:   Repo{Name: "repo_one"},
+		Tpl:    map[string]string{"value": "value_one"},
+	}
+	original := p
+	original.Tpl = map[string]string{"value": "value_one"}
+	input := []string{
+		"{{commit.branch}} `{{commit.branch}}` [{{commit.branch}}]({{build.link}})",
+		"{{commit.message}} {{build.tag}} {{repo.name}} {{tpl.value}} `{{tpl.value}}`",
+		"&#96;entity_code&#96; entity&#95;text",
+		"{{replace \"_\" \"-\" commit.branch}}",
+		" ",
+	}
+	want := []string{
+		"feature\\_one `feature_one` [feature_one](https://example.com/build_one)",
+		"fix\\_one tag\\_one repo\\_one value\\_one `value_one`",
+		"`entity_code` entity\\_text",
+		"feature-one",
+	}
+	for range 2 {
+		got, err := p.renderMessages(input)
+		require.NoError(t, err)
+		assert.Equal(t, want, got)
+		assert.Equal(t, original, p, "rendering must not mutate template fields")
+	}
+}
+
+func TestRenderMessagesOtherFormats(t *testing.T) {
+	for _, format := range []string{formatHTML, "", "markdown", "MarkdownV2"} {
+		t.Run(format, func(t *testing.T) {
+			p := Plugin{
+				Config: Config{Format: format},
+				Tpl:    map[string]string{"value": "value_one"},
+			}
+			got, err := p.renderMessages([]string{" <code>{{tpl.value}}</code> text_name &amp; "})
+			require.NoError(t, err)
+			assert.Equal(t, []string{"<code>value_one</code> text_name &"}, got)
+		})
+	}
+}
+
+func TestRenderMessagesFromFile(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "message.txt")
+	require.NoError(t, os.WriteFile(path, []byte("  {{tpl.value}} `{{tpl.value}}`\n"), 0o600))
+	messages, err := loadTextFromFile(path)
+	require.NoError(t, err)
+	p := Plugin{
+		Config: Config{Format: formatMarkdown},
+		Tpl:    map[string]string{"value": "file_value"},
+	}
+	got, err := p.renderMessages(messages)
+	require.NoError(t, err)
+	assert.Equal(t, []string{"file\\_value `file_value`"}, got)
+}
+
+func TestRenderMessagesDefaultMarkdown(t *testing.T) {
+	p := Plugin{
+		Config: Config{Format: formatMarkdown},
+		Repo:   Repo{FullName: "owner_name/repo_name", Namespace: "owner_name"},
+		Commit: Commit{Author: "author_name", Branch: "feature_one", Message: "fix_one"},
+		Build:  Build{Number: 101, Status: "success", Link: "https://example.com/build_one"},
+		GitHub: GitHub{Workflow: "test_workflow", EventName: "pull_request"},
+	}
+	got, err := p.renderMessages(p.Message())
+	require.NoError(t, err)
+	assert.Equal(
+		t,
+		[]string{
+			"✅ Build #101 of `owner_name/repo_name` success.\n\n📝 Commit by author\\_name on `feature_one`:\n``` fix_one ```\n\n🌐 https://example.com/build_one",
+		},
+		got,
+	)
+	p.Config.GitHub = true
+	got, err = p.renderMessages(p.Message())
+	require.NoError(t, err)
+	assert.Equal(
+		t,
+		[]string{`owner\_name/repo\_name/test\_workflow triggered by owner\_name (pull\_request)`},
+		got,
+	)
+}
+
+func TestRenderMessagesErrors(t *testing.T) {
+	p := Plugin{Config: Config{Format: formatMarkdown}}
+	got, err := p.renderMessages([]string{"valid_text", "{{#if}}"})
+	require.Error(t, err)
+	assert.Nil(t, got, "a failed template must not return partial messages")
+
+	p.Config.Token = "unused"
+	p.Config.To = []string{"1"}
+	p.Config.MessageFile = filepath.Join(t.TempDir(), "missing.txt")
+	err = p.Exec()
+	require.Error(t, err)
+	require.ErrorContains(t, err, "error loading message file")
+	require.ErrorIs(t, err, os.ErrNotExist)
 }
 
 func TestParseTo(t *testing.T) {
@@ -567,6 +744,7 @@ Sample message loaded from file.
 Commit msg:  {{uppercasefirst commit.message}}
 
 duration: {{duration build.started build.finished}}
-`, plugin)
+`, plugin,
+	)
 	assert.NoError(t, err)
 }
