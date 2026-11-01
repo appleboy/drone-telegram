@@ -13,6 +13,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	tgbotapi "github.com/OvyFlash/telegram-bot-api"
 	"github.com/appleboy/drone-template-lib/template"
@@ -146,16 +148,132 @@ func escapeMarkdown(keys []string) []string {
 }
 
 func escapeMarkdownOne(str string) string {
-	str = strings.ReplaceAll(str, `\_`, `_`)
-	str = strings.ReplaceAll(str, `_`, `\_`)
-
-	return str
+	ends := markdownDelimiters(str)
+	var out strings.Builder
+	out.Grow(len(str))
+	for i := 0; i < len(str); {
+		end := 0
+		switch str[i] {
+		case '`':
+			end = ends[i]
+		case '[':
+			if labelEnd := ends[i]; labelEnd > 0 && labelEnd < len(str) && str[labelEnd] == '(' {
+				end = ends[labelEnd]
+			}
+		case 'h':
+			if strings.HasPrefix(str[i:], "https://") || strings.HasPrefix(str[i:], "http://") {
+				end = markdownURLEnd(str, i)
+			}
+		}
+		if end > i {
+			out.WriteString(str[i:end])
+			i = end
+			continue
+		}
+		// Preserve escaped delimiters, including the backslash parity that
+		// determines whether a following delimiter can open an entity.
+		if str[i] == '\\' && i+1 < len(str) {
+			out.WriteString(str[i : i+2])
+			i += 2
+			continue
+		}
+		if str[i] == '_' && (i == 0 || str[i-1] != '\\') {
+			out.WriteByte('\\')
+		}
+		out.WriteByte(str[i])
+		i++
+	}
+	return out.String()
 }
 
-func escapeMarkdownFields(fields ...*string) {
-	for _, f := range fields {
-		*f = escapeMarkdownOne(*f)
+// markdownDelimiters indexes complete delimiters before scanning the message.
+// This keeps repeated unmatched brackets/backticks from rescanning the tail.
+// Values are exclusive ends; backticks point to the next run of the same size.
+func markdownDelimiters(str string) map[int]int {
+	ends := make(map[int]int)
+	var brackets, parens []int
+	lastTick := [4]int{-1, -1, -1, -1}
+	for i := 0; i < len(str); i++ {
+		switch str[i] {
+		case '\\':
+			i++
+		case '`':
+			start := i
+			for i+1 < len(str) && str[i+1] == '`' {
+				i++
+			}
+			size := i - start + 1
+			if size == 1 || size == 3 {
+				if previous := lastTick[size]; previous >= 0 {
+					ends[previous] = i + 1
+				}
+				lastTick[size] = start
+			}
+		case '[':
+			brackets = append(brackets, i)
+		case ']':
+			if len(brackets) > 0 {
+				ends[brackets[len(brackets)-1]] = i + 1
+				brackets = brackets[:len(brackets)-1]
+			}
+		case '(':
+			parens = append(parens, i)
+		case ')':
+			if len(parens) > 0 {
+				ends[parens[len(parens)-1]] = i + 1
+				parens = parens[:len(parens)-1]
+			}
+		}
 	}
+	return ends
+}
+
+// markdownURLEnd preserves bare HTTP(S) URLs, including balanced parentheses,
+// without consuming surrounding code/link delimiters or text after whitespace.
+func markdownURLEnd(str string, start int) int {
+	if start > 0 {
+		previous, _ := utf8.DecodeLastRuneInString(str[:start])
+		if unicode.IsLetter(previous) || unicode.IsDigit(previous) ||
+			strings.ContainsRune("_/\\", previous) {
+			return 0
+		}
+	}
+	depth := 0
+	i := start
+	for i < len(str) {
+		r, size := utf8.DecodeRuneInString(str[i:])
+		if unicode.IsSpace(r) || unicode.IsControl(r) || strings.ContainsRune("`<>[]", r) {
+			break
+		}
+		if r == '(' {
+			depth++
+		} else if r == ')' {
+			if depth == 0 {
+				break
+			}
+			depth--
+		}
+		i += size
+	}
+	return i
+}
+
+// renderMessages escapes the final Markdown context rather than mutating
+// template fields, which can occur in both ordinary text and code or links.
+func (p *Plugin) renderMessages(messages []string) ([]string, error) {
+	var rendered []string
+	for _, value := range trimElement(messages) {
+		txt, err := template.RenderTrim(value, p)
+		if err != nil {
+			return nil, err
+		}
+		txt = html.UnescapeString(txt)
+		if p.Config.Format == formatMarkdown {
+			txt = escapeMarkdownOne(txt)
+		}
+		rendered = append(rendered, txt)
+	}
+	return rendered, nil
 }
 
 func globList(keys []string) []string {
@@ -341,27 +459,10 @@ func (p *Plugin) Exec() (err error) {
 	locations := trimElement(p.Config.Location)
 	venues := trimElement(p.Config.Venue)
 
-	message = trimElement(message)
-
-	if p.Config.Format == formatMarkdown {
-		message = escapeMarkdown(message)
-
-		escapeMarkdownFields(
-			&p.Commit.Message, &p.Commit.Branch, &p.Commit.Link,
-			&p.Commit.Author, &p.Commit.Email,
-			&p.Build.Tag, &p.Build.Link, &p.Build.PR,
-			&p.Repo.Namespace, &p.Repo.Name,
-		)
-	}
-
 	// pre-render message templates (identical for all users)
-	var renderedMessages []string
-	for _, value := range message {
-		txt, err := template.RenderTrim(value, p)
-		if err != nil {
-			return err
-		}
-		renderedMessages = append(renderedMessages, html.UnescapeString(txt))
+	renderedMessages, err := p.renderMessages(message)
+	if err != nil {
+		return err
 	}
 
 	// pre-parse locations and venues (identical for all users)
