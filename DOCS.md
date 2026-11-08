@@ -392,3 +392,16 @@ urlencode
 
 since
 : returns a duration string between now and the given timestamp. Example `{{since build.started}}`
+
+## Rich messages
+
+Set `rich_message_file` (`--rich.message.file`) to a UTF-8 JSON file containing
+one Telegram [InputRichMessage](https://core.telegram.org/bots/api#inputrichmessage):
+
+```json
+{"html":"<h2>Build completed</h2><details><summary>Details</summary>All checks passed.</details>","skip_entity_detection":true}
+```
+
+Rich content is not template-rendered or HTML-unescaped. Do not combine this
+option with `message` or `message_file`. Separate attachments are sent as usual;
+local multipart uploads embedded inside the rich message are not supported.

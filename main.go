@@ -66,6 +66,11 @@ func main() {
 			EnvVar: "PLUGIN_MESSAGE_FILE,TELEGRAM_MESSAGE_FILE,INPUT_MESSAGE_FILE",
 		},
 		cli.StringFlag{
+			Name:   "rich.message.file",
+			Usage:  "send an InputRichMessage JSON file without template processing",
+			EnvVar: "PLUGIN_RICH_MESSAGE_FILE,TELEGRAM_RICH_MESSAGE_FILE,INPUT_RICH_MESSAGE_FILE",
+		},
+		cli.StringFlag{
 			Name:   "template.vars",
 			Usage:  "additional template vars to be used in message, as JSON string",
 			EnvVar: "PLUGIN_TEMPLATE_VARS,TELEGRAM_TEMPLATE_VARS,INPUT_TEMPLATE_VARS",
@@ -340,6 +345,7 @@ func run(c *cli.Context) error {
 			MessageThreadID:  c.Int("message.thread.id"),
 			Message:          c.String("message"),
 			MessageFile:      c.String("message.file"),
+			RichMessageFile:  c.String("rich.message.file"),
 			TemplateVars:     c.String("template.vars"),
 			TemplateVarsFile: c.String("template.vars.file"),
 			Photo:            c.StringSlice("photo"),
