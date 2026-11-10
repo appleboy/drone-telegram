@@ -148,38 +148,20 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Widget messages
 
-Set `--widget.file`, `PLUGIN_WIDGET_FILE`, `TELEGRAM_WIDGET_FILE` or
-`INPUT_WIDGET_FILE` to a UTF-8 JSON file (at most 1 MiB):
+Set `--widget.file` or `PLUGIN_WIDGET_FILE` / `TELEGRAM_WIDGET_FILE` /
+`INPUT_WIDGET_FILE` to a UTF-8 JSON file (up to 1 MiB):
 
 ```json
 {"html":"<strong>Build passed</strong>","caption":"See the workflow run for details"}
 ```
 
-The [sendWidget](https://core.telegram.org/bots/api#sendwidget) payload requires
-`html` (string) and accepts these optional fields:
+Use [sendWidget](https://core.telegram.org/bots/api#sendwidget) fields accepted by
+[the validator](widget.go). Supply `token`, one numeric `to`, `message_thread_id`
+and `disable_notification` through plugin inputs, not JSON. Other message/media,
+template and format inputs cannot be combined with widgets. HTML is not templated.
 
-- Strings: `public_data`, `chat_data`, `caption`, `parse_mode`, `message_effect_id`.
-- Integers: `width`, `height`.
-- Booleans: `show_caption_above_media`, `allow_queries`, `is_shared`,
-  `protect_content`, `allow_paid_broadcast` (opts into Telegram charges).
-- Objects: `reply_parameters`, `reply_markup`; array of objects: `caption_entities`.
-
-Unknown/duplicate top-level fields and null top-level values are rejected.
-Use normal plugin inputs for `token`, exactly one numeric `to`,
-`message_thread_id` and `disable_notification`. Proxy support is unchanged.
-Widget mode rejects other message/media, template-variable and format inputs,
-and enabled web-page-preview suppression. HTML is caller-owned, not templated.
-
-Limits: HTML 1–32768 UTF-8 bytes and 4096 bytes after zlib best compression;
-each state string 1024 bytes; caption 1024 characters after entity parsing.
-Use `parse_mode` (`HTML`, `Markdown`, `MarkdownV2`) or `caption_entities`, not both.
-Telegram validates nested schemas, parsed caption length, its own compressed
-size and the [widget profile](https://core.telegram.org/bots/widgets).
-Production widgets currently require private chats and cannot be forwarded.
-No query handler is provided for `allow_queries`.
-
-The existing client calls `getMe`, then sends once, with 30-second request
-timeouts. Widget mode suppresses debug payloads, rejects redirects and returns
-sanitized failures without retries or text fallback. After a timeout, inspect
-the chat before rerunning: delivery may have succeeded. `go test ./...` uses
-mocked transports and sends no Telegram messages.
+The sender checks HTML/state sizes and caption constraints; Telegram enforces
+its [widget profile](https://core.telegram.org/bots/widgets) and final compressed
+size. Production widgets currently require private chats. No query handler is
+provided. Sends have a 30-second timeout, suppress debug payloads and never
+retry, redirect or fall back to text. After a timeout, check delivery before rerunning.
