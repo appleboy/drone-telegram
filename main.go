@@ -24,6 +24,14 @@ func main() {
 		_ = godotenv.Overload("/run/drone/env")
 	}
 
+	// Empty action inputs are absent, not explicit format or media options.
+	for _, entry := range os.Environ() {
+		key, value, _ := strings.Cut(entry, "=")
+		if strings.HasPrefix(key, "INPUT_") && value == "" {
+			os.Unsetenv(key)
+		}
+	}
+
 	// GitHub Actions exports every declared input as INPUT_* even when the
 	// user leaves it empty, and urfave/cli cannot parse "" for numeric
 	// flags. Treat empty values as unset so the plugin does not fail.

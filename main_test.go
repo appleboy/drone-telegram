@@ -3,11 +3,35 @@ package main
 import (
 	"flag"
 	"os"
+	"os/exec"
 	"strings"
 	"testing"
 
 	"github.com/urfave/cli"
 )
+
+func TestWidgetWithEmptyActionInputs(t *testing.T) {
+	if os.Getenv("WIDGET_CLI_HELPER") == "1" {
+		os.Args = []string{"drone-telegram"}
+		main()
+		return
+	}
+	for _, format := range []string{"", "HTML"} {
+		cmd := exec.Command(os.Args[0], "-test.run=^TestWidgetWithEmptyActionInputs$")
+		cmd.Env = []string{"WIDGET_CLI_HELPER=1", "GITHUB=true", "INPUT_TOKEN=fake", "INPUT_TO=42", "INPUT_WIDGET_FILE=/nonexistent/widget.json", "INPUT_FORMAT=" + format}
+		for _, key := range []string{"MESSAGE", "MESSAGE_FILE", "RICH_MESSAGE_FILE", "PHOTO", "DOCUMENT", "STICKER", "AUDIO", "VOICE", "VIDEO", "LOCATION", "VENUE", "DEBUG", "DISABLE_WEB_PAGE_PREVIEW", "DISABLE_NOTIFICATION", "MESSAGE_THREAD_ID", "SOCKS5"} {
+			cmd.Env = append(cmd.Env, "INPUT_"+key+"=")
+		}
+		output, err := cmd.CombinedOutput()
+		want := "cannot read widget_file"
+		if format != "" {
+			want = "cannot be combined"
+		}
+		if err == nil || !strings.Contains(string(output), want) {
+			t.Fatalf("format %q: err=%v output=%s", format, err, output)
+		}
+	}
+}
 
 func TestUnsetEmptyEnv(t *testing.T) {
 	tests := []struct {
