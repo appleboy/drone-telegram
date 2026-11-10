@@ -145,3 +145,58 @@ docker run --rm \
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+## Widget messages
+
+Use `--widget.file notification.json` or `PLUGIN_WIDGET_FILE`,
+`TELEGRAM_WIDGET_FILE`, or `INPUT_WIDGET_FILE`. This selects `sendWidget` through
+the existing Bot API client; HTML and captions are caller-owned and are not
+processed as templates.
+
+```json
+{"html":"<strong>Build passed</strong>","height":80,"caption":"Build passed — see the workflow run for details"}
+```
+
+The file is one UTF-8 JSON object, at most 1 MiB. Its fields follow
+[sendWidget](https://core.telegram.org/bots/api#sendwidget), excluding credentials
+and delivery settings. Required: `html` (string). Optional fields:
+
+- Strings: `public_data`, `chat_data`, `caption`, `parse_mode`, `message_effect_id`.
+- Integers: `width`, `height`; Telegram clamps display dimensions.
+- Booleans: `show_caption_above_media`, `allow_queries`, `is_shared`,
+  `protect_content`, `allow_paid_broadcast` (the latter opts into Telegram charges).
+- Objects: `reply_parameters`, `reply_markup`.
+- Array of objects: `caption_entities`.
+
+Unknown or duplicate top-level keys and null top-level values are rejected.
+Nested entity and keyboard schemas are validated by Telegram. Supply `token`,
+exactly one numeric `to` destination, `message_thread_id` and
+`disable_notification` through the usual plugin inputs, never the JSON file.
+Existing proxy configuration is supported. `debug` does not log widget requests
+or responses.
+
+Widget mode rejects message, message-file, rich-message-file, media, location,
+venue, template-variable and format inputs, and enabled web-page-preview
+suppression. Other modes retain their existing behavior.
+
+HTML must contain 1–32768 UTF-8 bytes. A local zlib best-compression check rejects
+output over 4096 bytes; Telegram's server compression is authoritative and can
+produce a different size. Each state string is limited to 1024 UTF-8 bytes.
+Captions allow 1024 characters. Use `parse_mode` (`HTML`, `Markdown`, or
+`MarkdownV2`) or `caption_entities`, never both. For parse modes, Telegram checks
+caption length after parsing; plain/entity captions are also checked locally.
+HTML fragments are accepted. The action does not execute or fully lint the
+[widget HTML/CSS/JavaScript profile](https://core.telegram.org/bots/widgets):
+Telegram and its clients enforce it. Resources must be inline; widgets have no
+network access.
+
+Production widgets currently work only in private chats with the bot and cannot
+be forwarded. Clients without widget support can show the caption. This sender
+provides no query handler or service; `allow_queries` requires a separately
+managed handler if responses are desired.
+
+The existing client authenticates with `getMe`, then makes one `sendWidget`
+request. Widget HTTP requests have a 30-second timeout and reject redirects.
+Failures return a sanitized error with no retry or text fallback. A timeout may
+mean delivery succeeded: inspect the chat before rerunning. Tests use mocked
+HTTP transports and never send Telegram messages; run `go test ./...`.

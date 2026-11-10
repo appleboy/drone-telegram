@@ -71,6 +71,11 @@ func main() {
 			EnvVar: "PLUGIN_RICH_MESSAGE_FILE,TELEGRAM_RICH_MESSAGE_FILE,INPUT_RICH_MESSAGE_FILE",
 		},
 		cli.StringFlag{
+			Name:   "widget.file",
+			Usage:  "send a sendWidget JSON file without credentials or delivery settings",
+			EnvVar: "PLUGIN_WIDGET_FILE,TELEGRAM_WIDGET_FILE,INPUT_WIDGET_FILE",
+		},
+		cli.StringFlag{
 			Name:   "template.vars",
 			Usage:  "additional template vars to be used in message, as JSON string",
 			EnvVar: "PLUGIN_TEMPLATE_VARS,TELEGRAM_TEMPLATE_VARS,INPUT_TEMPLATE_VARS",
@@ -346,6 +351,7 @@ func run(c *cli.Context) error {
 			Message:          c.String("message"),
 			MessageFile:      c.String("message.file"),
 			RichMessageFile:  c.String("rich.message.file"),
+			WidgetFile:       c.String("widget.file"),
 			TemplateVars:     c.String("template.vars"),
 			TemplateVarsFile: c.String("template.vars.file"),
 			Photo:            c.StringSlice("photo"),
@@ -365,5 +371,9 @@ func run(c *cli.Context) error {
 		},
 	}
 
+	// The default text format is not an explicit widget input.
+	if plugin.Config.WidgetFile != "" && !c.IsSet("format") {
+		plugin.Config.Format = ""
+	}
 	return plugin.Exec()
 }

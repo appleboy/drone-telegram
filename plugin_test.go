@@ -567,6 +567,7 @@ Sample message loaded from file.
 Commit msg:  {{uppercasefirst commit.message}}
 
 duration: {{duration build.started build.finished}}
-`, plugin)
+`, plugin,
+	)
 	assert.NoError(t, err)
 }
