@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	tgbotapi "github.com/OvyFlash/telegram-bot-api"
 	"github.com/appleboy/drone-template-lib/template"
@@ -75,6 +76,7 @@ type (
 		Message          string
 		MessageFile      string
 		RichMessageFile  string
+		WidgetFile       string
 		TemplateVarsFile string
 		TemplateVars     string
 		Photo            []string
@@ -264,6 +266,14 @@ func (p *Plugin) Exec() (err error) {
 		return errors.New("missing telegram token or user list")
 	}
 
+	var widget tgbotapi.Params
+	if p.Config.WidgetFile != "" {
+		widget, err = p.prepareWidget()
+		if err != nil {
+			return err
+		}
+	}
+
 	var richMessage *tgbotapi.InputRichMessage
 	if p.Config.RichMessageFile != "" {
 		if p.Config.Message != "" || p.Config.MessageFile != "" {
@@ -277,8 +287,8 @@ func (p *Plugin) Exec() (err error) {
 
 	var message []string
 	switch {
-	case richMessage != nil:
-		// Rich messages are already rendered; do not process them as templates.
+	case richMessage != nil || widget != nil:
+		// Structured messages are caller-rendered; do not process them as templates.
 	case len(p.Config.MessageFile) > 0:
 		message, err = loadTextFromFile(p.Config.MessageFile)
 		if err != nil {
@@ -328,22 +338,40 @@ func (p *Plugin) Exec() (err error) {
 	}
 
 	var opts []tgbotapi.BotAPIOption
+	var client *http.Client
+	if widget != nil {
+		client = &http.Client{
+			Timeout:       30 * time.Second,
+			CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse },
+		}
+	}
 	if len(p.Config.Socks5) > 0 {
 		var proxyURL *url.URL
 		proxyURL, err = url.Parse(p.Config.Socks5)
 		if err != nil {
+			if widget != nil {
+				return errors.New("invalid widget proxy URL")
+			}
 			return fmt.Errorf("unable to parse socks5 proxy URL '%s': %w", p.Config.Socks5, err)
 		}
-		proxyClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyURL)}}
-		opts = append(opts, tgbotapi.WithHTTPClient(proxyClient))
+		if client == nil {
+			client = &http.Client{}
+		}
+		client.Transport = &http.Transport{Proxy: http.ProxyURL(proxyURL)}
 	}
 
+	if client != nil {
+		opts = append(opts, tgbotapi.WithHTTPClient(client))
+	}
 	bot, err := tgbotapi.NewBotAPIWithOptions(p.Config.Token, opts...)
 	if err != nil {
+		if widget != nil {
+			return errors.New("unable to initialize widget bot client")
+		}
 		return err
 	}
 
-	bot.Debug = p.Config.Debug
+	bot.Debug = p.Config.Debug && widget == nil
 
 	ids := parseTo(p.Config.To, p.Commit.Email, p.Config.MatchEmail)
 	photos := globList(p.Config.Photo)
@@ -396,6 +424,9 @@ func (p *Plugin) Exec() (err error) {
 	}
 
 	for _, user := range ids {
+		if widget != nil {
+			return p.sendWidget(bot, widget, user)
+		}
 		if richMessage != nil {
 			msg := tgbotapi.NewSendRichMessage(user, *richMessage)
 			msg.MessageThreadID = p.Config.MessageThreadID

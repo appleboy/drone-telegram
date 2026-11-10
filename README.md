@@ -145,3 +145,23 @@ docker run --rm \
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+## Widget messages
+
+Set `--widget.file` or `PLUGIN_WIDGET_FILE` / `TELEGRAM_WIDGET_FILE` /
+`INPUT_WIDGET_FILE` to a UTF-8 JSON file (up to 1 MiB):
+
+```json
+{"html":"<strong>Build passed</strong>","caption":"See the workflow run for details"}
+```
+
+Use [sendWidget](https://core.telegram.org/bots/api#sendwidget) fields accepted by
+[the validator](widget.go). Supply `token`, one numeric `to`, `message_thread_id`
+and `disable_notification` through plugin inputs, not JSON. Other message/media,
+template and format inputs cannot be combined with widgets. HTML is not templated.
+
+The sender checks HTML/state sizes and caption constraints; Telegram enforces
+its [widget profile](https://core.telegram.org/bots/widgets) and final compressed
+size. Production widgets currently require private chats. No query handler is
+provided. Sends have a 30-second timeout, suppress debug payloads and never
+retry, redirect or fall back to text. After a timeout, check delivery before rerunning.

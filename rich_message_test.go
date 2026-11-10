@@ -13,7 +13,7 @@ import (
 func richFile(t *testing.T, content string) string {
 	t.Helper()
 	path := filepath.Join(t.TempDir(), "rich.json")
-	if err := os.WriteFile(path, []byte(content), 0600); err != nil {
+	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	return path
@@ -27,9 +27,13 @@ func TestLoadRichMessage(t *testing.T) {
 		{`{"html":"<h2>Hello</h2>"}`, true},
 		{`{"markdown":"# Hello"}`, true},
 		{`{"blocks":[{"type":"paragraph","text":"Hello"}]}`, true},
-		{`null`, false}, {`[]`, false}, {`{}`, false}, {`{"html":42}`, false},
+		{`null`, false},
+		{`[]`, false},
+		{`{}`, false},
+		{`{"html":42}`, false},
 		{`{"html":"hello","markdown":"hello"}`, false},
-		{`{"blocks":[]}`, false}, {`{"html":"hello"}{}`, false},
+		{`{"blocks":[]}`, false},
+		{`{"html":"hello"}{}`, false},
 	} {
 		t.Run(tc.input, func(t *testing.T) {
 			_, err := loadRichMessage(richFile(t, tc.input))
@@ -56,7 +60,7 @@ func TestExecRichMessage(t *testing.T) {
 		body := `{"ok":true,"result":{"id":1,"is_bot":true,"first_name":"Test"}}`
 		if !strings.HasSuffix(r.URL.Path, "/getMe") {
 			calls++
-			if r.Method != "POST" || !strings.HasSuffix(r.URL.Path, "/sendRichMessage") {
+			if r.Method != http.MethodPost || !strings.HasSuffix(r.URL.Path, "/sendRichMessage") {
 				t.Error("unexpected request")
 			}
 			if err := r.ParseForm(); err != nil {
@@ -72,15 +76,23 @@ func TestExecRichMessage(t *testing.T) {
 			if payload.HTML != markup || !payload.Skip {
 				t.Error("rich content was altered")
 			}
-			if r.Form.Get("chat_id") != "42" || r.Form.Get("message_thread_id") != "7" || r.Form.Get("disable_notification") != "true" {
+			if r.Form.Get("chat_id") != "42" || r.Form.Get("message_thread_id") != "7" ||
+				r.Form.Get("disable_notification") != "true" {
 				t.Error("delivery settings lost")
 			}
 			body = `{"ok":true,"result":{"message_id":99,"date":0,"chat":{"id":42,"type":"private"}}}`
 		}
-		return &http.Response{StatusCode: 200, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(body)), Request: r}, nil
+		return &http.Response{
+			StatusCode: http.StatusOK,
+			Header:     make(http.Header),
+			Body:       io.NopCloser(strings.NewReader(body)),
+			Request:    r,
+		}, nil
 	})
-	p := Plugin{Config: Config{Token: "fake-token", To: []string{"42"}, MessageThreadID: 7, DisableNotification: true,
-		RichMessageFile: richFile(t, `{"html":"`+markup+`","skip_entity_detection":true}`)}}
+	p := Plugin{Config: Config{
+		Token: "fake-token", To: []string{"42"}, MessageThreadID: 7, DisableNotification: true,
+		RichMessageFile: richFile(t, `{"html":"`+markup+`","skip_entity_detection":true}`),
+	}}
 	if err := p.Exec(); err != nil {
 		t.Fatal(err)
 	}

@@ -1,8 +1,12 @@
 package main
 
 import (
+	"flag"
 	"os"
+	"strings"
 	"testing"
+
+	"github.com/urfave/cli"
 )
 
 func TestUnsetEmptyEnv(t *testing.T) {
@@ -37,5 +41,31 @@ func TestUnsetEmptyEnv(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestWidgetIgnoresOnlyImplicitTextFormat(t *testing.T) {
+	for _, explicit := range []bool{false, true} {
+		flags := flag.NewFlagSet("widget", flag.ContinueOnError)
+		flags.String("widget.file", "/nonexistent/widget.json", "")
+		flags.String("token", "fake", "")
+		flags.String("format", formatMarkdown, "")
+		recipients := cli.StringSlice{"42"}
+		flags.Var(&recipients, "to", "")
+		args := []string{}
+		if explicit {
+			args = append(args, "--format", "HTML")
+		}
+		if err := flags.Parse(args); err != nil {
+			t.Fatal(err)
+		}
+		err := run(cli.NewContext(cli.NewApp(), flags, nil))
+		want := "cannot read widget_file"
+		if explicit {
+			want = "cannot be combined"
+		}
+		if err == nil || !strings.Contains(err.Error(), want) {
+			t.Fatalf("unexpected validation: %v", err)
+		}
 	}
 }
